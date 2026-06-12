@@ -91,3 +91,4 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 - [ ] הגדר Domain ב-Vercel
  
 .
+..
