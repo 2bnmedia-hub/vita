@@ -1,18 +1,22 @@
 import { Suspense } from "react";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { BenefitsSection } from "@/components/sections/BenefitsSection";
 import { FeaturedProducts } from "@/components/sections/FeaturedProducts";
-import { FeaturesSection } from "@/components/sections/FeaturesSection";
-import { AboutSection } from "@/components/sections/AboutSection";
+import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
+import { CtaBanner } from "@/components/sections/CtaBanner";
+import { InstagramSection } from "@/components/sections/InstagramSection";
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <BenefitsSection />
       <Suspense fallback={<ProductsSkeleton />}>
         <FeaturedProducts />
       </Suspense>
-      <FeaturesSection />
-      <AboutSection />
+      <TestimonialsSection />
+      <CtaBanner />
+      <InstagramSection />
     </>
   );
 }
