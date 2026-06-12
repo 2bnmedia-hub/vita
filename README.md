@@ -89,3 +89,4 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 - [ ] הוסף admin dashboard לניהול מוצרים
 - [ ] הוסף Google Analytics / Plausible
 - [ ] הגדר Domain ב-Vercel
+ 
