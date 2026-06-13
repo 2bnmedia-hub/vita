@@ -83,7 +83,7 @@ export function CartDrawer() {
               >
                 {/* Product thumb */}
                 <div className="w-16 h-16 rounded-lg bg-navy-900 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                  <span className="text-3xl">🏋️</span>
+                  <img src="/creatine-hero.png" alt="product" className="w-10 h-10 object-contain" />
                 </div>
 
                 {/* Info */}

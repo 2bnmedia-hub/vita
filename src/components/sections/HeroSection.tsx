@@ -66,7 +66,6 @@ export function HeroSection() {
               </Link>
             </motion.div>
 
-            {/* Stats */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -91,43 +90,32 @@ export function HeroSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative flex items-center justify-center"
+            className="relative flex flex-col items-center justify-center gap-5"
           >
-            <div className="relative w-full max-w-md mx-auto">
-              {/* Main card */}
-              <div className="relative rounded-3xl overflow-hidden glass-cyan border border-cyan/20 shadow-cyan aspect-[4/5] flex items-center justify-center bg-gradient-to-br from-navy-800 to-navy-950">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 to-transparent" />
-                <span className="text-[180px] animate-float">🏋️</span>
-                {/* Scan line */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-                  <div className="animate-scan w-full h-12 bg-gradient-to-b from-transparent via-cyan/10 to-transparent" />
-                </div>
+            {/* Product image */}
+            <img
+              src="/creatine-hero.png"
+              alt="VITA Creatine"
+              className="animate-float"
+              style={{
+                width: "85%",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 8px rgba(0,212,255,0.8)) drop-shadow(0 0 18px rgba(0,180,255,0.4))",
+                animation: "float 6s ease-in-out infinite, lava 3s ease-in-out infinite"
+              }}
+            />
+
+            {/* Info row — under image */}
+            <div className="flex flex-row gap-3 justify-center">
+              <div className="glass-cyan border border-cyan/20 rounded-xl px-4 py-2.5">
+                <p className="text-cyan text-sm">✓ GMP מוסמך</p>
               </div>
-
-              {/* Floating cards */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-4 -right-4 glass-cyan border border-cyan/30 rounded-2xl px-4 py-3 shadow-cyan-sm"
-              >
-                <p className="text-cyan text-xs font-black">✓ GMP מוסמך</p>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-4 -left-4 glass-cyan border border-cyan/30 rounded-2xl px-4 py-3 shadow-cyan-sm"
-              >
-                <p className="text-cyan text-xs font-black">3g / מנה יומית</p>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute top-1/2 -left-8 glass border border-white/[0.08] rounded-xl px-3 py-2"
-              >
-                <p className="text-white/60 text-xs font-bold">166 מנות</p>
-              </motion.div>
+              <div className="glass-cyan border border-cyan/20 rounded-xl px-4 py-2.5">
+                <p className="text-cyan text-sm">3g מנה יומית</p>
+              </div>
+              <div className="glass-cyan border border-cyan/20 rounded-xl px-4 py-2.5">
+                <p className="text-cyan text-sm">166 מנות</p>
+              </div>
             </div>
           </motion.div>
 

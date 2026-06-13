@@ -51,7 +51,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Glow effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           {/* Placeholder — swap with Next/Image when images are ready */}
-          <div className="text-7xl animate-float">{getEmoji(product.flavor)}</div>
+          <div className="text-7xl animate-float"><img src="/creatine-hero.png" alt="product" className="w-24 h-24 object-contain" /></div>
           {/* Scan line animation */}
           <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             <div className="animate-scan w-full h-8 bg-gradient-to-b from-transparent via-cyan/6 to-transparent" />
