@@ -7,7 +7,7 @@ const benefits = [
     id: "01",
     title: "שפר את הביצועים שלך",
     desc: "קריאטין מונוהידראט תורם לשיפור הביצועים הגופניים בפעילות עצימה וקצרת מועד. מבוסס על מחקר מדעי מוכח.",
-    emoji: "⚡",
+    emoji: "⚡", image: "/benefit-1.png",
     color: "from-cyan/10 to-transparent",
     border: "border-cyan/20",
   },
@@ -15,7 +15,7 @@ const benefits = [
     id: "02",
     title: "השג את המטרות שלך היום",
     desc: "3 גרם קריאטין ביום — בין אם אבקה לשייק או טבליות לעיסה ללא מים. נוחות מקסימלית לשגרת האימון שלך.",
-    emoji: "🎯",
+    emoji: "🎯", image: "/benefit-2.png",
     color: "from-blue-500/10 to-transparent",
     border: "border-blue-500/20",
   },
@@ -23,7 +23,7 @@ const benefits = [
     id: "03",
     title: "ייצור לפי תקנים בינלאומיים",
     desc: "כל מוצר מיוצר לפי תקני GMP, HACCP ו-ISO. שקיפות מלאה בחומרי גלם ובתהליך הייצור.",
-    emoji: "🔬",
+    emoji: "🔬", image: "/benefit-3.png",
     color: "from-purple-500/10 to-transparent",
     border: "border-purple-500/20",
   },
@@ -31,7 +31,7 @@ const benefits = [
     id: "04",
     title: "חזק ועצמתי יותר",
     desc: "מיועד לספורטאים, מתאמנים וחובבי כושר. תוסף שמתאים לכל שגרת אימון — לפני, אחרי, או במהלך היום.",
-    emoji: "💪",
+    emoji: "💪", image: "/benefit-4.png",
     color: "from-green-500/10 to-transparent",
     border: "border-green-500/20",
   },
@@ -81,7 +81,7 @@ export function BenefitsSection() {
               <div className="w-full lg:w-1/2">
                 <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${b.color} border ${b.border} h-72 flex items-center justify-center glass`}>
                   <div className="absolute inset-0 bg-grid opacity-30" />
-                  <span className="text-[100px] relative z-10">{b.emoji}</span>
+                  <>{b.image ? <img src={b.image} alt={b.title} className="w-full h-full object-cover absolute inset-0 rounded-2xl" /> : <span className="text-[100px] relative z-10">{b.emoji}</span>}</>
                   <div className="absolute top-4 right-4 w-10 h-10 rounded-full glass-cyan border border-cyan/30 flex items-center justify-center">
                     <span className="text-cyan text-xs font-black">{b.id}</span>
                   </div>
