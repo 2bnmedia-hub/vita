@@ -1,10 +1,11 @@
 "use client";
+import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+
 import { Plus, Edit, Trash2, Tag, CheckCircle, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
 
 export default function AdminCategories() {
   const [cats, setCats] = useState<any[]>([]);

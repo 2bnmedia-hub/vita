@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/auth";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getProducts, getCategories } from "@/lib/supabase";

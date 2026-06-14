@@ -1,9 +1,10 @@
 "use client";
+import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+
 import { ShoppingBag } from "lucide-react";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
 
 const statusColors: Record<string, string> = {
   pending: "bg-amber-500/15 text-amber-400 border-amber-500/20",

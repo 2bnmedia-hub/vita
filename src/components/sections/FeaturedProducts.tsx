@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/auth";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getFeaturedProducts } from "@/lib/supabase";

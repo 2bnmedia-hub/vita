@@ -1,11 +1,12 @@
 "use client";
+import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
+
 import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu, Zap, Users } from "lucide-react";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
 
 const navItems = [
   { href: "/admin", label: "לוח בקרה", icon: LayoutDashboard },

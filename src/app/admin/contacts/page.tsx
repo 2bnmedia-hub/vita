@@ -1,9 +1,10 @@
 "use client";
+import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+
 import { MessageSquare, Phone, Mail } from "lucide-react";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
 
 export default function AdminContacts() {
   const [contacts, setContacts] = useState<any[]>([]);

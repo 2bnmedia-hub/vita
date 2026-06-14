@@ -1,14 +1,12 @@
 "use client";
+import { supabase } from "@/lib/auth";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+
 import Link from "next/link";
 import { Plus, Edit, Trash2, Search, Package } from "lucide-react";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);

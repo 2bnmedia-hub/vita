@@ -1,13 +1,14 @@
 "use client";
+import { supabase } from "@/lib/auth";
 import { useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Package, ShoppingBag, MessageSquare, Users, TrendingUp, CheckCircle, Plus, Edit, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
+
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
 
 const statusLabel: Record<string, { label: string; color: string }> = {
   pending:   { label: "ממתין",  color: "text-amber-400 bg-amber-400/10 border-amber-400/20" },
