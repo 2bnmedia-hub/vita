@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/auth";
 import { Zap, Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
@@ -17,17 +17,7 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
     
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    
-    console.log("Trying login with:", email);
-    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-    
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
-    
-    console.log("Result:", JSON.stringify({ data, error: authError }));
     
     if (authError) {
       setError("שגיאה: " + authError.message);
