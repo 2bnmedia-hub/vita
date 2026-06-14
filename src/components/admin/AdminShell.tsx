@@ -24,16 +24,16 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (pathname === "/admin/login") { setLoading(false); return; }
     const check = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/admin/login"); return; }
       const { data, error } = await supabase.from("admin_users").select("id").eq("id", session.user.id).single();
-      console.log("admin check:", { data, error, userId: session.user.id });
       if (!data) { router.push("/admin/login"); return; }
       setLoading(false);
     };
     check();
-  }, [router]);
+  }, [router, pathname]);
 
   const handleLogout = async () => { await supabase.auth.signOut(); router.push("/admin/login"); };
 
