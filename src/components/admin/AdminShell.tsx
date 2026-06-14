@@ -8,7 +8,7 @@ import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 const navItems = [
-  { href: "/admin", label: "דשבורד", icon: LayoutDashboard },
+  { href: "/admin", label: "לוח בקרה", icon: LayoutDashboard },
   { href: "/admin/products", label: "מוצרים", icon: Package },
   { href: "/admin/categories", label: "קטגוריות", icon: Tag },
   { href: "/admin/orders", label: "הזמנות", icon: ShoppingBag },
@@ -63,9 +63,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
       <div className="flex-1 md:mr-64 flex flex-col min-h-screen">
-        <header className="sticky top-0 z-20 bg-navy-900/80 backdrop-blur border-b border-white/[0.06] px-6 h-14 flex items-center justify-between">
+        <header className="sticky top-0 z-20 bg-navy-900/80 backdrop-blur border-b border-white/[0.06] px-6 h-20 flex items-center justify-between">
           <button className="md:hidden" onClick={() => setMenuOpen(true)}><Menu className="w-5 h-5 text-white" /></button>
-          <h1 className="text-sm font-bold text-white/60">{navItems.find(n => n.href === pathname)?.label ?? "Admin"}</h1>
+          <div />
           <Link href="/" className="text-xs text-cyan hover:underline">← לאתר</Link>
         </header>
         <main className="flex-1 p-6">{children}</main>
