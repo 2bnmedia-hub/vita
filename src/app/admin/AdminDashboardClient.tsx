@@ -142,7 +142,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
                 <XAxis dataKey="month" tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₪${v}`} />
                 <Tooltip contentStyle={{ background: "#0F2238", border: "1px solid rgba(0,212,255,0.2)", borderRadius: 10, color: "#fff", fontSize: 11 }}
-                  formatter={(v: number) => [`₪${v.toLocaleString("he-IL")}`, "הכנסות"]} />
+                  formatter={(v: any) => [`₪${Number(v).toLocaleString("he-IL")}`, "הכנסות"]} />
                 <Area type="monotone" dataKey="revenue" stroke="#00D4FF" strokeWidth={2} fill="url(#cg)" />
               </AreaChart>
             </ResponsiveContainer>
