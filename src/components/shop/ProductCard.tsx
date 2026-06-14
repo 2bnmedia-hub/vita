@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Star, Zap } from "lucide-react";
+import Image from "next/image";
+import { ShoppingCart, Star } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, calcDiscount } from "@/lib/utils";
 import type { Product } from "@/types";
@@ -12,16 +13,25 @@ interface ProductCardProps {
 }
 
 const flavorColors: Record<string, string> = {
-  "ללא טעם":       "text-white/50",
-  "ענבים":          "text-purple-400",
-  "קוקטייל פירות":  "text-pink-400",
+  "ללא טעם":      "text-white/50",
+  ענבים:           "text-purple-400",
+  "קוקטייל פירות": "text-pink-400",
 };
+
+// Fallback placeholder when no image or image fails to load
+const PLACEHOLDER = "/creatine-hero.png";
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCartStore();
   const discount = product.compare_price
     ? calcDiscount(product.price, product.compare_price)
     : null;
+
+  // Pick first real image, fall back to placeholder
+  const imageSrc =
+    Array.isArray(product.images) && product.images.length > 0 && product.images[0]
+      ? product.images[0]
+      : PLACEHOLDER;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,11 +58,21 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image area */}
       <Link href={`/shop/${product.slug}`} className="block">
         <div className="relative h-52 bg-gradient-to-br from-navy-900 to-navy-950 flex items-center justify-center overflow-hidden">
-          {/* Glow effect */}
+          {/* Glow on hover */}
           <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          {/* Placeholder — swap with Next/Image when images are ready */}
-          <div className="text-7xl animate-float"><img src="/creatine-hero.png" alt="product" className="w-24 h-24 object-contain" /></div>
-          {/* Scan line animation */}
+
+          <Image
+            src={imageSrc}
+            alt={product.name}
+            width={180}
+            height={180}
+            className="object-contain w-36 h-36 drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = PLACEHOLDER;
+            }}
+          />
+
+          {/* Scan line */}
           <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             <div className="animate-scan w-full h-8 bg-gradient-to-b from-transparent via-cyan/6 to-transparent" />
           </div>
@@ -98,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Stars (static for now) */}
+        {/* Stars */}
         <div className="flex items-center gap-1 mb-3">
           {[...Array(5)].map((_, i) => (
             <Star key={i} className="w-3 h-3 fill-cyan/60 text-cyan/60" />
@@ -106,7 +126,6 @@ export function ProductCard({ product }: ProductCardProps) {
           <span className="text-white/30 text-xs mr-1">(12)</span>
         </div>
 
-        {/* Spacer */}
         <div className="flex-1" />
 
         {/* Price + CTA */}
@@ -132,12 +151,4 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
     </div>
   );
-}
-
-function getEmoji(flavor?: string): string {
-  if (!flavor) return "🏋️";
-  if (flavor.includes("ענבים")) return "🍇";
-  if (flavor.includes("פירות") || flavor.includes("קוקטייל")) return "🍹";
-  if (flavor.includes("ללא")) return "💊";
-  return "🏋️";
 }

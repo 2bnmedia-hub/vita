@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingCart, Menu, X, Zap, User, LogOut } from "lucide-react";
+import { ShoppingCart, Menu, X, Zap, User, LogOut, Settings } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { supabase } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -69,6 +69,13 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
+          <Link href="/admin/login"
+            className="hidden md:flex w-9 h-9 rounded-xl glass flex items-center justify-center hover:border-cyan/20 transition-all duration-200 opacity-30 hover:opacity-70"
+            aria-label="כניסת מנהל"
+            title="כניסת מנהל">
+            <Settings className="w-4 h-4 text-white/60" />
+          </Link>
+
           <button
             onClick={openCart}
             className="relative w-11 h-11 rounded-xl glass-cyan flex items-center justify-center hover:border-cyan/40 transition-all duration-200"

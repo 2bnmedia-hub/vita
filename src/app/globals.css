@@ -195,3 +195,12 @@ input:focus, textarea:focus, select:focus {
   75%  { filter: drop-shadow(0 0 35px rgba(0,200,255,1)) drop-shadow(0 0 70px rgba(0,212,255,0.85)) drop-shadow(0 0 110px rgba(0,160,255,0.55)); }
   100% { filter: drop-shadow(0 0 30px rgba(0,212,255,1)) drop-shadow(0 0 60px rgba(0,180,255,0.8)) drop-shadow(0 0 100px rgba(0,150,255,0.5)); }
 }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-start infinite;
+}

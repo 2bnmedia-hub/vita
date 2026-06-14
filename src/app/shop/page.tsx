@@ -1,37 +1,38 @@
 import type { Metadata } from "next";
-import { getProducts } from "@/lib/supabase";
+import { Suspense } from "react";
+import { getProducts, getCategories } from "@/lib/supabase";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { ShopFilters } from "@/components/shop/ShopFilters";
+import { ProductCardSkeleton } from "@/components/shop/ProductCardSkeleton";
 
 export const metadata: Metadata = {
-  title: "חנות",
-  description: "כל מוצרי VFORM NUTRITION — קריאטין אבקה וטבליות לעיסה.",
+  title: "חנות | VITA Nutrition",
+  description: "כל מוצרי VITA NUTRITION — קריאטין אבקה וטבליות לעיסה.",
 };
 
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams: { cat?: string; sort?: string };
-}) {
-  const products = await getProducts();
+// Force dynamic so searchParams always fresh
+export const dynamic = "force-dynamic";
 
-  // Filter
-  const filtered =
-    searchParams.cat === "powder"
-      ? products.filter((p) => p.category === "קריאטין" && !p.name.includes("טבליות"))
-      : searchParams.cat === "chewable"
-      ? products.filter((p) => p.name.includes("טבליות"))
-      : products;
+interface ShopPageProps {
+  searchParams: {
+    cat?: string;
+    sort?: string;
+    q?: string;
+  };
+}
 
-  // Sort
-  const sorted = [...filtered].sort((a, b) => {
-    if (searchParams.sort === "price-asc") return a.price - b.price;
-    if (searchParams.sort === "price-desc") return b.price - a.price;
-    return 0;
-  });
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const [products, categories] = await Promise.all([
+    getProducts({
+      category: searchParams.cat || undefined,
+      search: searchParams.q || undefined,
+      sort: searchParams.sort as any,
+    }),
+    getCategories(),
+  ]);
 
   return (
-    <div className="min-h-screen bg-navy-950 pt-24">
+    <div className="min-h-screen bg-navy-950 pt-24" dir="rtl">
       {/* Hero bar */}
       <div className="relative bg-navy-900 border-b border-white/[0.06] py-12 overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-50" />
@@ -42,27 +43,49 @@ export default async function ShopPage({
           </span>
           <h1 className="text-4xl font-black tracking-tight">כל המוצרים</h1>
           <p className="mt-2 text-white/50">
-            {sorted.length} מוצרים · קריאטין מונוהידראט איכותי
+            {products.length} מוצרים · קריאטין מונוהידראט איכותי
           </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         {/* Filters */}
-        <ShopFilters currentCat={searchParams.cat} currentSort={searchParams.sort} />
+        <ShopFilters
+          categories={categories}
+          currentCat={searchParams.cat}
+          currentSort={searchParams.sort}
+          currentSearch={searchParams.q}
+        />
 
         {/* Grid */}
-        {sorted.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-8">
-            {sorted.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <p className="text-white/30 text-lg">לא נמצאו מוצרים</p>
-          </div>
-        )}
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-8">
+              {[...Array(4)].map((_, i) => <ProductCardSkeleton key={i} />)}
+            </div>
+          }
+        >
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-8">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 space-y-3">
+              <p className="text-5xl">🔍</p>
+              <p className="text-white/40 text-lg">לא נמצאו מוצרים</p>
+              {(searchParams.q || searchParams.cat) && (
+                <a
+                  href="/shop"
+                  className="inline-block mt-2 text-cyan text-sm hover:underline"
+                >
+                  נקה פילטרים
+                </a>
+              )}
+            </div>
+          )}
+        </Suspense>
       </div>
     </div>
   );

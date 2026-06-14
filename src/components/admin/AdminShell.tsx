@@ -26,7 +26,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     const check = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/admin/login"); return; }
-      const { data } = await supabase.from("admin_users").select("id").eq("id", session.user.id).single();
+      const { data, error } = await supabase.from("admin_users").select("id").eq("id", session.user.id).single();
+      console.log("admin check:", { data, error, userId: session.user.id });
       if (!data) { router.push("/admin/login"); return; }
       setLoading(false);
     };

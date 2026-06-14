@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import { Toaster } from "react-hot-toast";
+import AdminShell from "@/components/admin/AdminShell";
 
 export const metadata: Metadata = {
   title: "VITA Admin",
@@ -9,13 +10,13 @@ export const metadata: Metadata = {
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{direction: "rtl"}}>
+    <AdminShell>
       {children}
       <Toaster position="bottom-center" toastOptions={{
         style: { background: "#0F2238", color: "#fff", border: "1px solid rgba(0,212,255,0.2)", fontFamily: "Heebo, sans-serif", direction: "rtl" },
         success: { iconTheme: { primary: "#00D4FF", secondary: "#0B1929" } },
         error: { iconTheme: { primary: "#ef4444", secondary: "#fff" } },
       }} />
-    </div>
+    </AdminShell>
   );
 }

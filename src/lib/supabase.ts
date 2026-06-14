@@ -6,7 +6,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// ── Mock data (replace with real Supabase queries once DB is set up) ──
+// ── Mock data ──
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: "1",
@@ -14,7 +14,7 @@ export const MOCK_PRODUCTS: Product[] = [
     slug: "creatine-unflavored",
     description: "קריאטין נקי ופשוט, מתאים לשילוב בכל משקה ללא שינוי הטעם.",
     long_description:
-      "קריאטין מונוהידראט טהור מבית VITA — הבחירה הקלאסית למי שמעדיף גמישות מקסימלית. מתערבב בקלות עם מים, מיץ, שייק חלבון או כל משקה אחר, בלי לשנות את הטעם. מיוצר בתקני GMP, HACCP ו-ISO.",
+      "קריאטין מונוהידראט טהור מבית VITA — הבחירה הקלאסית למי שמעדיף גמישות מקסימלית.",
     price: 89,
     compare_price: 109,
     images: ["/images/creatine-unflavored.jpg"],
@@ -27,7 +27,7 @@ export const MOCK_PRODUCTS: Product[] = [
     featured: true,
     badge: "הנמכר ביותר",
     tags: ["קריאטין", "אבקה", "ללא טעם"],
-    nutrition_facts: { "קריאטין מונוהידראט": "3g", "קלוריות": "0", "פחמימות": "0g" },
+    nutrition_facts: { "קריאטין מונוהידראט": "3g", קלוריות: "0", פחמימות: "0g" },
     created_at: new Date().toISOString(),
   },
   {
@@ -35,8 +35,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: "קריאטין מונוהידראט — טעם ענבים",
     slug: "creatine-grape",
     description: "קריאטין בטעם ענבים מרענן, לשימוש יומיומי נוח ומהנה.",
-    long_description:
-      "קריאטין מונוהידראט בטעם ענבים מרענן ומתוק. מתאים למי שרוצה ליהנות מהשגרה היומית שלו בלי להסתבך עם ערבובים. 3 גרם למנה, 166 מנות לאריזה.",
+    long_description: "קריאטין מונוהידראט בטעם ענבים מרענן ומתוק.",
     price: 94,
     compare_price: 114,
     images: ["/images/creatine-grape.jpg"],
@@ -49,7 +48,7 @@ export const MOCK_PRODUCTS: Product[] = [
     featured: true,
     badge: "פופולרי",
     tags: ["קריאטין", "אבקה", "ענבים"],
-    nutrition_facts: { "קריאטין מונוהידראט": "3g", "קלוריות": "5", "פחמימות": "1g" },
+    nutrition_facts: { "קריאטין מונוהידראט": "3g", קלוריות: "5", פחמימות: "1g" },
     created_at: new Date().toISOString(),
   },
   {
@@ -57,8 +56,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: "קריאטין מונוהידראט — קוקטייל פירות",
     slug: "creatine-fruit-cocktail",
     description: "טעם פירותי קליל ומרענן, לחוויית שתייה טעימה.",
-    long_description:
-      "קריאטין מונוהידראט בטעם קוקטייל פירות — עם טעם פירותי קליל ומרענן. מתאים למתאמנים שמחפשים מוצר יעיל עם חוויית שתייה טעימה.",
+    long_description: "קריאטין מונוהידראט בטעם קוקטייל פירות.",
     price: 94,
     compare_price: 114,
     images: ["/images/creatine-fruit.jpg"],
@@ -70,7 +68,7 @@ export const MOCK_PRODUCTS: Product[] = [
     in_stock: true,
     featured: false,
     tags: ["קריאטין", "אבקה", "פירות"],
-    nutrition_facts: { "קריאטין מונוהידראט": "3g", "קלוריות": "5", "פחמימות": "1g" },
+    nutrition_facts: { "קריאטין מונוהידראט": "3g", קלוריות: "5", פחמימות: "1g" },
     created_at: new Date().toISOString(),
   },
   {
@@ -78,8 +76,7 @@ export const MOCK_PRODUCTS: Product[] = [
     name: "קריאטין טבליות לעיסה",
     slug: "creatine-chewable",
     description: "ללא מים, ללא ערבוב — 150 טבליות בטעם קוקטייל פירות.",
-    long_description:
-      "טבליות קריאטין ללעיסה של VFORM Nutrition — הדרך הנוחה ביותר לקחת קריאטין בכל יום. ללא מים, ללא ערבוב, פחות מ-2 קק\"ל לטבלייה. 3 גרם קריאטין ל-3 טבליות יומיות.",
+    long_description: "טבליות קריאטין ללעיסה — הדרך הנוחה ביותר לקחת קריאטין.",
     price: 99,
     compare_price: 129,
     images: ["/images/creatine-chewable.jpg"],
@@ -92,29 +89,92 @@ export const MOCK_PRODUCTS: Product[] = [
     featured: true,
     badge: "חדש",
     tags: ["קריאטין", "טבליות", "ללא מים"],
-    nutrition_facts: { "קריאטין מונוהידראט": "3g", "קלוריות": "<2 לטבלייה", "שומן": "0g" },
+    nutrition_facts: { "קריאטין מונוהידראט": "3g", קלוריות: "<2 לטבלייה", שומן: "0g" },
     created_at: new Date().toISOString(),
   },
 ];
 
-// ── Supabase queries (active when DB is connected) ──
-export async function getProducts(): Promise<Product[]> {
-  if (!supabaseUrl || supabaseUrl === "https://placeholder.supabase.co") {
-    return MOCK_PRODUCTS;
+const isMock =
+  !supabaseUrl || supabaseUrl === "https://placeholder.supabase.co";
+
+// ── Categories ──
+export async function getCategories(): Promise<{ id: string; name: string; slug: string }[]> {
+  if (isMock) {
+    return [{ id: "1", name: "קריאטין", slug: "creatine" }];
   }
   const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("in_stock", true)
-    .order("created_at", { ascending: false });
-  if (error) { console.error(error); return MOCK_PRODUCTS; }
-  return data ?? MOCK_PRODUCTS;
+    .from("categories")
+    .select("id, name, slug")
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+  if (error) { console.error(error); return []; }
+  return data ?? [];
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  if (!supabaseUrl || supabaseUrl === "https://placeholder.supabase.co") {
-    return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
+// ── Products with optional filters ──
+export interface GetProductsParams {
+  category?: string;   // category name (Hebrew)
+  search?: string;     // free-text search on name
+  sort?: "price-asc" | "price-desc" | "featured" | "newest";
+}
+
+export async function getProducts(params: GetProductsParams = {}): Promise<Product[]> {
+  if (isMock) {
+    let results = [...MOCK_PRODUCTS];
+    if (params.category) {
+      results = results.filter((p) => p.category === params.category);
+    }
+    if (params.search) {
+      const q = params.search.toLowerCase();
+      results = results.filter((p) => p.name.toLowerCase().includes(q));
+    }
+    return applySortMock(results, params.sort);
   }
+
+  let query = supabase.from("products").select("*").eq("in_stock", true);
+
+  if (params.category) {
+    query = query.eq("category", params.category);
+  }
+  if (params.search) {
+    query = query.ilike("name", `%${params.search}%`);
+  }
+
+  // Sort
+  switch (params.sort) {
+    case "price-asc":
+      query = query.order("price", { ascending: true });
+      break;
+    case "price-desc":
+      query = query.order("price", { ascending: false });
+      break;
+    case "featured":
+      query = query.order("featured", { ascending: false });
+      break;
+    case "newest":
+    default:
+      query = query.order("created_at", { ascending: false });
+      break;
+  }
+
+  const { data, error } = await query;
+  if (error) { console.error(error); return MOCK_PRODUCTS; }
+  return data ?? [];
+}
+
+function applySortMock(products: Product[], sort?: string): Product[] {
+  const arr = [...products];
+  switch (sort) {
+    case "price-asc":  return arr.sort((a, b) => a.price - b.price);
+    case "price-desc": return arr.sort((a, b) => b.price - a.price);
+    case "featured":   return arr.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+    default:           return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+}
+
+// ── Single product ──
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  if (isMock) return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -124,10 +184,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return data;
 }
 
+// ── Featured products ──
 export async function getFeaturedProducts(): Promise<Product[]> {
-  if (!supabaseUrl || supabaseUrl === "https://placeholder.supabase.co") {
-    return MOCK_PRODUCTS.filter((p) => p.featured);
-  }
+  if (isMock) return MOCK_PRODUCTS.filter((p) => p.featured);
   const { data, error } = await supabase
     .from("products")
     .select("*")
