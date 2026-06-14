@@ -1,17 +1,16 @@
 "use client";
 import { supabase } from "@/lib/auth";
-
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Plus, Edit, Trash2, Search, Package } from "lucide-react";
-
-
+import { Plus, Edit, Trash2, Search, Package, Upload, Download } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [search, setSearch] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchProducts = async () => {
     const { data } = await supabase.from("products").select("*").order("created_at", { ascending: false });
@@ -27,32 +26,101 @@ export default function AdminProducts() {
     fetchProducts();
   };
 
+  const downloadTemplate = () => {
+    const headers = ["name","slug","description","price","compare_price","category","flavor","weight","servings","serving_size","in_stock","featured","badge"];
+    const example = ["קריאטין מונוהידראט — ללא טעם","creatine-unflavored","תיאור קצר","89","109","קריאטין","ללא טעם","500g","166","3g","true","true","הנמכר ביותר"];
+    const csv = [headers.join(","), example.join(",")].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "vita-products-template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+
+    const text = await file.text();
+    const lines = text.trim().split("\n");
+    const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
+    
+    const rows = lines.slice(1).map(line => {
+      const values = line.split(",").map(v => v.trim().replace(/"/g, ""));
+      const obj: any = {};
+      headers.forEach((h, i) => {
+        if (h === "price" || h === "compare_price" || h === "servings") {
+          obj[h] = Number(values[i]) || null;
+        } else if (h === "in_stock" || h === "featured") {
+          obj[h] = values[i] === "true";
+        } else {
+          obj[h] = values[i] || null;
+        }
+      });
+      return obj;
+    }).filter(r => r.name && r.slug);
+
+    if (rows.length === 0) {
+      toast.error("לא נמצאו מוצרים בקובץ");
+      setImporting(false);
+      return;
+    }
+
+    const { error } = await supabase.from("products").upsert(rows, { onConflict: "slug" });
+    
+    if (error) {
+      toast.error("שגיאה בייבוא: " + error.message);
+    } else {
+      toast.success(`${rows.length} מוצרים יובאו בהצלחה!`);
+      fetchProducts();
+    }
+    
+    setImporting(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
   const filtered = products.filter(p =>
     p.name?.includes(search) || p.flavor?.includes(search)
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6" dir="rtl">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black">מוצרים</h1>
+          <h1 className="text-2xl font-black text-white">מוצרים</h1>
           <p className="text-white/40 text-sm">{products.length} מוצרים</p>
         </div>
-        <Link href="/admin/products/new"
-          className="btn-primary bg-cyan text-navy-900 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-cyan-600 transition-colors flex items-center gap-2">
-          <Plus className="w-4 h-4" /> מוצר חדש
-        </Link>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={downloadTemplate}
+            className="flex items-center gap-2 glass border border-white/[0.08] hover:border-cyan/30 text-white/70 hover:text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
+            <Download className="w-4 h-4" /> טמפלט CSV
+          </button>
+          <button onClick={() => fileRef.current?.click()} disabled={importing}
+            className="flex items-center gap-2 glass border border-green-400/30 hover:border-green-400/60 text-green-400 font-bold px-4 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50">
+            <Upload className="w-4 h-4" /> {importing ? "מייבא..." : "ייבא CSV"}
+          </button>
+          <input ref={fileRef} type="file" accept=".csv" onChange={handleImport} className="hidden" />
+          <Link href="/admin/products/new"
+            className="flex items-center gap-2 bg-cyan text-navy-900 font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-cyan-600 transition-colors">
+            <Plus className="w-4 h-4" /> מוצר חדש
+          </Link>
+        </div>
+      </div>
+
+      {/* Import info */}
+      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-3 text-blue-300 text-xs">
+        💡 הורד את טמפלט ה-CSV, מלא את המוצרים ב-Excel, ואז ייבא חזרה. מוצרים קיימים יתעדכנו לפי ה-slug.
       </div>
 
       {/* Search */}
       <div className="relative">
         <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
+        <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="חפש מוצר..."
-          className="w-full bg-navy-800 border border-white/[0.08] rounded-xl pr-11 pl-4 py-3 text-white text-sm placeholder-white/25"
-        />
+          className="w-full bg-navy-800 border border-white/[0.08] rounded-xl pr-11 pl-4 py-3 text-white text-sm placeholder-white/25" />
       </div>
 
       {/* Table */}
