@@ -5,6 +5,7 @@ import { FeaturedProducts } from "@/components/sections/FeaturedProducts";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { CtaBanner } from "@/components/sections/CtaBanner";
 import { InstagramSection } from "@/components/sections/InstagramSection";
+import AboutSection from "@/components/sections/AboutSection";
 
 export default function HomePage() {
   return (
@@ -16,6 +17,7 @@ export default function HomePage() {
       </Suspense>
       <TestimonialsSection />
       <CtaBanner />
+      <AboutSection />
       <InstagramSection />
     </>
   );

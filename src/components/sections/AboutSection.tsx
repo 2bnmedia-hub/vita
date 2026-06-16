@@ -1,124 +1,128 @@
-import Link from "next/link";
-import { ArrowLeft, MapPin, Phone } from "lucide-react";
+'use client';
 
-const aboutStats = [
-  { label: "משקל אריזה", value: "500g" },
-  { label: "מנות באריזה", value: "166" },
-  { label: "קריאטין למנה", value: "3g" },
-  { label: "גרסאות אבקה", value: "3" },
-  { label: "טבליות לעיסה", value: "150" },
-  { label: "קלוריות לטבלייה", value: "<2 קק\"ל" },
-];
+import { motion } from 'framer-motion';
 
-export function AboutSection() {
+export default function AboutSection() {
   return (
-    <>
-      {/* About */}
-      <section id="about" className="py-24 bg-navy-950 relative overflow-hidden">
-        <div className="orb w-80 h-80 bg-cyan/6 top-0 right-0" />
+    <section id="about" className="relative py-24 bg-navy-950 overflow-hidden" dir="rtl">
+      {/* Background grid */}
+      <div className="bg-grid absolute inset-0 opacity-20" />
+      <div className="orb absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-10" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-            {/* Text */}
-            <div>
-              <span className="inline-block text-cyan text-xs font-bold uppercase tracking-widest mb-3">
-                אודות המותג
-              </span>
-              <h2 className="text-4xl font-black tracking-tight mb-5">
-                VFORM{" "}
-                <span className="text-gradient">NUTRITION</span>
-              </h2>
-              <p className="text-white/55 leading-relaxed mb-4">
-                מותג בתחום תוספי התזונה ותזונת הספורט, המיועד לספורטאים,
-                מתאמנים, חובבי כושר ואנשים השומרים על אורח חיים פעיל ובריא.
-              </p>
-              <p className="text-white/55 leading-relaxed mb-6">
-                אנו מאמינים שתוסף תזונה איכותי מתחיל בייצור מקצועי, בקרת
-                איכות ותיעוד מסודר. לכן אנו פועלים אך ורק עם ספקים ויצרנים
-                מנוסים ומוסמכים.
-              </p>
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
 
-              <p className="text-cyan/80 font-bold text-lg italic mb-6">
-                איכות, אמינות וביצועים.
-              </p>
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-black text-gradient mb-4">אודותינו</h2>
+          <div className="w-20 h-1 bg-cyan mx-auto rounded-full" />
+        </motion.div>
 
-              {/* Certs */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {["GMP", "HACCP", "ISO"].map((c) => (
-                  <span
-                    key={c}
-                    className="px-3 py-1 rounded-lg glass-cyan border border-cyan/25 text-cyan text-xs font-black tracking-wider"
-                  >
-                    {c}
-                  </span>
-                ))}
-              </div>
-
-              {/* Location */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-white/40 text-sm">
-                  <MapPin className="w-4 h-4 text-cyan flex-shrink-0" />
-                  באר שבע, מבצע נחשון 60
-                </div>
-                <a
-                  href="tel:+972553056222"
-                  className="flex items-center gap-2 text-white/40 hover:text-white text-sm transition-colors"
-                >
-                  <Phone className="w-4 h-4 text-cyan flex-shrink-0" />
-                  055-305-6222
-                </a>
-              </div>
-            </div>
-
-            {/* Stats box */}
-            <div className="glass border border-white/[0.08] rounded-2xl p-6 divide-y divide-white/[0.06]">
-              <p className="text-white/30 text-xs font-bold uppercase tracking-widest pb-4">
-                נתוני מוצר
-              </p>
-              {aboutStats.map(({ label, value }) => (
-                <div
-                  key={label}
-                  className="flex items-center justify-between py-3.5"
-                >
-                  <span className="text-white/45 text-sm">{label}</span>
-                  <span className="font-black text-white">{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Banner */}
-      <section className="relative py-20 bg-navy-900 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan/10 via-transparent to-blue-500/5" />
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan/40 to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan/20 to-transparent" />
-
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-4xl font-black tracking-tight mb-4">
-            מוכן להתחיל?
-          </h2>
-          <p className="text-white/50 text-lg mb-8 leading-relaxed">
-            הצטרף לאלפי מתאמנים שכבר בחרו ב-VITA. משלוח מהיר לכל הארץ.
+        {/* Main content card */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+          className="glass rounded-3xl p-8 md:p-12 mb-10"
+        >
+          <h3 className="text-2xl md:text-3xl font-black text-cyan mb-6">V-FORM NUTRITION</h3>
+          <p className="text-gray-300 text-lg leading-relaxed mb-6">
+            מותג בתחום תוספי התזונה ותזונת הספורט, המיועד לספורטאים, מתאמנים, חובבי כושר ואנשים השומרים על אורח חיים פעיל ובריא.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/shop"
-              className="btn-primary inline-flex items-center gap-2 bg-cyan text-navy-900 font-black px-8 py-4 rounded-xl text-base hover:bg-cyan-600 transition-colors shadow-cyan"
+          <p className="text-gray-300 text-lg leading-relaxed mb-6">
+            המותג הוקם מתוך מטרה להציע מוצרים איכותיים, אמינים ונוחים לשימוש, תוך הקפדה על בחירת חומרי גלם מתאימים, שקיפות מול הלקוח ועמידה בדרישות הרגולציה הרלוונטיות בישראל.
+          </p>
+          <p className="text-gray-300 text-lg leading-relaxed">
+            ב־VFORM NUTRITION אנו מאמינים שתוסף תזונה איכותי מתחיל בייצור מקצועי, בקרת איכות ותיעוד מסודר. לכן אנו פועלים מול יצרנים וספקים בעלי ניסיון בתחום תוספי התזונה, הפועלים בהתאם למערכות איכות ובטיחות מזון מקובלות.
+          </p>
+        </motion.div>
+
+        {/* Standards cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {[
+            { title: 'GMP', sub: 'תנאי ייצור נאותים', icon: '🏭' },
+            { title: 'HACCP', sub: 'ניהול סיכונים ובקרת בטיחות מזון', icon: '🛡️' },
+            { title: 'ISO', sub: 'מערכות ניהול איכות ובטיחות בהתאם לתקנים בינלאומיים', icon: '✅' },
+          ].map((item, i) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.15 }}
+              className="glass-cyan rounded-2xl p-6 text-center"
             >
-              לחנות
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 glass border border-white/10 hover:border-cyan/30 text-white/80 hover:text-white font-bold px-8 py-4 rounded-xl text-base transition-all"
-            >
-              צור קשר
-            </Link>
-          </div>
+              <div className="text-4xl mb-3">{item.icon}</div>
+              <h4 className="text-cyan text-2xl font-black mb-2">{item.title}</h4>
+              <p className="text-gray-300 text-sm leading-relaxed">{item.sub}</p>
+            </motion.div>
+          ))}
         </div>
-      </section>
-    </>
+
+        {/* Products line */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="glass rounded-2xl p-8 mb-10 text-center"
+        >
+          <p className="text-gray-300 text-lg leading-relaxed mb-4">
+            מגוון המוצרים של V-FORM NUTRITION מיועד להשתלב בשגרת האימונים והתזונה היומית, וכולל בין היתר:
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {['אבקות חלבון', 'קריאטין', 'חומצות אמינו', 'פרי-וורקאאוט', 'ויטמינים', 'מינרלים'].map((tag) => (
+              <span key={tag} className="bg-cyan/10 border border-cyan/30 text-cyan px-4 py-2 rounded-full text-sm font-semibold">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Footer info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <div className="glass rounded-2xl p-6 flex items-center gap-4">
+            <span className="text-3xl">📍</span>
+            <div>
+              <p className="text-cyan font-bold text-lg">מיקום</p>
+              <p className="text-gray-300">באר שבע, מבצע נחשון 60</p>
+            </div>
+          </div>
+          <div className="glass rounded-2xl p-6 flex items-center gap-4">
+            <span className="text-3xl">📞</span>
+            <div>
+              <p className="text-cyan font-bold text-lg">טלפון</p>
+              <p className="text-gray-300" dir="ltr">055-305-6222</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Tagline */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="text-center mt-12"
+        >
+          <p className="text-gradient text-2xl md:text-3xl font-black">
+            VFORM NUTRITION — איכות, אמינות וביצועים
+          </p>
+        </motion.div>
+
+      </div>
+    </section>
   );
 }

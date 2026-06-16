@@ -204,3 +204,5 @@ input:focus, textarea:focus, select:focus {
 .animate-blink {
   animation: blink 1s step-start infinite;
 }
+
+html { scroll-behavior: smooth; }
