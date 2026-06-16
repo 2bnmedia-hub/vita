@@ -46,9 +46,9 @@ export function Navbar() {
           <div className="w-9 h-9 rounded-xl bg-cyan flex items-center justify-center shadow-cyan-sm">
             <Zap className="w-5 h-5 text-navy-900 fill-navy-900" />
           </div>
-          <span className="font-black text-2xl tracking-tight">
-            <span className="text-cyan">VI</span>
-            <span className="text-white">TA</span>
+          <span className="font-black text-2xl tracking-tight"><span className="text-cyan">V-FORM</span>
+            
+            
             <span className="text-white/30 text-sm font-medium ms-2 tracking-normal">NUTRITION</span>
           </span>
         </Link>

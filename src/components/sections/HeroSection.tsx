@@ -24,7 +24,7 @@ export function HeroSection() {
             >
               <span className="w-2 h-2 rounded-full bg-cyan animate-pulse" />
               <span className="text-cyan text-xs font-bold tracking-widest uppercase">
-                VITA NUTRITION — ישראל
+                V-FORM NUTRITION — ישראל
               </span>
             </motion.div>
 
@@ -95,7 +95,7 @@ export function HeroSection() {
             {/* Product image */}
             <img
               src="/creatine-hero.png"
-              alt="VITA Creatine"
+              alt="V-FORM Creatine"
               className="animate-float"
               style={{
                 width: "85%",

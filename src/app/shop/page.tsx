@@ -7,8 +7,8 @@ import { ShopFilters } from "@/components/shop/ShopFilters";
 import { ProductCardSkeleton } from "@/components/shop/ProductCardSkeleton";
 
 export const metadata: Metadata = {
-  title: "חנות | VITA Nutrition",
-  description: "כל מוצרי VITA NUTRITION — קריאטין אבקה וטבליות לעיסה.",
+  title: "חנות | V-FORM Nutrition",
+  description: "כל מוצרי V-FORM NUTRITION — קריאטין אבקה וטבליות לעיסה.",
 };
 
 // Force dynamic so searchParams always fresh
