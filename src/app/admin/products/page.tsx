@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { Plus, Edit, Trash2, Search, Package, Upload, Download } from "lucide-react";
 import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
+import Papa from "papaparse";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
@@ -44,37 +46,75 @@ export default function AdminProducts() {
     if (!file) return;
     setImporting(true);
 
-    const text = await file.text();
-    const lines = text.trim().split("\n");
-    const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
-    
-    const rows = lines.slice(1).map(line => {
-      const values = line.split(",").map(v => v.trim().replace(/"/g, ""));
+    const isExcel = file.name.endsWith(".xlsx") || file.name.endsWith(".xls");
+    let headers: string[] = [];
+    let dataRows: any[][] = [];
+
+    if (isExcel) {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+      headers = (json[0] || []).map((h: any) => String(h).trim());
+      dataRows = json.slice(1).map(row => row.map((v: any) => (v === undefined || v === null ? "" : String(v).trim())));
+    } else {
+      // Read as ArrayBuffer to detect/handle encoding properly, then decode as UTF-8 first.
+      const buffer = await file.arrayBuffer();
+      let text = new TextDecoder("utf-8").decode(buffer);
+      // Heuristic: if decoding produced replacement characters, retry with windows-1255 (Hebrew)
+      if (text.includes("\ufffd")) {
+        text = new TextDecoder("windows-1255").decode(buffer);
+      }
+      const parsed = Papa.parse<string[]>(text.trim(), { skipEmptyLines: true });
+      const rowsRaw = parsed.data as string[][];
+      headers = (rowsRaw[0] || []).map(h => String(h).trim().replace(/^"|"$/g, ""));
+      dataRows = rowsRaw.slice(1).map(row => row.map(v => String(v ?? "").trim()));
+    }
+
+    const rows = dataRows.map(values => {
       const obj: any = {};
       headers.forEach((h, i) => {
         if (h === "price" || h === "compare_price" || h === "servings") {
           obj[h] = Number(values[i]) || null;
         } else if (h === "in_stock" || h === "featured") {
-          obj[h] = values[i] === "true";
+          obj[h] = String(values[i]).toLowerCase() === "true";
         } else {
           obj[h] = values[i] || null;
         }
       });
+      if (!obj.slug && obj.name) {
+        const base = (obj.flavor ? obj.name + "-" + obj.flavor : obj.name);
+        obj.slug = base.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^\w\-א-ת]/g, "");
+      }
       return obj;
-    }).filter(r => r.name && r.slug);
+    });
 
-    if (rows.length === 0) {
+    // Ensure slugs are unique within this batch (append index if duplicate)
+    const seenSlugs: Record<string, number> = {};
+    rows.forEach((r: any) => {
+      if (!r.slug) return;
+      if (seenSlugs[r.slug] !== undefined) {
+        seenSlugs[r.slug] += 1;
+        r.slug = r.slug + "-" + seenSlugs[r.slug];
+      } else {
+        seenSlugs[r.slug] = 0;
+      }
+    });
+
+    const filteredRows = rows.filter((r: any) => r.name && r.slug);
+
+    if (filteredRows.length === 0) {
       toast.error("לא נמצאו מוצרים בקובץ");
       setImporting(false);
       return;
     }
 
-    const { error } = await supabase.from("products").upsert(rows, { onConflict: "slug" });
+    const { error } = await supabase.from("products").upsert(filteredRows, { onConflict: "slug" });
     
     if (error) {
       toast.error("שגיאה בייבוא: " + error.message);
     } else {
-      toast.success(`${rows.length} מוצרים יובאו בהצלחה!`);
+      toast.success(`${filteredRows.length} מוצרים יובאו בהצלחה!`);
       fetchProducts();
     }
     
@@ -100,9 +140,9 @@ export default function AdminProducts() {
           </button>
           <button onClick={() => fileRef.current?.click()} disabled={importing}
             className="flex items-center gap-2 glass border border-green-400/30 hover:border-green-400/60 text-green-400 font-bold px-4 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50">
-            <Upload className="w-4 h-4" /> {importing ? "מייבא..." : "ייבא CSV"}
+            <Upload className="w-4 h-4" /> {importing ? "מייבא..." : "ייבא CSV/Excel"}
           </button>
-          <input ref={fileRef} type="file" accept=".csv" onChange={handleImport} className="hidden" />
+          <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleImport} className="hidden" />
           <Link href="/admin/products/new"
             className="flex items-center gap-2 bg-cyan text-navy-900 font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-cyan-600 transition-colors">
             <Plus className="w-4 h-4" /> מוצר חדש

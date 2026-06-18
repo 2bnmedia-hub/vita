@@ -46,7 +46,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <div className="p-5 border-b border-white/[0.06]">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-cyan flex items-center justify-center"><Zap className="w-4 h-4 text-navy-900 fill-navy-900" /></div>
-            <span className="font-black text-lg"><span className="text-cyan">VI</span><span className="text-white">TA</span><span className="text-white/30 text-xs mr-1">ADMIN</span></span>
+            <span className="font-black text-lg"><span className="text-cyan">VF</span><span className="text-white">ORM</span><span className="text-white/30 text-xs mr-1">ADMIN</span></span>
           </Link>
         </div>
         <nav className="flex-1 p-4 space-y-1">

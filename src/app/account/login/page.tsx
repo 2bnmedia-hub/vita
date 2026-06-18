@@ -40,7 +40,7 @@ export default function LoginPage() {
             <div className="w-10 h-10 rounded-xl bg-cyan flex items-center justify-center shadow-cyan">
               <Zap className="w-5 h-5 text-navy-900 fill-navy-900" />
             </div>
-            <span className="font-black text-xl"><span className="text-cyan">VI</span>TA</span>
+            <span className="font-black text-xl"><span className="text-cyan">V</span>FORM</span>
           </Link>
           <h1 className="text-3xl font-black">כניסה לחשבון</h1>
           <p className="text-white/40 mt-2">ברוך הבא בחזרה</p>

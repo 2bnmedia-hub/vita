@@ -31,8 +31,8 @@ export function Footer() {
                 <Zap className="w-4 h-4 text-navy-900 fill-navy-900" />
               </div>
               <span className="font-black text-lg">
-                <span className="text-cyan">VI</span>
-                <span className="text-white">TA</span>
+                <span className="text-cyan">VF</span>
+                <span className="text-white">ORM</span>
               </span>
             </Link>
             <p className="text-white/50 text-sm leading-relaxed mb-5">
@@ -93,11 +93,11 @@ export function Footer() {
                 באר שבע, מבצע נחשון 60
               </div>
               <a
-                href="mailto:info@vita.co.il"
+                href="mailto:vformnutrition@gmail.com"
                 className="flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
               >
                 <Mail className="w-4 h-4 text-cyan flex-shrink-0" />
-                info@vita.co.il
+                vformnutrition@gmail.com
               </a>
             </div>
 
@@ -118,7 +118,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-white/30 text-xs">
-            © 2024 VITA · כל הזכויות שמורות
+            © 2026 <a href="https://www.2bnmedia.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan transition-colors">2bnmedia.com</a> · כל הזכויות שמורות
           </p>
           <p className="text-white/20 text-xs">
             תוסף תזונה — יש לשמור במקום קריר ויבש · להרחיק מהישג ידם של ילדים

@@ -98,7 +98,7 @@ export function HeroSection() {
               alt="V-FORM Creatine"
               className="animate-float"
               style={{
-                width: "85%",
+                width: "57%",
                 objectFit: "contain",
                 filter: "drop-shadow(0 0 8px rgba(0,212,255,0.8)) drop-shadow(0 0 18px rgba(0,180,255,0.4))",
                 animation: "float 6s ease-in-out infinite, lava 3s ease-in-out infinite"
