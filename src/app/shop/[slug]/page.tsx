@@ -4,17 +4,14 @@ import { notFound } from "next/navigation";
 import { getProductBySlug, getProducts } from "@/lib/supabase";
 import { ProductDetailClient } from "@/components/shop/ProductDetailClient";
 
-export async function generateStaticParams() {
-  const products = await getProducts();
-  return products.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const product = await getProductBySlug(params.slug);
+  const product = await getProductBySlug(decodeURIComponent(params.slug));
   if (!product) return { title: "מוצר לא נמצא" };
   return {
     title: product.name,
@@ -27,7 +24,7 @@ export default async function ProductPage({
 }: {
   params: { slug: string };
 }) {
-  const product = await getProductBySlug(params.slug);
+  const product = await getProductBySlug(decodeURIComponent(params.slug));
   if (!product) notFound();
 
   const related = (await getProducts()).filter(

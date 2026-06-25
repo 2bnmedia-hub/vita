@@ -159,7 +159,11 @@ export async function getProducts(params: GetProductsParams = {}): Promise<Produ
 
   const { data, error } = await query;
   if (error) { console.error(error); return MOCK_PRODUCTS; }
-  return data ?? [];
+  return (data ?? []).map((p: any) => ({
+    ...p,
+    price: Number(p.price) || 0,
+    compare_price: p.compare_price != null ? Number(p.compare_price) : undefined,
+  }));
 }
 
 function applySortMock(products: Product[], sort?: string): Product[] {
@@ -172,6 +176,14 @@ function applySortMock(products: Product[], sort?: string): Product[] {
   }
 }
 
+function normalizeProduct(p: any): Product {
+  return {
+    ...p,
+    price: Number(p.price) || 0,
+    compare_price: p.compare_price != null ? Number(p.compare_price) : undefined,
+  };
+}
+
 // ── Single product ──
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   if (isMock) return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
@@ -180,8 +192,8 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     .select("*")
     .eq("slug", slug)
     .single();
-  if (error) return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
-  return data;
+  if (error || !data) return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
+  return normalizeProduct(data);
 }
 
 // ── Featured products ──
@@ -194,5 +206,5 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     .eq("in_stock", true)
     .limit(4);
   if (error) return MOCK_PRODUCTS.filter((p) => p.featured);
-  return data ?? [];
+  return (data ?? []).map(normalizeProduct);
 }
