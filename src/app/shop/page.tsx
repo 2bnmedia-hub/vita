@@ -6,13 +6,16 @@ import { ProductCard } from "@/components/shop/ProductCard";
 import { ShopFilters } from "@/components/shop/ShopFilters";
 import { ProductCardSkeleton } from "@/components/shop/ProductCardSkeleton";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 export const metadata: Metadata = {
   title: "חנות | V-FORM Nutrition",
   description: "כל מוצרי V-FORM NUTRITION — קריאטין אבקה וטבליות לעיסה.",
 };
 
 // Force dynamic so searchParams always fresh
-export const dynamic = "force-dynamic";
 
 interface ShopPageProps {
   searchParams: {

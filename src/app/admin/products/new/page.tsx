@@ -64,7 +64,14 @@ export default function AdminProductNew() {
     };
     const { error } = await supabase.from("products").insert(payload);
     if (error) { toast.error("שגיאה בשמירה"); setSaving(false); return; }
-    toast.success("מוצר נוסף!");
+    // Trigger production deploy so the new product publishes to the live site
+    const hook = process.env.NEXT_PUBLIC_DEPLOY_HOOK_URL;
+    if (hook) {
+      try { await fetch(hook, { method: "POST" }); } catch (_) {}
+      toast.success("מוצר נוסף! מתפרסם לאתר (~דקה)");
+    } else {
+      toast.success("מוצר נוסף!");
+    }
     router.push("/admin/products");
   };
 

@@ -94,8 +94,7 @@ export const MOCK_PRODUCTS: Product[] = [
   },
 ];
 
-const isMock =
-  !supabaseUrl || supabaseUrl === "https://placeholder.supabase.co";
+const isMock = false;
 
 // ── Categories ──
 export async function getCategories(): Promise<{ id: string; name: string; slug: string }[]> {
@@ -120,7 +119,7 @@ export interface GetProductsParams {
 
 export async function getProducts(params: GetProductsParams = {}): Promise<Product[]> {
   if (isMock) {
-    let results = [...MOCK_PRODUCTS];
+    let results: Product[] = [];
     if (params.category) {
       results = results.filter((p) => p.category === params.category);
     }
@@ -158,7 +157,7 @@ export async function getProducts(params: GetProductsParams = {}): Promise<Produ
   }
 
   const { data, error } = await query;
-  if (error) { console.error(error); return MOCK_PRODUCTS; }
+  if (error) { console.error("getProducts error:", error.message); return []; }
   return (data ?? []).map((p: any) => ({
     ...p,
     price: Number(p.price) || 0,
@@ -186,25 +185,23 @@ function normalizeProduct(p: any): Product {
 
 // ── Single product ──
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  if (isMock) return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("slug", slug)
+    .eq("slug", slug.trim())
     .single();
-  if (error || !data) return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
+  if (error || !data) { if (error) console.error("getProductBySlug error:", error.message); return null; }
   return normalizeProduct(data);
 }
 
 // ── Featured products ──
 export async function getFeaturedProducts(): Promise<Product[]> {
-  if (isMock) return MOCK_PRODUCTS.filter((p) => p.featured);
   const { data, error } = await supabase
     .from("products")
     .select("*")
     .eq("featured", true)
     .eq("in_stock", true)
     .limit(4);
-  if (error) return MOCK_PRODUCTS.filter((p) => p.featured);
+  if (error) { console.error("getFeatured error:", error.message); return []; }
   return (data ?? []).map(normalizeProduct);
 }

@@ -13,6 +13,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const total = useCartStore(selectTotal);
+  const SHIPPING = { north: 29, center: 39, south: 49 } as const;
+  const REGION_LABEL = { north: "צפון", center: "מרכז", south: "דרום ואילת" } as const;
+  const [region, setRegion] = useState<keyof typeof SHIPPING>("center");
+  const shipping = SHIPPING[region];
+  const grandTotal = total + shipping;
   const clearCart = useCartStore((s) => s.clearCart);
 
   const [loading, setLoading] = useState(false);
@@ -77,7 +82,9 @@ export default function CheckoutPage() {
           address: `${form.address.trim()}, ${form.city.trim()}`,
           notes: form.notes.trim() || null,
           items: orderItems,
-          total,
+          total: grandTotal,
+          shipping_region: REGION_LABEL[region],
+          shipping_cost: shipping,
           status: "pending",
         },
       ]);
@@ -159,6 +166,28 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Shipping region */}
+            <div className="glass border border-white/[0.08] rounded-2xl p-6 space-y-3">
+              <h2 className="font-bold text-white/80 text-sm uppercase tracking-wider mb-1">אזור משלוח *</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {(["north","center","south"] as const).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRegion(r)}
+                    className={`rounded-xl px-4 py-3 text-sm font-bold border transition-all ${
+                      region === r
+                        ? "bg-cyan/10 border-cyan/40 text-cyan"
+                        : "bg-navy-800 border-white/[0.08] text-white/60 hover:border-white/20"
+                    }`}
+                  >
+                    {REGION_LABEL[r]}
+                    <span className="block text-xs font-normal mt-0.5 text-white/40">{formatPrice(SHIPPING[r])}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Payment notice */}
             <div className="glass border border-cyan/20 rounded-2xl p-5 flex gap-3">
               <div className="w-8 h-8 rounded-lg bg-cyan/10 flex items-center justify-center flex-shrink-0">
@@ -178,7 +207,7 @@ export default function CheckoutPage() {
               {loading ? (
                 <><Loader2 className="w-5 h-5 animate-spin" />שולח הזמנה...</>
               ) : (
-                <>אישור הזמנה — {formatPrice(total)}<ArrowRight className="w-5 h-5" /></>
+                <>אישור הזמנה — {formatPrice(grandTotal)}<ArrowRight className="w-5 h-5" /></>
               )}
             </button>
           </form>
@@ -208,12 +237,16 @@ export default function CheckoutPage() {
               </div>
               <div className="border-t border-white/[0.06] pt-4 space-y-2">
                 <div className="flex justify-between text-sm text-white/50">
-                  <span>משלוח</span>
-                  <span className="text-green-400 font-bold">חינם</span>
+                  <span>סכום ביניים</span>
+                  <span className="text-white/70">{formatPrice(total)}</span>
                 </div>
-                <div className="flex justify-between font-black text-lg">
+                <div className="flex justify-between text-sm text-white/50">
+                  <span>משלוח ({REGION_LABEL[region]})</span>
+                  <span className="text-white/70">{formatPrice(shipping)}</span>
+                </div>
+                <div className="flex justify-between font-black text-lg pt-1">
                   <span>סה&quot;כ</span>
-                  <span className="text-white">{formatPrice(total)}</span>
+                  <span className="text-white">{formatPrice(grandTotal)}</span>
                 </div>
               </div>
             </div>
