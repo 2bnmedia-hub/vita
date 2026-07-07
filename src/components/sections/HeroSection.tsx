@@ -41,7 +41,9 @@ export function HeroSection() {
                 להתחיל.
               </h1>
               <p className="mt-6 text-white/55 text-xl leading-relaxed max-w-lg">
-                קריאטין מונוהידראט טהור לספורטאים ומתאמנים. הכלים שצריך כדי להגיע לרמה הבאה.
+                קריאטין טבליות — פתרון נוח ויעיל לצריכת קריאטין יומית.
+                <br />
+                טבליות לעיסה בטעם פירות לשימוש קל, ללא שייקר וללא צורך במים.
               </p>
             </motion.div>
 
@@ -74,7 +76,7 @@ export function HeroSection() {
             >
               {[
                 { value: "3g", label: "קריאטין למנה" },
-                { value: "166", label: "מנות באריזה" },
+                { value: "150", label: "טבליות" },
                 { value: "100%", label: "קריאטין טהור" },
               ].map(({ value, label }) => (
                 <div key={label} className="text-center">
@@ -114,7 +116,7 @@ export function HeroSection() {
                 <p className="text-cyan text-sm">3g מנה יומית</p>
               </div>
               <div className="glass-cyan border border-cyan/20 rounded-xl px-4 py-2.5">
-                <p className="text-cyan text-sm">166 מנות</p>
+                <p className="text-cyan text-sm">150 טבליות</p>
               </div>
             </div>
           </motion.div>

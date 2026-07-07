@@ -26,18 +26,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     if (pathname === "/admin/login") { setLoading(false); return; }
     const check = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { router.push("/admin/login"); return; }
-      const { data } = await supabase.from("admin_users").select("id").eq("id", session.user.id).maybeSingle();
-      if (!data) { await supabase.auth.signOut(); router.push("/admin/login"); return; }
+      const res = await fetch("/api/admin-auth");
+      if (!res.ok) { router.push("/admin/login"); return; }
       setLoading(false);
     };
     check();
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => { if (!session) router.push("/admin/login"); });
-    return () => sub.subscription.unsubscribe();
   }, [router, pathname]);
 
-  const handleLogout = async () => { await supabase.auth.signOut(); router.push("/admin/login"); };
+  const handleLogout = async () => {
+    await fetch("/api/admin-auth", { method: "DELETE" });
+    router.push("/admin/login");
+  };
 
   if (loading) return <div className="min-h-screen bg-navy-950 flex items-center justify-center"><div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" /></div>;
 

@@ -41,17 +41,10 @@ export function Navbar() {
       scrolled ? "glass border-b border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.4)]" : "bg-transparent"
     )}>
       <nav className="max-w-7xl mx-auto px-6 sm:px-10 h-20 flex items-center justify-between">
-        
+
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-cyan flex items-center justify-center shadow-cyan-sm">
-            <Zap className="w-5 h-5 text-navy-900 fill-navy-900" />
-          </div>
-          <span className="font-black text-2xl tracking-tight"><span className="text-cyan">V-FORM</span>
-            
-            
-            <span className="text-white/30 text-sm font-medium ms-2 tracking-normal">NUTRITION</span>
-          </span>
+        <Link href="/" className="flex items-center group">
+          <img src="/logo.png" alt="V-FORM NUTRITION" className="h-12 w-auto object-contain mix-blend-screen" />
         </Link>
 
         {/* Desktop nav */}

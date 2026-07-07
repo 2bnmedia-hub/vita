@@ -64,16 +64,16 @@ export function ProductCard({ product }: ProductCardProps) {
           <Image
             src={imageSrc}
             alt={product.name}
-            width={180}
-            height={180}
-            className="object-contain w-36 h-36 drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
+            width={200}
+            height={200}
+            className="object-contain w-44 h-44 drop-shadow-2xl transition-transform duration-300 group-hover:scale-105 relative z-10"
             onError={(e) => {
               (e.target as HTMLImageElement).src = PLACEHOLDER;
             }}
           />
 
           {/* Scan line */}
-          <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
             <div className="animate-scan w-full h-8 bg-gradient-to-b from-transparent via-cyan/6 to-transparent" />
           </div>
         </div>
@@ -130,12 +130,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Price + CTA */}
         <div className="flex items-center justify-between mt-2">
-          <div>
+          <div className="flex items-baseline gap-3">
             <span className="font-black text-xl text-white">
               {formatPrice(product.price)}
             </span>
             {product.compare_price && (
-              <span className="text-white/30 text-sm line-through mr-2">
+              <span className="text-white/30 text-sm line-through">
                 {formatPrice(product.compare_price)}
               </span>
             )}

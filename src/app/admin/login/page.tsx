@@ -1,12 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/auth";
 import { Zap, Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,15 +13,20 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-    
-    if (authError) {
-      setError("שגיאה: " + authError.message);
+
+    const res = await fetch("/api/admin-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || "שגיאה בכניסה");
       setLoading(false);
       return;
     }
-    await supabase.auth.getSession();
+
     window.location.href = "/admin";
   };
 
@@ -35,25 +37,37 @@ export default function AdminLogin() {
           <div className="w-14 h-14 rounded-2xl bg-cyan mx-auto flex items-center justify-center mb-4 shadow-cyan">
             <Zap className="w-7 h-7 text-navy-900 fill-navy-900" />
           </div>
-          <h1 className="text-2xl font-black"><span className="text-cyan">VI</span>TA ADMIN</h1>
+          <h1 className="text-2xl font-black"><span className="text-cyan">VF</span>ORM ADMIN</h1>
           <p className="text-white/40 text-sm mt-1">כניסה לממשק ניהול</p>
         </div>
         <form onSubmit={handleLogin} className="glass border border-white/[0.08] rounded-2xl p-6 space-y-4">
-          {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-2.5 rounded-xl">{error}</div>}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-2.5 rounded-xl">
+              {error}
+            </div>
+          )}
           <div className="space-y-1.5">
             <label className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">אימייל</label>
-            <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+            <input
+              type="email" required value={email}
+              onChange={e => setEmail(e.target.value)}
               className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20"
-              placeholder="admin@vita.co.il" />
+              placeholder="admin@vform.co.il"
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label>
-            <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
+            <input
+              type="password" required value={password}
+              onChange={e => setPassword(e.target.value)}
               className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20"
-              placeholder="••••••••" />
+              placeholder="••••••••"
+            />
           </div>
-          <button type="submit" disabled={loading}
-            className="w-full bg-cyan text-navy-900 font-black py-3 rounded-xl hover:bg-cyan-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+          <button
+            type="submit" disabled={loading}
+            className="w-full bg-cyan text-navy-900 font-black py-3 rounded-xl hover:bg-cyan-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          >
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" />נכנס...</> : "כניסה"}
           </button>
         </form>

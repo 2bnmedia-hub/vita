@@ -50,14 +50,19 @@ export function ProductDetailClient({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
           {/* Image */}
-          <div className="sticky top-28">
+          <div className="lg:sticky lg:top-28">
             <div className="relative aspect-square rounded-3xl bg-navy-800 border border-white/[0.07] flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 to-transparent" />
-              <span className="text-[160px]">
-                {product.flavor?.includes("ענבים") ? "🍇" :
-                 product.flavor?.includes("פירות") ? "🍹" :
-                 product.name.includes("טבליות") ? "💊" : "🏋️"}
-              </span>
+              {product.images?.[0] ? (
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="w-full h-full object-contain p-6 drop-shadow-2xl relative z-10"
+                  onError={(e) => { (e.target as HTMLImageElement).src = "/creatine-hero.png"; }}
+                />
+              ) : (
+                <img src="/creatine-hero.png" alt={product.name} className="w-full h-full object-contain p-6 relative z-10" />
+              )}
               {product.badge && (
                 <div className="absolute top-4 right-4 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan">
                   {product.badge}
@@ -124,7 +129,7 @@ export function ProductDetailClient({
             </div>
 
             {/* Description */}
-            <p className="text-white/55 leading-relaxed mb-7">{product.long_description}</p>
+            <p className="text-white/55 leading-relaxed mb-7" style={{ unicodeBidi: "plaintext" }}>{product.long_description}</p>
 
             {/* Quantity + Add */}
             <div className="flex gap-4 items-center mb-6">

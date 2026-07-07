@@ -153,20 +153,23 @@ export function CartDrawer() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="px-5 py-5 border-t border-white/[0.08] space-y-3">
-            {/* Subtotal per item breakdown */}
-            <div className="space-y-1.5 mb-2">
+          <div className="px-5 py-5 border-t border-white/[0.08] space-y-4">
+
+            {/* Subtotal */}
+            <div className="space-y-1.5">
               {items.map((item) => (
                 <div key={item.product.id} className="flex justify-between text-xs text-white/40">
                   <span>{item.product.name} × {item.quantity}</span>
                   <span>{formatPrice(item.product.price * item.quantity)}</span>
                 </div>
               ))}
+              <div className="flex justify-between font-black text-lg border-t border-white/[0.06] pt-3">
+                <span>סה&quot;כ</span>
+                <span className="text-white">{formatPrice(total)}</span>
+              </div>
+              <p className="text-xs text-white/30 text-left">+ משלוח לפי אזור — יחושב בתשלום</p>
             </div>
-            <div className="flex items-center justify-between border-t border-white/[0.06] pt-3">
-              <span className="text-white/60 text-sm">סה&quot;כ לתשלום</span>
-              <span className="font-black text-xl text-white">{formatPrice(total)}</span>
-            </div>
+
             <Link
               href="/checkout"
               onClick={closeCart}

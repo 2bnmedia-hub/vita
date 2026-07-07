@@ -25,15 +25,19 @@ export interface CartItem {
   quantity: number;
 }
 
+export type ShippingRegion = "north" | "center" | "south" | "pickup";
+
 export interface CartState {
   items: CartItem[];
   isOpen: boolean;
+  shippingRegion: ShippingRegion;
   addItem: (product: Product, qty?: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  setShippingRegion: (region: ShippingRegion) => void;
 }
 
 export interface ContactForm {

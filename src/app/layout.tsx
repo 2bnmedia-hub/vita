@@ -1,25 +1,27 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/shop/CartDrawer";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: {
-    default: "VITA — הדלק לחיים שלך",
-    template: "%s | VITA",
+    default: "V-FORM NUTRITION — הדלק לחיים שלך",
+    template: "%s | V-FORM NUTRITION",
   },
   description:
     "קריאטין מונוהידראט איכותי לספורטאים ומתאמנים. אבקה בשלושה טעמים וטבליות לעיסה. ייצור לפי תקני GMP, HACCP ו-ISO.",
-  keywords: ["קריאטין", "תוספי תזונה", "ספורט", "כושר", "VITA", "creatine"],
+  keywords: ["קריאטין", "תוספי תזונה", "ספורט", "כושר", "VFORM", "creatine"],
   openGraph: {
     type: "website",
     locale: "he_IL",
-    siteName: "VITA",
+    siteName: "V-FORM NUTRITION",
   },
   robots: { index: true, follow: true },
-  metadataBase: new URL("https://vform-nutrition.vercel.app"),
+  metadataBase: new URL("https://www.vform-nutrition.com"),
 };
 
 export const viewport: Viewport = {
@@ -52,6 +54,11 @@ export default function RootLayout({
         <main className="min-h-screen">{children}</main>
         <Footer />
         <CartDrawer />
+        <CookieConsent />
+        <Script
+          src="https://cdn.enable.co.il/licenses/enable-L39938vi6kreahtn-0325-82744/init.js"
+          strategy="afterInteractive"
+        />
         <Toaster
           position="bottom-center"
           toastOptions={{

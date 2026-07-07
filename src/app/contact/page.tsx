@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const contacts = [
   { icon: Phone, label: "טלפון", value: "055-305-6222", href: "tel:+972553056222" },
   { icon: Mail, label: "אימייל", value: "info@vformnutrition.co.il", href: "mailto:info@vformnutrition.co.il" },
-  { icon: MapPin, label: "כתובת", value: "באר שבע, מבצע נחשון 60", href: undefined },
+  { icon: MapPin, label: "כתובת", value: "נהריה, הגעתון 12", href: undefined },
   { icon: Instagram, label: "Instagram", value: "@vform_nutrition", href: "https://www.instagram.com/vform_nutrition" },
   { icon: Clock, label: "שעות פעילות", value: "א׳–ה׳ 09:00–18:00", href: undefined },
 ];

@@ -7,23 +7,23 @@ const testimonials = [
   {
     name: "יוסי כ.",
     role: "מתאמן כושר",
-    text: "התחלתי עם קריאטין VITA לפני 3 חודשים. ההבדל בכוח ובביצועים מדהים. מומלץ בחום לכל מי שרוצה להתקדם.",
+    text: "התחלתי עם קריאטין VFORM לפני 3 חודשים. ההבדל בכוח ובביצועים מדהים. מומלץ בחום לכל מי שרוצה להתקדם.",
     stars: 5,
-    emoji: "👨‍💪",
+    avatar: "https://i.pravatar.cc/88?img=12",
   },
   {
-    name: "מיכל ר.",
-    role: "רצה מרתון",
-    text: "ניסיתי הרבה תוספים, אבל VITA הוא פשוט אחרת. הטבליות לעיסה נוחות במיוחד — לוקחת אותן לפני כל אימון בלי ערבוב.",
+    name: "אלכס מ.",
+    role: "רץ מרתון",
+    text: "ניסיתי הרבה תוספים, אבל VFORM הוא פשוט אחרת. הטבליות לעיסה נוחות במיוחד — לוקח אותן לפני כל אימון בלי ערבוב.",
     stars: 5,
-    emoji: "🏃‍♀️",
+    avatar: "https://i.pravatar.cc/88?img=52",
   },
   {
     name: "דניאל מ.",
     role: "מאמן כושר אישי",
-    text: "אני ממליץ לכל הלקוחות שלי על VITA. מוצר איכותי, שקוף, עם תקנים בינלאומיים. התוצאות מדברות בעד עצמן.",
+    text: "אני ממליץ לכל הלקוחות שלי על VFORM. מוצר איכותי, שקוף, עם תקנים בינלאומיים. התוצאות מדברות בעד עצמן.",
     stars: 5,
-    emoji: "🏋️",
+    avatar: "https://i.pravatar.cc/88?img=33",
   },
 ];
 
@@ -80,9 +80,11 @@ export function TestimonialsSection() {
 
               {/* Author */}
               <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
-                <div className="w-11 h-11 rounded-2xl glass-cyan border border-cyan/20 flex items-center justify-center text-xl">
-                  {t.emoji}
-                </div>
+                <img
+                  src={t.avatar}
+                  alt={t.name}
+                  className="w-11 h-11 rounded-2xl object-cover border border-cyan/20"
+                />
                 <div>
                   <p className="font-bold text-white">{t.name}</p>
                   <p className="text-white/40 text-sm">{t.role}</p>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, ShoppingBag, Loader2, CheckCircle } from "lucide-react";
-import { useCartStore, selectTotal } from "@/store/cart";
+import { useCartStore, selectTotal, SHIPPING_COST, SHIPPING_LABEL } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
@@ -13,11 +13,12 @@ export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const total = useCartStore(selectTotal);
-  const SHIPPING = { north: 29, center: 39, south: 49 } as const;
-  const REGION_LABEL = { north: "צפון", center: "מרכז", south: "דרום ואילת" } as const;
-  const [region, setRegion] = useState<keyof typeof SHIPPING>("center");
-  const shipping = SHIPPING[region];
+  const region = useCartStore((s) => s.shippingRegion);
+  const setRegion = useCartStore((s) => s.setShippingRegion);
+  const shipping = SHIPPING_COST[region];
   const grandTotal = total + shipping;
+
+
   const clearCart = useCartStore((s) => s.clearCart);
 
   const [loading, setLoading] = useState(false);
@@ -74,22 +75,28 @@ export default function CheckoutPage() {
         quantity: i.quantity,
       }));
 
-      const { error } = await supabase.from("orders").insert([
-        {
-          customer_name: form.name.trim(),
-          customer_email: form.email.trim(),
-          customer_phone: form.phone.trim() || null,
-          address: `${form.address.trim()}, ${form.city.trim()}`,
-          notes: form.notes.trim() || null,
-          items: orderItems,
-          total: grandTotal,
-          shipping_region: REGION_LABEL[region],
-          shipping_cost: shipping,
-          status: "pending",
-        },
-      ]);
+      const orderData = {
+        customer_name: form.name.trim(),
+        customer_email: form.email.trim(),
+        customer_phone: form.phone.trim() || null,
+        address: `${form.address.trim()}, ${form.city.trim()}`,
+        notes: form.notes.trim() || null,
+        items: orderItems,
+        total: grandTotal,
+        shipping_region: SHIPPING_LABEL[region],
+        shipping_cost: shipping,
+        status: "pending",
+      };
+
+      const { error } = await supabase.from("orders").insert([orderData]);
 
       if (error) throw error;
+
+      fetch("/api/send-order-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      }).catch(() => {});
 
       clearCart();
       setDone(true);
@@ -169,8 +176,8 @@ export default function CheckoutPage() {
             {/* Shipping region */}
             <div className="glass border border-white/[0.08] rounded-2xl p-6 space-y-3">
               <h2 className="font-bold text-white/80 text-sm uppercase tracking-wider mb-1">אזור משלוח *</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {(["north","center","south"] as const).map((r) => (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {(["north","center","south","pickup"] as const).map((r) => (
                   <button
                     key={r}
                     type="button"
@@ -181,8 +188,8 @@ export default function CheckoutPage() {
                         : "bg-navy-800 border-white/[0.08] text-white/60 hover:border-white/20"
                     }`}
                   >
-                    {REGION_LABEL[r]}
-                    <span className="block text-xs font-normal mt-0.5 text-white/40">{formatPrice(SHIPPING[r])}</span>
+                    {SHIPPING_LABEL[r]}
+                    <span className="block text-xs font-normal mt-0.5 text-white/40">{formatPrice(SHIPPING_COST[r])}</span>
                   </button>
                 ))}
               </div>
@@ -241,7 +248,7 @@ export default function CheckoutPage() {
                   <span className="text-white/70">{formatPrice(total)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-white/50">
-                  <span>משלוח ({REGION_LABEL[region]})</span>
+                  <span>משלוח ({SHIPPING_LABEL[region]})</span>
                   <span className="text-white/70">{formatPrice(shipping)}</span>
                 </div>
                 <div className="flex justify-between font-black text-lg pt-1">

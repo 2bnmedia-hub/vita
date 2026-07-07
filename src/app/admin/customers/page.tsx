@@ -14,20 +14,78 @@ export default function AdminCustomers() {
   const [filter, setFilter] = useState("all");
 
   const loadCustomers = async () => {
-    const { data } = await supabase.from("customers").select("*").order("created_at", { ascending: false });
-    setCustomers(data ?? []);
+    const { data: custData } = await supabase
+      .from("customers")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    // Also pull pending signups saved to contact_submissions as fallback
+    const { data: fallback } = await supabase
+      .from("contact_submissions")
+      .select("*")
+      .ilike("message", "%הרשמה חדשה לאתר%")
+      .order("created_at", { ascending: false });
+
+    const fallbackCustomers = (fallback ?? []).map((f: any) => ({
+      id: "fallback_" + f.id,
+      full_name: f.name,
+      email: f.email,
+      phone: f.phone,
+      status: "pending",
+      created_at: f.created_at,
+      _fallback: true,
+    }));
+
+    // Merge — skip fallback entries whose email already exists in customers
+    const existingEmails = new Set((custData ?? []).map((c: any) => c.email));
+    const newFallbacks = fallbackCustomers.filter((f) => !existingEmails.has(f.email));
+
+    setCustomers([...(custData ?? []), ...newFallbacks]);
     setLoading(false);
   };
 
   useEffect(() => { loadCustomers(); }, []);
 
   const approve = async (id: string, name: string) => {
+    if (id.startsWith("fallback_")) {
+      const customer = customers.find(c => c.id === id);
+      if (!customer) return;
+      const tid = toast.loading("יוצר חשבון עבור " + name + "...");
+      try {
+        const res = await fetch("/api/admin/promote-fallback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contactId: id,
+            email: customer.email,
+            fullName: customer.full_name,
+            phone: customer.phone,
+          }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "שגיאה");
+        toast.success(name + " אושר ✓ — נשלח לינק איפוס סיסמה", { id: tid });
+        loadCustomers();
+      } catch (err: any) {
+        toast.error("שגיאה: " + err.message, { id: tid });
+      }
+      return;
+    }
     const { error } = await supabase.from("customers").update({ status: "approved", approved_at: new Date().toISOString() }).eq("id", id);
     if (error) toast.error("שגיאה באישור");
     else { toast.success(name + " אושר בהצלחה ✓"); loadCustomers(); }
   };
 
   const reject = async (id: string, name: string) => {
+    if (id.startsWith("fallback_")) {
+      const customer = customers.find(c => c.id === id);
+      if (!customer) return;
+      const numericId = id.replace("fallback_", "");
+      await supabase.from("contact_submissions").delete().eq("id", numericId);
+      toast.success("הרשמת " + name + " נמחקה");
+      loadCustomers();
+      return;
+    }
     if (!confirm("לדחות את " + name + "?")) return;
     const { error } = await supabase.from("customers").update({ status: "rejected" }).eq("id", id);
     if (error) toast.error("שגיאה");
@@ -85,6 +143,7 @@ export default function AdminCustomers() {
                 <td className="px-5 py-4">
                   <p className="font-semibold text-white text-sm">{c.full_name ?? "—"}</p>
                   <p className="text-white/30 text-xs">{c.email}</p>
+                  {c._fallback && <span className="text-amber-400/70 text-[10px] font-bold">⚠ ממתין ליצירת חשבון</span>}
                 </td>
                 <td className="px-5 py-4 hidden md:table-cell"><span className="text-white/40 text-sm">{c.phone ?? "—"}</span></td>
                 <td className="px-5 py-4 hidden md:table-cell"><span className="text-white/40 text-xs">{new Date(c.created_at).toLocaleDateString("he-IL")}</span></td>

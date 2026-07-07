@@ -2,13 +2,30 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CartState, Product } from "@/types";
+import type { CartState, Product, ShippingRegion } from "@/types";
+
+export const SHIPPING_COST: Record<ShippingRegion, number> = {
+  north: 29,
+  center: 39,
+  south: 49,
+  pickup: 0,
+};
+
+export const SHIPPING_LABEL: Record<ShippingRegion, string> = {
+  north: "צפון",
+  center: "מרכז",
+  south: "דרום ואילת",
+  pickup: "איסוף עצמי",
+};
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
       isOpen: false,
+      shippingRegion: "center",
+
+      setShippingRegion: (region: ShippingRegion) => set({ shippingRegion: region }),
 
       addItem: (product: Product, qty: number = 1) => {
         const items = get().items;
@@ -49,7 +66,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "vform-cart",
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, shippingRegion: state.shippingRegion }),
     }
   )
 );
