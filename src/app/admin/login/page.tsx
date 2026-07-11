@@ -37,7 +37,7 @@ export default function AdminLogin() {
           <div className="mx-auto mb-4 flex items-center justify-center">
             <img src="/logo.png" alt="V-FORM NUTRITION" className="h-14 w-auto object-contain mix-blend-screen" />
           </div>
-          <h1 className="text-2xl font-black"><span className="text-cyan">V-FORM</span> ADMIN</h1>
+          <h1 className="text-2xl font-black">ADMIN</h1>
           <p className="text-white/40 text-sm mt-1">כניסה לממשק ניהול</p>
         </div>
         <form onSubmit={handleLogin} className="glass border border-white/[0.08] rounded-2xl p-6 space-y-4">
