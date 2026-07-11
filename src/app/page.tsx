@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { VideoSection } from "@/components/sections/VideoSection";
 import { BenefitsSection } from "@/components/sections/BenefitsSection";
 import { FeaturedProducts } from "@/components/sections/FeaturedProducts";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
@@ -15,6 +16,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <VideoSection />
       <BenefitsSection />
       <Suspense fallback={<ProductsSkeleton />}>
         <FeaturedProducts />
