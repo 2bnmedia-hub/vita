@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 import AdminShell from "@/components/admin/AdminShell";
 
 export const metadata: Metadata = {
-  title: "VITA Admin",
+  title: "V-FORM Admin",
   robots: { index: false, follow: false },
 };
 

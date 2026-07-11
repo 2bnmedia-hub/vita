@@ -37,7 +37,7 @@ export default function AdminLogin() {
           <div className="w-14 h-14 rounded-2xl bg-cyan mx-auto flex items-center justify-center mb-4 shadow-cyan">
             <Zap className="w-7 h-7 text-navy-900 fill-navy-900" />
           </div>
-          <h1 className="text-2xl font-black"><span className="text-cyan">VF</span>ORM ADMIN</h1>
+          <h1 className="text-2xl font-black"><span className="text-cyan">V-FORM</span> ADMIN</h1>
           <p className="text-white/40 text-sm mt-1">כניסה לממשק ניהול</p>
         </div>
         <form onSubmit={handleLogin} className="glass border border-white/[0.08] rounded-2xl p-6 space-y-4">

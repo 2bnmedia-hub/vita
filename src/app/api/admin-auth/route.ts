@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const ADMIN_EMAILS = ["2bnbussiness@gmail.com", "2bnmedia@gmail.com", "vformnutrition@gmail.com"];
-const ADMIN_PASSWORD = "123456";
+const ADMIN_PASSWORD = "v12348765v";
 const SESSION_TOKEN = "vform_admin_session";
 
 export async function POST(req: NextRequest) {
