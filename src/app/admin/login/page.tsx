@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Zap, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -34,8 +34,8 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-navy-950 flex items-center justify-center px-4" dir="rtl">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-cyan mx-auto flex items-center justify-center mb-4 shadow-cyan">
-            <Zap className="w-7 h-7 text-navy-900 fill-navy-900" />
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            <img src="/logo.png" alt="V-FORM NUTRITION" className="h-14 w-auto object-contain mix-blend-screen" />
           </div>
           <h1 className="text-2xl font-black"><span className="text-cyan">V-FORM</span> ADMIN</h1>
           <p className="text-white/40 text-sm mt-1">כניסה לממשק ניהול</p>

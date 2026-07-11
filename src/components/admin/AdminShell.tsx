@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
-import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu, Zap, Users } from "lucide-react";
+import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu, Users } from "lucide-react";
 
 
 
@@ -46,8 +46,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       <aside className={`fixed top-0 right-0 h-full w-64 bg-navy-900 border-l border-white/[0.06] z-40 flex flex-col transition-transform duration-300 ${menuOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}`}>
         <div className="p-5 border-b border-white/[0.06]">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-cyan flex items-center justify-center"><Zap className="w-4 h-4 text-navy-900 fill-navy-900" /></div>
-            <span className="font-black text-lg"><span className="text-cyan">V-FORM</span><span className="text-white/30 text-xs mr-1">ADMIN</span></span>
+            <img src="/logo.png" alt="V-FORM NUTRITION" className="h-8 w-auto object-contain mix-blend-screen" />
+            <span className="font-black text-lg"><span className="text-white/30 text-xs mr-1">ADMIN</span></span>
           </Link>
         </div>
         <nav className="flex-1 p-4 space-y-1">
