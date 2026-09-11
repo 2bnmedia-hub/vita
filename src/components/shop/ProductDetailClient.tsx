@@ -92,13 +92,13 @@ export function ProductDetailClient({
             <h1 className="text-3xl font-black tracking-tight mb-4">{product.name}</h1>
 
             {/* Stars */}
-            <div className="flex items-center gap-2 mb-5">
-              <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-2 mb-5" role="img" aria-label="דירוג 4.9 מתוך 5, 12 ביקורות">
+              <div className="flex items-center gap-0.5" aria-hidden="true">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-cyan/70 text-cyan/70" />
                 ))}
               </div>
-              <span className="text-white/30 text-sm">4.9 (12 ביקורות)</span>
+              <span className="text-white/30 text-sm" aria-hidden="true">4.9 (12 ביקורות)</span>
             </div>
 
             {/* Price */}
@@ -136,16 +136,20 @@ export function ProductDetailClient({
               <div className="flex items-center glass border border-white/[0.08] rounded-xl overflow-hidden">
                 <button
                   onClick={() => setQty(Math.max(1, qty - 1))}
+                  aria-label="הקטן כמות"
                   className="w-11 h-11 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-all text-lg"
                 >
-                  −
+                  <span aria-hidden="true">−</span>
                 </button>
-                <span className="w-10 text-center font-bold">{qty}</span>
+                <span className="w-10 text-center font-bold" aria-live="polite">
+                  <span className="sr-only">כמות: </span>{qty}
+                </span>
                 <button
                   onClick={() => setQty(qty + 1)}
+                  aria-label="הגדל כמות"
                   className="w-11 h-11 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-all text-lg"
                 >
-                  +
+                  <span aria-hidden="true">+</span>
                 </button>
               </div>
               <button
@@ -153,7 +157,7 @@ export function ProductDetailClient({
                 disabled={!product.in_stock}
                 className="btn-primary flex-1 flex items-center justify-center gap-2 bg-cyan text-navy-900 font-black py-3.5 rounded-xl text-base hover:bg-cyan-600 transition-colors shadow-cyan disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-5 h-5" aria-hidden="true" />
                 הוסף לסל
               </button>
             </div>
@@ -162,7 +166,7 @@ export function ProductDetailClient({
             <div className="flex flex-wrap gap-4 pt-5 border-t border-white/[0.06]">
               {guarantees.map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-2 text-white/40 text-sm">
-                  <Icon className="w-4 h-4 text-cyan flex-shrink-0" />
+                  <Icon className="w-4 h-4 text-cyan flex-shrink-0" aria-hidden="true" />
                   {text}
                 </div>
               ))}
@@ -171,9 +175,9 @@ export function ProductDetailClient({
             {/* Nutrition facts */}
             {product.nutrition_facts && (
               <div className="mt-7 glass border border-white/[0.07] rounded-2xl p-5">
-                <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-4">
+                <h2 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-4">
                   ערכים תזונתיים / מנה
-                </h3>
+                </h2>
                 <div className="divide-y divide-white/[0.06]">
                   {Object.entries(product.nutrition_facts).map(([k, v]) => (
                     <div key={k} className="flex justify-between py-2.5">

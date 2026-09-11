@@ -64,11 +64,13 @@ export function ShopFilters({
   return (
     <div className="space-y-4">
       {/* Search bar */}
-      <form onSubmit={handleSearch} className="relative">
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+      <form onSubmit={handleSearch} className="relative" role="search">
+        <label htmlFor="shop-search" className="sr-only">חיפוש מוצר</label>
+        <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" aria-hidden="true" />
         <input
           ref={searchRef}
-          type="text"
+          id="shop-search"
+          type="search"
           defaultValue={currentSearch ?? ""}
           placeholder="חיפוש מוצר..."
           className="w-full bg-navy-800 border border-white/[0.08] rounded-xl pr-10 pl-10 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-cyan/40 transition-colors"
@@ -77,9 +79,10 @@ export function ShopFilters({
           <button
             type="button"
             onClick={clearSearch}
+            aria-label="נקה חיפוש"
             className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         )}
       </form>
@@ -87,9 +90,10 @@ export function ShopFilters({
       {/* Category pills + Sort */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         {/* Category pills — dynamic from DB */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="סינון לפי קטגוריה">
           <button
             onClick={() => navigate({ cat: null })}
+            aria-pressed={!currentCat}
             className={`px-4 py-1.5 rounded-xl text-sm font-bold transition-all duration-200 ${
               !currentCat
                 ? "bg-cyan text-navy-900 shadow-cyan-sm"
@@ -102,6 +106,7 @@ export function ShopFilters({
             <button
               key={id}
               onClick={() => navigate({ cat: name })}
+              aria-pressed={currentCat === name}
               className={`px-4 py-1.5 rounded-xl text-sm font-bold transition-all duration-200 ${
                 currentCat === name
                   ? "bg-cyan text-navy-900 shadow-cyan-sm"
@@ -114,17 +119,21 @@ export function ShopFilters({
         </div>
 
         {/* Sort */}
-        <select
-          value={currentSort ?? "newest"}
-          onChange={(e) => navigate({ sort: e.target.value || null })}
-          className="glass border border-white/[0.08] text-white/70 text-sm rounded-xl px-4 py-1.5 bg-navy-800 cursor-pointer focus:outline-none focus:border-cyan/40"
-        >
-          {sorts.map(({ label, value }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="shop-sort" className="sr-only">מיין לפי</label>
+          <select
+            id="shop-sort"
+            value={currentSort ?? "newest"}
+            onChange={(e) => navigate({ sort: e.target.value || null })}
+            className="glass border border-white/[0.08] text-white/70 text-sm rounded-xl px-4 py-1.5 bg-navy-800 cursor-pointer focus:outline-none focus:border-cyan/40"
+          >
+            {sorts.map(({ label, value }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Loading indicator */}

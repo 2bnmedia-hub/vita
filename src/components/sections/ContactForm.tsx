@@ -51,12 +51,14 @@ export function ContactForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className="space-y-1.5">
-          <label className="text-white/60 text-xs font-bold uppercase tracking-wider">
+          <label htmlFor="contact-name" className="text-white/60 text-xs font-bold uppercase tracking-wider">
             שם מלא *
           </label>
           <input
+            id="contact-name"
             type="text"
             required
+            autoComplete="name"
             placeholder="ישראל ישראלי"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -64,12 +66,14 @@ export function ContactForm() {
           />
         </div>
         <div className="space-y-1.5">
-          <label className="text-white/60 text-xs font-bold uppercase tracking-wider">
+          <label htmlFor="contact-email" className="text-white/60 text-xs font-bold uppercase tracking-wider">
             אימייל *
           </label>
           <input
+            id="contact-email"
             type="email"
             required
+            autoComplete="email"
             placeholder="israel@example.com"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -79,11 +83,13 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-white/60 text-xs font-bold uppercase tracking-wider">
+        <label htmlFor="contact-phone" className="text-white/60 text-xs font-bold uppercase tracking-wider">
           טלפון (אופציונלי)
         </label>
         <input
+          id="contact-phone"
           type="tel"
+          autoComplete="tel"
           placeholder="05X-XXX-XXXX"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -92,10 +98,11 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-white/60 text-xs font-bold uppercase tracking-wider">
+        <label htmlFor="contact-message" className="text-white/60 text-xs font-bold uppercase tracking-wider">
           הודעה *
         </label>
         <textarea
+          id="contact-message"
           required
           rows={5}
           placeholder="שאלתך / פנייתך..."
@@ -112,13 +119,13 @@ export function ContactForm() {
       >
         {loading ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
             שולח...
           </>
         ) : (
           <>
             שלח הודעה
-            <Send className="w-4 h-4" />
+            <Send className="w-4 h-4" aria-hidden="true" />
           </>
         )}
       </button>

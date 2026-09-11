@@ -45,23 +45,23 @@ export default function AccountPage() {
             <p className="text-white/40 mt-1">{customer?.email}</p>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-2 glass border border-white/[0.08] px-4 py-2 rounded-xl text-white/50 hover:text-red-400 hover:border-red-500/20 transition-all text-sm">
-            <LogOut className="w-4 h-4" />התנתק
+            <LogOut className="w-4 h-4" aria-hidden="true" />התנתק
           </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Link href="/account/orders" className="group p-5 glass border border-white/[0.07] hover:border-cyan/25 rounded-2xl transition-all hover:-translate-y-1">
-            <ShoppingBag className="w-6 h-6 text-cyan mb-3" />
+            <ShoppingBag className="w-6 h-6 text-cyan mb-3" aria-hidden="true" />
             <p className="font-black text-xl">{orders.length}</p>
             <p className="text-white/40 text-sm">הזמנות</p>
           </Link>
           <Link href="/account/profile" className="group p-5 glass border border-white/[0.07] hover:border-cyan/25 rounded-2xl transition-all hover:-translate-y-1">
-            <User className="w-6 h-6 text-purple-400 mb-3" />
+            <User className="w-6 h-6 text-purple-400 mb-3" aria-hidden="true" />
             <p className="font-black text-sm text-white">הפרופיל שלי</p>
             <p className="text-white/40 text-sm">עדכן פרטים</p>
           </Link>
           <Link href="/shop" className="group p-5 glass border border-white/[0.07] hover:border-cyan/25 rounded-2xl transition-all hover:-translate-y-1">
-            <Package className="w-6 h-6 text-green-400 mb-3" />
+            <Package className="w-6 h-6 text-green-400 mb-3" aria-hidden="true" />
             <p className="font-black text-sm text-white">לחנות</p>
             <p className="text-white/40 text-sm">הזמן מוצרים</p>
           </Link>
@@ -74,7 +74,7 @@ export default function AccountPage() {
           </div>
           {orders.length === 0 ? (
             <div className="text-center py-12 text-white/30">
-              <Clock className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              <Clock className="w-8 h-8 mx-auto mb-2 opacity-30" aria-hidden="true" />
               <p>אין הזמנות עדיין</p>
               <Link href="/shop" className="text-cyan text-sm hover:underline mt-2 block">לחנות →</Link>
             </div>

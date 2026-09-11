@@ -42,23 +42,25 @@ export default function AdminLogin() {
         </div>
         <form onSubmit={handleLogin} className="glass border border-white/[0.08] rounded-2xl p-6 space-y-4">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-2.5 rounded-xl">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-2.5 rounded-xl" role="alert">
               {error}
             </div>
           )}
           <div className="space-y-1.5">
-            <label className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">אימייל</label>
+            <label htmlFor="admin-email" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">אימייל</label>
             <input
-              type="email" required value={email}
+              id="admin-email"
+              type="email" required value={email} autoComplete="email"
               onChange={e => setEmail(e.target.value)}
               className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20"
               placeholder="admin@vform.co.il"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label>
+            <label htmlFor="admin-password" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label>
             <input
-              type="password" required value={password}
+              id="admin-password"
+              type="password" required value={password} autoComplete="current-password"
               onChange={e => setPassword(e.target.value)}
               className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20"
               placeholder="••••••••"

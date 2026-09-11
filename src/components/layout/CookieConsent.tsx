@@ -85,6 +85,8 @@ export function CookieConsent() {
   return (
     <div
       dir="rtl"
+      role="region"
+      aria-label="הודעת עוגיות"
       className="fixed bottom-0 inset-x-0 z-[9999] p-4 sm:p-6 animate-in slide-in-from-bottom duration-500"
     >
       <div className="max-w-3xl mx-auto bg-navy-900 border border-white/10 rounded-2xl shadow-[0_-8px_40px_rgba(0,0,0,0.6)] overflow-hidden">
@@ -96,7 +98,7 @@ export function CookieConsent() {
           <div className="flex items-start justify-between gap-4 mb-3">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-cyan/10 border border-cyan/20 flex items-center justify-center flex-shrink-0">
-                <Cookie className="w-4 h-4 text-cyan" />
+                <Cookie className="w-4 h-4 text-cyan" aria-hidden="true" />
               </div>
               <div>
                 <h2 className="text-white font-bold text-base leading-tight">אנחנו משתמשים ב-Cookies</h2>
@@ -108,7 +110,7 @@ export function CookieConsent() {
               className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors flex-shrink-0"
               aria-label="סגור"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
 
@@ -137,7 +139,7 @@ export function CookieConsent() {
                     className="flex items-start gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06]"
                   >
                     <div className="w-8 h-8 rounded-lg bg-cyan/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-3.5 h-3.5 text-cyan" />
+                      <Icon className="w-3.5 h-3.5 text-cyan" aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-semibold">{title}</p>
@@ -176,7 +178,7 @@ export function CookieConsent() {
               onClick={() => accept(true)}
               className="flex-1 bg-cyan text-navy-900 font-black py-2.5 px-5 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center justify-center gap-2"
             >
-              <Check className="w-4 h-4" />
+              <Check className="w-4 h-4" aria-hidden="true" />
               אישור הכל
             </button>
             {showDetails ? (

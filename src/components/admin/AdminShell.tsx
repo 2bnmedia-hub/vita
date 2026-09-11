@@ -3,8 +3,9 @@ import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
-import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu, Users } from "lucide-react";
+import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu, Users, Bell } from "lucide-react";
 
 
 
@@ -22,6 +23,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unreadOrders, setUnreadOrders] = useState(0);
 
   useEffect(() => {
     if (pathname === "/admin/login") { setLoading(false); return; }
@@ -32,6 +34,22 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     };
     check();
   }, [router, pathname]);
+
+  useEffect(() => {
+    if (pathname === "/admin/orders") setUnreadOrders(0);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (pathname === "/admin/login" || pathname === "/admin/orders") return;
+    const channel = supabase
+      .channel("admin-shell-order-notifications")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
+        toast.success(`הזמנה חדשה מ־${(payload.new as any).customer_name ?? "לקוח"}!`);
+        setUnreadOrders((n) => n + 1);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [pathname]);
 
   const handleLogout = async () => {
     await fetch("/api/admin-auth", { method: "DELETE" });
@@ -67,7 +85,14 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       <div className="flex-1 md:mr-64 flex flex-col min-h-screen">
         <header className="sticky top-0 z-20 bg-navy-900/80 backdrop-blur border-b border-white/[0.06] px-6 h-20 flex items-center justify-between">
           <button className="md:hidden" onClick={() => setMenuOpen(true)}><Menu className="w-5 h-5 text-white" /></button>
-          <div />
+          <Link href="/admin/orders" aria-label="הזמנות חדשות" className="relative w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-cyan hover:bg-white/5 transition-all">
+            <Bell className={`w-5 h-5 ${unreadOrders > 0 ? "animate-pulse text-cyan" : ""}`} aria-hidden="true" />
+            {unreadOrders > 0 && (
+              <span className="absolute top-1 left-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center">
+                {unreadOrders > 9 ? "9+" : unreadOrders}
+              </span>
+            )}
+          </Link>
           <Link href="/" className="text-xs text-cyan hover:underline">← לאתר</Link>
         </header>
         <main className="flex-1 p-6">{children}</main>

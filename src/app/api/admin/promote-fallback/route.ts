@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
-
-const ADMIN_SESSION_COOKIE = "vform_admin_session";
-
-function isAdminAuthed(req: NextRequest): boolean {
-  const token = req.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-  return !!token;
-}
+import { isAdminAuthed } from "@/lib/adminAuth";
 
 export async function POST(req: NextRequest) {
   if (!isAdminAuthed(req)) {

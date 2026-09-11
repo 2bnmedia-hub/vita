@@ -65,16 +65,16 @@ export function TestimonialsSection() {
               className="group relative p-7 rounded-3xl glass border border-white/[0.07] hover:border-cyan/25 transition-all duration-300 hover:-translate-y-1"
             >
               {/* Quote mark */}
-              <div className="text-cyan/20 text-7xl font-black leading-none mb-4 select-none">"</div>
+              <div className="text-cyan/20 text-7xl font-black leading-none mb-4 select-none" aria-hidden="true">&quot;</div>
 
               <p className="text-white/70 text-base leading-relaxed mb-6 -mt-6">
                 {t.text}
               </p>
 
               {/* Stars */}
-              <div className="flex gap-1 mb-4">
+              <div className="flex gap-1 mb-4" role="img" aria-label={`דירוג ${t.stars} מתוך 5 כוכבים`}>
                 {[...Array(t.stars)].map((_, j) => (
-                  <Star key={j} className="w-4 h-4 fill-cyan text-cyan" />
+                  <Star key={j} className="w-4 h-4 fill-cyan text-cyan" aria-hidden="true" />
                 ))}
               </div>
 
@@ -82,7 +82,7 @@ export function TestimonialsSection() {
               <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
                 <img
                   src={t.avatar}
-                  alt={t.name}
+                  alt=""
                   className="w-11 h-11 rounded-2xl object-cover border border-cyan/20"
                 />
                 <div>

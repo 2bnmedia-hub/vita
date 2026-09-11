@@ -19,6 +19,7 @@ const footerLinks = {
     { label: "מדיניות אספקה", href: "/shipping" },
     { label: "מדיניות החזרות", href: "/returns" },
     { label: "צור קשר", href: "/contact" },
+    { label: "הצהרת נגישות", href: "/accessibility" },
   ],
 };
 
@@ -94,18 +95,18 @@ export function Footer() {
                 href="tel:+972553056222"
                 className="flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
               >
-                <Phone className="w-4 h-4 text-cyan flex-shrink-0" />
+                <Phone className="w-4 h-4 text-cyan flex-shrink-0" aria-hidden="true" />
                 055-305-6222
               </a>
               <div className="flex items-center gap-2 text-white/50 text-sm">
-                <MapPin className="w-4 h-4 text-cyan flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-cyan flex-shrink-0" aria-hidden="true" />
                 נהריה, הגעתון 12
               </div>
               <a
                 href="mailto:vformnutrition@gmail.com"
                 className="flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
               >
-                <Mail className="w-4 h-4 text-cyan flex-shrink-0" />
+                <Mail className="w-4 h-4 text-cyan flex-shrink-0" aria-hidden="true" />
                 vformnutrition@gmail.com
               </a>
             </div>

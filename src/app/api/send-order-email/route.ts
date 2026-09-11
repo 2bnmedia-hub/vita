@@ -39,12 +39,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: "VITA Orders <onboarding@resend.dev>",
       to: TO_EMAIL,
       subject: `הזמנה חדשה מ-${order.customer_name}`,
       html,
     });
+    if (error) {
+      console.error("send-order-email rejected by Resend:", error);
+      return NextResponse.json({ error: error.message ?? "failed to send email" }, { status: 502 });
+    }
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("send-order-email failed", err);

@@ -3,20 +3,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartState, Product, ShippingRegion } from "@/types";
+import { SHIPPING_COST, SHIPPING_LABEL } from "@/lib/shipping";
 
-export const SHIPPING_COST: Record<ShippingRegion, number> = {
-  north: 29,
-  center: 39,
-  south: 49,
-  pickup: 0,
-};
-
-export const SHIPPING_LABEL: Record<ShippingRegion, string> = {
-  north: "צפון",
-  center: "מרכז",
-  south: "דרום ואילת",
-  pickup: "איסוף עצמי",
-};
+export { SHIPPING_COST, SHIPPING_LABEL };
 
 export const useCartStore = create<CartState>()(
   persist(

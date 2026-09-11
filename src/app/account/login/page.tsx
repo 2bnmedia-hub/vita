@@ -46,11 +46,11 @@ export default function LoginPage() {
         </div>
         <div className="glass border border-white/[0.08] rounded-2xl p-7 space-y-4">
           <form onSubmit={handleLogin} className="space-y-4">
-            <div><label className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">אימייל</label><input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className={field} placeholder="you@gmail.com" /></div>
-            <div><label className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label><input required type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className={field} placeholder="••••••••" /></div>
+            <div><label htmlFor="login-email" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">אימייל</label><input id="login-email" required type="email" autoComplete="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className={field} placeholder="you@gmail.com" /></div>
+            <div><label htmlFor="login-password" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label><input id="login-password" required type="password" autoComplete="current-password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className={field} placeholder="••••••••" /></div>
             <button type="submit" disabled={loading}
               className="w-full bg-cyan text-navy-900 font-black py-3.5 rounded-xl hover:bg-cyan-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" />נכנס...</> : "כניסה"}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />נכנס...</> : "כניסה"}
             </button>
           </form>
           <p className="text-center text-white/40 text-sm">

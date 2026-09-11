@@ -33,7 +33,7 @@ export default function ReturnsPage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-12">
           <div className="w-14 h-14 rounded-2xl bg-cyan/10 border border-cyan/20 flex items-center justify-center mx-auto mb-4">
-            <RefreshCcw className="w-7 h-7 text-cyan" />
+            <RefreshCcw className="w-7 h-7 text-cyan" aria-hidden="true" />
           </div>
           <h1 className="text-3xl font-black text-white mb-2">מדיניות החזרות</h1>
           <p className="text-white/50 text-sm">עודכן לאחרונה: ינואר 2026</p>
@@ -43,7 +43,7 @@ export default function ReturnsPage() {
           {items.map(({ icon: Icon, title, body }) => (
             <div key={title} className="bg-navy-900 border border-white/[0.08] rounded-2xl p-5 flex gap-4">
               <div className="w-10 h-10 rounded-xl bg-cyan/10 flex items-center justify-center flex-shrink-0">
-                <Icon className="w-5 h-5 text-cyan" />
+                <Icon className="w-5 h-5 text-cyan" aria-hidden="true" />
               </div>
               <div>
                 <h2 className="text-white font-bold mb-1">{title}</h2>
@@ -62,7 +62,7 @@ export default function ReturnsPage() {
 
         <div className="bg-navy-900 border border-white/[0.08] rounded-2xl p-5">
           <h2 className="text-white font-bold mb-2 flex items-center gap-2">
-            <Phone className="w-4 h-4 text-cyan" /> רוצה להחזיר מוצר?
+            <Phone className="w-4 h-4 text-cyan" aria-hidden="true" /> רוצה להחזיר מוצר?
           </h2>
           <p className="text-white/60 text-sm mb-3">צור איתנו קשר ונטפל בזה במהירות.</p>
           <div className="flex flex-wrap gap-3">

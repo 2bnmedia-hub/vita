@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ADMIN_EMAILS, createAdminSessionToken } from "@/lib/adminAuth";
 
-const ADMIN_EMAILS = ["2bnbussiness@gmail.com", "2bnmedia@gmail.com", "vformnutrition@gmail.com"];
 const ADMIN_PASSWORD = "v12348765v";
 const SESSION_TOKEN = "vform_admin_session";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
+  const normalizedEmail = email?.toLowerCase().trim();
 
-  if (!ADMIN_EMAILS.includes(email?.toLowerCase().trim()) || password !== ADMIN_PASSWORD) {
+  if (!ADMIN_EMAILS.includes(normalizedEmail) || password !== ADMIN_PASSWORD) {
     return NextResponse.json({ error: "אימייל או סיסמה שגויים" }, { status: 401 });
   }
 
-  const token = Buffer.from(`${email}:${Date.now()}`).toString("base64");
+  const token = createAdminSessionToken(normalizedEmail);
 
   const res = NextResponse.json({ ok: true });
   res.cookies.set(SESSION_TOKEN, token, {

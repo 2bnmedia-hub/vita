@@ -101,7 +101,7 @@ export default function AboutSection() {
             >
               <div className="flex justify-center mb-4">
                 <div className="w-14 h-14 rounded-2xl bg-cyan/10 border border-cyan/20 flex items-center justify-center">
-                  <item.Icon className="w-7 h-7 text-cyan" strokeWidth={1.5} />
+                  <item.Icon className="w-7 h-7 text-cyan" strokeWidth={1.5} aria-hidden="true" />
                 </div>
               </div>
               <h4 className="text-cyan text-2xl font-black mb-2">{item.title}</h4>
@@ -140,7 +140,7 @@ export default function AboutSection() {
         >
           <div className="glass rounded-2xl p-6 flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-cyan/10 border border-cyan/20 flex items-center justify-center flex-shrink-0">
-              <MapPin className="w-7 h-7 text-cyan" strokeWidth={1.5} />
+              <MapPin className="w-7 h-7 text-cyan" strokeWidth={1.5} aria-hidden="true" />
             </div>
             <div>
               <p className="text-cyan font-bold text-lg">מיקום</p>
@@ -149,7 +149,7 @@ export default function AboutSection() {
           </div>
           <div className="glass rounded-2xl p-6 flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-cyan/10 border border-cyan/20 flex items-center justify-center flex-shrink-0">
-              <Phone className="w-7 h-7 text-cyan" strokeWidth={1.5} />
+              <Phone className="w-7 h-7 text-cyan" strokeWidth={1.5} aria-hidden="true" />
             </div>
             <div>
               <p className="text-cyan font-bold text-lg">טלפון</p>

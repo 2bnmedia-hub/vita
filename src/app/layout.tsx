@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/shop/CartDrawer";
 import { CookieConsent } from "@/components/layout/CookieConsent";
+import { AccessibilityWidget } from "@/components/layout/AccessibilityWidget";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
@@ -48,17 +48,22 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var r=localStorage.getItem('vform_a11y_settings');if(!r)return;var s=JSON.parse(r);var h=document.documentElement;if(s.textScale)h.style.setProperty('--a11y-text-scale',s.textScale);var f=[];if(s.grayscale)f.push('grayscale(1)');if(s.contrastHigh)f.push('contrast(1.35) saturate(1.15)');if(s.contrastDark)f.push('brightness(0.82)');if(s.invertColors)f.push('invert(1)');if(s.theme==='light')f.push('invert(1) hue-rotate(180deg)');if(f.length)h.style.filter=f.join(' ');var m={contrastHigh:'a11y-contrast-high',underlineLinks:'a11y-underline-links',highlightHeadings:'a11y-highlight-headings',lineHeight:'a11y-line-height',letterSpacing:'a11y-letter-spacing',readableFont:'a11y-readable-font',stopMotion:'a11y-stop-motion',hideImages:'a11y-hide-images',bigCursor:'a11y-big-cursor',focusStrong:'a11y-focus-strong'};for(var k in m){if(s[k])h.classList.add(m[k]);}}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="bg-navy-950 text-white font-sans antialiased">
+        <a href="#main-content" className="skip-link">
+          דילוג לתוכן הראשי
+        </a>
         <Navbar />
-        <main className="min-h-screen">{children}</main>
+        <main id="main-content" className="min-h-screen">{children}</main>
         <Footer />
         <CartDrawer />
         <CookieConsent />
-        <Script
-          src="https://cdn.enable.co.il/licenses/enable-L39938vi6kreahtn-0325-82744/init.js"
-          strategy="afterInteractive"
-        />
+        <AccessibilityWidget />
         <Toaster
           position="bottom-center"
           toastOptions={{

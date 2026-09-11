@@ -43,7 +43,7 @@ export default function ContactPage() {
                 className="flex gap-4 p-4 glass border border-white/[0.07] rounded-xl hover:border-cyan/25 transition-all group"
               >
                 <div className="w-10 h-10 rounded-xl glass-cyan border border-cyan/20 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-4 h-4 text-cyan" />
+                  <Icon className="w-4 h-4 text-cyan" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-white/30 text-xs font-bold uppercase tracking-wider">{label}</p>

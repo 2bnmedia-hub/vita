@@ -80,21 +80,21 @@ export default function RegisterPage() {
 
         <div className="glass border border-white/[0.08] rounded-2xl p-7 space-y-5">
           <form onSubmit={handleRegister} className="space-y-4">
-            <div><label className={label}>שם מלא *</label><input required value={form.full_name} onChange={e => set("full_name", e.target.value)} className={field} placeholder="ישראל ישראלי" /></div>
-            <div><label className={label}>אימייל *</label><input required type="email" value={form.email} onChange={e => set("email", e.target.value)} className={field} placeholder="you@gmail.com" /></div>
-            <div><label className={label}>טלפון</label><input value={form.phone} onChange={e => set("phone", e.target.value)} className={field} placeholder="05X-XXX-XXXX" /></div>
+            <div><label htmlFor="register-name" className={label}>שם מלא *</label><input id="register-name" required autoComplete="name" value={form.full_name} onChange={e => set("full_name", e.target.value)} className={field} placeholder="ישראל ישראלי" /></div>
+            <div><label htmlFor="register-email" className={label}>אימייל *</label><input id="register-email" required type="email" autoComplete="email" value={form.email} onChange={e => set("email", e.target.value)} className={field} placeholder="you@gmail.com" /></div>
+            <div><label htmlFor="register-phone" className={label}>טלפון</label><input id="register-phone" autoComplete="tel" value={form.phone} onChange={e => set("phone", e.target.value)} className={field} placeholder="05X-XXX-XXXX" /></div>
             <div>
-              <label className={label}>סיסמה *</label>
+              <label htmlFor="register-password" className={label}>סיסמה *</label>
               <div className="relative">
-                <input required type={showPass ? "text" : "password"} value={form.password} onChange={e => set("password", e.target.value)} className={field + " pl-11"} placeholder="לפחות 6 תווים" minLength={6} />
-                <button type="button" onClick={() => setShowPass(v => !v)} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors">
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <input id="register-password" required type={showPass ? "text" : "password"} autoComplete="new-password" value={form.password} onChange={e => set("password", e.target.value)} className={field + " pl-11"} placeholder="לפחות 6 תווים" minLength={6} />
+                <button type="button" onClick={() => setShowPass(v => !v)} aria-label={showPass ? "הסתר סיסמה" : "הצג סיסמה"} aria-pressed={showPass} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors">
+                  {showPass ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                 </button>
               </div>
             </div>
             <button type="submit" disabled={loading}
               className="w-full bg-cyan text-navy-900 font-black py-3.5 rounded-xl hover:bg-cyan-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" />נרשם...</> : "הירשם עכשיו"}
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />נרשם...</> : "הירשם עכשיו"}
             </button>
           </form>
 

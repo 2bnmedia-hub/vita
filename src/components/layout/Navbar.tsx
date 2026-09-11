@@ -83,9 +83,9 @@ export function Navbar() {
                 <User className="w-4 h-4 text-cyan" />
                 האזור שלי
               </Link>
-              <button onClick={handleLogout}
+              <button onClick={handleLogout} aria-label="התנתק"
                 className="w-10 h-10 rounded-xl glass flex items-center justify-center transition-all hover:bg-red-500/10">
-                <LogOut className="w-4 h-4" style={{color: "#FF2800"}} />
+                <LogOut className="w-4 h-4" style={{color: "#FF2800"}} aria-hidden="true" />
               </button>
             </div>
           ) : (
@@ -103,15 +103,18 @@ export function Navbar() {
 
           <button
             className="md:hidden w-11 h-11 rounded-xl glass flex items-center justify-center"
-            onClick={() => setMenuOpen((v) => !v)}>
-            {menuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            aria-label={menuOpen ? "סגור תפריט" : "פתח תפריט"}>
+            {menuOpen ? <X className="w-5 h-5 text-white" aria-hidden="true" /> : <Menu className="w-5 h-5 text-white" aria-hidden="true" />}
           </button>
         </div>
       </nav>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden glass border-t border-white/[0.06] px-6 py-5 flex flex-col gap-4">
+        <div id="mobile-menu" className="md:hidden glass border-t border-white/[0.06] px-6 py-5 flex flex-col gap-4">
           {navLinks.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
               className="text-white/80 hover:text-white font-semibold text-base py-2 border-b border-white/[0.06] last:border-0 tracking-wide">

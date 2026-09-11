@@ -202,9 +202,25 @@ export default function AdminProducts() {
                     {p.compare_price && <span className="text-white/30 text-xs line-through mr-1">₪{p.compare_price}</span>}
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
-                    <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${p.in_stock ? "bg-green-500/15 text-green-400" : "bg-red-500/15 text-red-400"}`}>
-                      {p.in_stock ? "במלאי" : "אזל"}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${p.in_stock ? "bg-green-500/15 text-green-400" : "bg-red-500/15 text-red-400"}`}>
+                        {p.in_stock ? "במלאי" : "אזל"}
+                      </span>
+                      <input
+                        type="number"
+                        min={0}
+                        defaultValue={p.stock_quantity ?? ""}
+                        placeholder="ללא הגבלה"
+                        title="כמות במלאי (ריק = ללא הגבלה)"
+                        onBlur={async (e) => {
+                          const raw = e.target.value.trim();
+                          const value = raw === "" ? null : Math.max(0, parseInt(raw, 10));
+                          await supabase.from("products").update({ stock_quantity: value }).eq("id", p.id);
+                          fetchProducts();
+                        }}
+                        className="w-20 bg-navy-800 border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-white placeholder-white/25 focus:border-cyan/40 focus:outline-none"
+                      />
+                    </div>
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2 justify-end">

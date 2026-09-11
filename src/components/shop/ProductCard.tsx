@@ -119,11 +119,13 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Stars */}
-        <div className="flex items-center gap-1 mb-3">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} className="w-3 h-3 fill-cyan/60 text-cyan/60" />
-          ))}
-          <span className="text-white/30 text-xs mr-1">(12)</span>
+        <div className="flex items-center gap-1 mb-3" role="img" aria-label="דירוג 4.9 מתוך 5, 12 ביקורות">
+          <div className="flex items-center gap-1" aria-hidden="true">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-3 h-3 fill-cyan/60 text-cyan/60" />
+            ))}
+            <span className="text-white/30 text-xs mr-1">(12)</span>
+          </div>
         </div>
 
         <div className="flex-1" />
@@ -142,9 +144,10 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
           <button
             onClick={handleAdd}
+            aria-label={`הוסף ${product.name} לסל`}
             className="btn-primary flex items-center gap-1.5 bg-cyan text-navy-900 font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-cyan-600 transition-colors shadow-cyan-sm"
           >
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCart className="w-4 h-4" aria-hidden="true" />
             הוסף
           </button>
         </div>
