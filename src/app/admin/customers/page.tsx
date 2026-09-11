@@ -1,5 +1,4 @@
 "use client";
-import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
 
 import { CheckCircle, XCircle, Users, Search } from "lucide-react";
@@ -14,33 +13,9 @@ export default function AdminCustomers() {
   const [filter, setFilter] = useState("all");
 
   const loadCustomers = async () => {
-    const { data: custData } = await supabase
-      .from("customers")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    // Also pull pending signups saved to contact_submissions as fallback
-    const { data: fallback } = await supabase
-      .from("contact_submissions")
-      .select("*")
-      .ilike("message", "%הרשמה חדשה לאתר%")
-      .order("created_at", { ascending: false });
-
-    const fallbackCustomers = (fallback ?? []).map((f: any) => ({
-      id: "fallback_" + f.id,
-      full_name: f.name,
-      email: f.email,
-      phone: f.phone,
-      status: "pending",
-      created_at: f.created_at,
-      _fallback: true,
-    }));
-
-    // Merge — skip fallback entries whose email already exists in customers
-    const existingEmails = new Set((custData ?? []).map((c: any) => c.email));
-    const newFallbacks = fallbackCustomers.filter((f) => !existingEmails.has(f.email));
-
-    setCustomers([...(custData ?? []), ...newFallbacks]);
+    const res = await fetch("/api/admin/customers");
+    const data = await res.json();
+    setCustomers(data.customers ?? []);
     setLoading(false);
   };
 
@@ -71,24 +46,33 @@ export default function AdminCustomers() {
       }
       return;
     }
-    const { error } = await supabase.from("customers").update({ status: "approved", approved_at: new Date().toISOString() }).eq("id", id);
-    if (error) toast.error("שגיאה באישור");
+    const res = await fetch(`/api/admin/customers/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "approve" }),
+    });
+    if (!res.ok) toast.error("שגיאה באישור");
     else { toast.success(name + " אושר בהצלחה ✓"); loadCustomers(); }
   };
 
   const reject = async (id: string, name: string) => {
     if (id.startsWith("fallback_")) {
-      const customer = customers.find(c => c.id === id);
-      if (!customer) return;
-      const numericId = id.replace("fallback_", "");
-      await supabase.from("contact_submissions").delete().eq("id", numericId);
+      await fetch(`/api/admin/customers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reject" }),
+      });
       toast.success("הרשמת " + name + " נמחקה");
       loadCustomers();
       return;
     }
     if (!confirm("לדחות את " + name + "?")) return;
-    const { error } = await supabase.from("customers").update({ status: "rejected" }).eq("id", id);
-    if (error) toast.error("שגיאה");
+    const res = await fetch(`/api/admin/customers/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "reject" }),
+    });
+    if (!res.ok) toast.error("שגיאה");
     else { toast.success("הלקוח נדחה"); loadCustomers(); }
   };
 

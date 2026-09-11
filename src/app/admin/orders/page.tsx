@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { supabase } from "@/lib/auth";
 import { useEffect, useMemo, useState } from "react";
 import { ShoppingBag, ChevronDown, Trash2, X, Mail, Phone, User, Clock, Send, Search, CreditCard, RotateCcw } from "lucide-react";
 import toast from "react-hot-toast";
@@ -63,41 +62,35 @@ export default function AdminOrders() {
   const [dateTo, setDateTo] = useState("");
 
   const loadOrders = async () => {
-    const { data } = await supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setOrders(data ?? []);
+    const res = await fetch("/api/admin/orders");
+    const data = await res.json();
+    setOrders(data.orders ?? []);
     setLoading(false);
   };
 
   useEffect(() => { loadOrders(); }, []);
 
+  // Orders now go through a service-role API route (anon key no longer has
+  // table access — see the RLS migration), so a client-side Supabase Realtime
+  // subscription can't see changes anymore. Poll instead; 15s is frequent
+  // enough for an admin dashboard without hammering the API.
   useEffect(() => {
-    const channel = supabase
-      .channel("admin-orders-live")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
-        setOrders((prev) => [payload.new, ...prev]);
-        toast.success(`הזמנה חדשה מ־${(payload.new as any).customer_name ?? "לקוח"}!`);
-      })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, (payload) => {
-        setOrders((prev) => prev.map((o) => (o.id === (payload.new as any).id ? payload.new : o)));
-      })
-      .on("postgres_changes", { event: "DELETE", schema: "public", table: "orders" }, (payload) => {
-        setOrders((prev) => prev.filter((o) => o.id !== (payload.old as any).id));
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(loadOrders, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const updateStatus = async (id: string, status: string) => {
-    await supabase.from("orders").update({ status }).eq("id", id);
+    await fetch(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
     loadOrders();
   };
 
   const deleteOrder = async (id: string) => {
     if (!window.confirm("למחוק את ההזמנה הזו? הפעולה אינה הפיכה.")) return;
-    await supabase.from("orders").delete().eq("id", id);
+    await fetch(`/api/admin/orders/${id}`, { method: "DELETE" });
     if (expandedId === id) setExpandedId(null);
     loadOrders();
   };

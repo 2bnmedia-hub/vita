@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { SHIPPING_COST, SHIPPING_LABEL, isShippingRegion } from "@/lib/shipping";
 import { createHandshake, tranzilaTerminal, sanitizeForLog } from "@/lib/tranzila";
 import { priceOrder } from "@/lib/orderPricing";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 
 interface RequestItem {
   product_id: string;

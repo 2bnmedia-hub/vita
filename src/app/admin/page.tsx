@@ -1,4 +1,7 @@
-import { supabase } from "@/lib/auth";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
+import { verifyAdminSessionToken } from "@/lib/adminAuth";
 
 import AdminDashboardClient from "./AdminDashboardClient";
 
@@ -67,6 +70,13 @@ async function getStats() {
 }
 
 export default async function AdminDashboard() {
+  // This is a Server Component — getStats() runs on every request to /admin
+  // regardless of auth, and its result is embedded in the RSC payload before
+  // AdminShell's client-side redirect can fire. Without this guard that's a
+  // real data leak (full order/customer data), not just a UX gap.
+  const token = (await cookies()).get("vform_admin_session")?.value;
+  if (!verifyAdminSessionToken(token)) redirect("/admin/login");
+
   const stats = await getStats();
   return <AdminDashboardClient stats={stats} />;
 }

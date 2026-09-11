@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { lookupTransaction, TRANZILA_SUCCESS_CODES, hebrewMessageForCode, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
 import { notifyOrderPaid } from "@/lib/orderNotify";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 
 const RPC_SECRET = process.env.TRANZILA_WEBHOOK_SECRET;
 
