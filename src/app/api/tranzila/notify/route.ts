@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
     if (rpcError) console.error("notify: confirm_tranzila_payment RPC error:", sanitizeForLog(rpcError.message));
     // Only notify if THIS call won the idempotent claim — otherwise /api/checkout/verify
     // already confirmed it and already sent the emails; sending again would double-notify.
-    else if (confirmed) notifyOrderPaid(req, order);
+    else if (confirmed) await notifyOrderPaid(req, order);
   } else if (RPC_SECRET) {
     const { error: rpcError } = await supabase.rpc("mark_tranzila_payment_failed", {
       p_secret: RPC_SECRET,

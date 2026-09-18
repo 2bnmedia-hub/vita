@@ -109,6 +109,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, message: "אירעה שגיאה באישור התשלום." }, { status: 500 });
   }
 
-  notifyOrderPaid(req, order);
+  await notifyOrderPaid(req, order);
   return NextResponse.json({ ok: true, message: "התשלום אושר בהצלחה." });
 }
