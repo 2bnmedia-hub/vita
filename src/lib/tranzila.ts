@@ -109,6 +109,27 @@ export async function lookupTransaction(transactionIndex: string): Promise<Track
   return json.transactions?.[0] ?? null;
 }
 
+/**
+ * Tranzila's Track Transaction Data API can lag a few seconds behind a
+ * charge that just completed. A single immediate lookup can come back empty
+ * for a real, approved transaction, which would wrongly mark it failed —
+ * this happened to real customers (empty result right after charge, even
+ * though their card was approved). Retry briefly before giving up.
+ * ponytail: fixed delay schedule, not adaptive; widen it if lag grows.
+ */
+export async function lookupTransactionWithRetry(
+  transactionIndex: string,
+  delaysMs: number[] = [0, 1000, 2000, 2000]
+): Promise<TrackedTransaction | null> {
+  let tracked: TrackedTransaction | null = null;
+  for (const delay of delaysMs) {
+    if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+    tracked = await lookupTransaction(transactionIndex);
+    if (tracked) return tracked;
+  }
+  return tracked;
+}
+
 export interface RefundResult {
   ok: boolean;
   errorCode?: number;

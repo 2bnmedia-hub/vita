@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { lookupTransaction, TRANZILA_SUCCESS_CODES, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
+import { lookupTransactionWithRetry, TRANZILA_SUCCESS_CODES, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
 import { notifyOrderPaid } from "@/lib/orderNotify";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
   // Never trust the posted Response field alone — reconcile server-to-server.
   let tracked;
   try {
-    tracked = await lookupTransaction(String(transactionId));
+    tracked = await lookupTransactionWithRetry(String(transactionId));
   } catch (e) {
     console.error("notify: lookup failed", sanitizeForLog(String(e)));
     return new NextResponse("OK", { status: 200 });

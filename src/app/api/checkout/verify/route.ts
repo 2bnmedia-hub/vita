@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { lookupTransaction, TRANZILA_SUCCESS_CODES, hebrewMessageForCode, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
+import { lookupTransactionWithRetry, TRANZILA_SUCCESS_CODES, hebrewMessageForCode, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
 import { notifyOrderPaid } from "@/lib/orderNotify";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   let tracked;
   try {
-    tracked = await lookupTransaction(transactionId);
+    tracked = await lookupTransactionWithRetry(transactionId);
   } catch (e) {
     console.error("tranzila lookup failed:", sanitizeForLog(String(e)));
     return NextResponse.json({ ok: false, message: "לא ניתן לאמת את העסקה כרגע. נסה/י שוב." }, { status: 502 });

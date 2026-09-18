@@ -1,10 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import crypto from "crypto";
 import {
   computeAccessToken,
   hebrewMessageForCode,
   TRANZILA_SUCCESS_CODES,
   sanitizeForLog,
+  lookupTransactionWithRetry,
 } from "@/lib/tranzila";
 
 describe("computeAccessToken", () => {
@@ -44,6 +45,45 @@ describe("hebrewMessageForCode / TRANZILA_SUCCESS_CODES", () => {
   it("falls back to a generic Hebrew message for unknown codes", () => {
     expect(hebrewMessageForCode("999999")).toBeTruthy();
     expect(hebrewMessageForCode(undefined)).toBeTruthy();
+  });
+});
+
+describe("lookupTransactionWithRetry", () => {
+  const originalFetch = global.fetch;
+  const originalEnv = { ...process.env };
+
+  beforeEach(() => {
+    process.env.TRANZILA_TERMINAL_NAME = "t";
+    process.env.TRANZILA_PUBLIC_KEY = "k";
+    process.env.TRANZILA_PRIVATE_KEY = "s";
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    process.env = { ...originalEnv };
+  });
+
+  it("retries until the transaction shows up, without waiting real time", async () => {
+    let calls = 0;
+    global.fetch = vi.fn(async () => {
+      calls++;
+      const body =
+        calls < 3
+          ? { transactions: [] }
+          : { transactions: [{ index: "1", amount: "10", currency: "ILS", authorization_number: "a", transtatus: "000" }] };
+      return { json: async () => body } as unknown as Response;
+    });
+
+    const result = await lookupTransactionWithRetry("1", [0, 0, 0, 0]);
+    expect(calls).toBe(3);
+    expect(result?.transtatus).toBe("000");
+  });
+
+  it("gives up and returns null after exhausting all retries", async () => {
+    global.fetch = vi.fn(async () => ({ json: async () => ({ transactions: [] }) } as unknown as Response));
+
+    const result = await lookupTransactionWithRetry("1", [0, 0]);
+    expect(result).toBeNull();
   });
 });
 
