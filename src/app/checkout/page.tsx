@@ -219,8 +219,8 @@ export default function CheckoutPage() {
               orderId,
               transactionId,
               cardBrand: txResult.card_type_name,
-              last4: txResult.last_4,
-              installments: txResult.installments,
+              last4: txResult.credit_card_last_4_digits,
+              installments: txResult.total_installments_number,
               processorCode,
             }),
           });

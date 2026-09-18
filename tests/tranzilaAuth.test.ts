@@ -37,6 +37,10 @@ describe("hebrewMessageForCode / TRANZILA_SUCCESS_CODES", () => {
     expect(hebrewMessageForCode("000")).toContain("אושר");
   });
 
+  it("treats 777 as success (Tranzila's secondary success code for J2/J5-style operations)", () => {
+    expect(TRANZILA_SUCCESS_CODES.has("777")).toBe(true);
+  });
+
   it("returns a Hebrew decline message for known decline codes", () => {
     expect(hebrewMessageForCode("015")).toContain("תוקף");
     expect(hebrewMessageForCode("447")).toContain("כרטיס");

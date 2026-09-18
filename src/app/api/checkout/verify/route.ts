@@ -50,7 +50,23 @@ export async function POST(req: NextRequest) {
     tracked = await lookupTransactionWithRetry(transactionId);
   } catch (e) {
     console.error("tranzila lookup failed:", sanitizeForLog(String(e)));
-    return NextResponse.json({ ok: false, message: "לא ניתן לאמת את העסקה כרגע. נסה/י שוב." }, { status: 502 });
+    // Outcome is genuinely unknown here — Tranzila may have approved the charge
+    // even though we couldn't reach the lookup API to confirm it. Record this
+    // on the order (without touching payment_status, so a legitimate retry
+    // still works) so it isn't silently lost — an unreconciled charge with no
+    // trace anywhere is the real risk, not just a UI error message.
+    await supabase
+      .from("orders")
+      .update({
+        payment_attempts: (order.payment_attempts ?? 0) + 1,
+        last_payment_error: sanitizeForLog(`verify_lookup_error transactionId=${transactionId} :: ${String(e)}`),
+      })
+      .eq("id", orderId)
+      .eq("payment_status", "pending");
+    return NextResponse.json(
+      { ok: false, message: "לא ניתן לאמת את העסקה כרגע. אם נגבה סכום בכרטיס, אל תנסה/י שוב לפני בדיקת מצב ההזמנה — פנה/י אלינו לבדיקה." },
+      { status: 502 }
+    );
   }
 
   const status = tracked?.transtatus != null ? String(tracked.transtatus) : undefined;

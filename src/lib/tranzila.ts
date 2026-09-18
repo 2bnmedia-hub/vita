@@ -169,7 +169,11 @@ export async function refundTransaction(params: {
 }
 
 /** docs.tranzila.com/docs/payments-and-billing/transaction-response-codes */
-export const TRANZILA_SUCCESS_CODES = new Set(["000", "0"]);
+// Per docs.tranzila.com/docs/payments-and-billing/transaction-response-codes:
+// "000" is the standard approved-sale code; "777" is a secondary success code
+// for operations that don't record a formal transaction (e.g. J2/J5) — added
+// so a real approval of that kind is never misread as a decline.
+export const TRANZILA_SUCCESS_CODES = new Set(["000", "0", "777"]);
 
 const HEBREW_DECLINE_MESSAGES: Record<string, string> = {
   "001": "הכרטיס חסום. פנה/י לחברת האשראי.",

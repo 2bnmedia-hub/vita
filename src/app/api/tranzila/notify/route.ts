@@ -83,6 +83,18 @@ export async function POST(req: NextRequest) {
     tracked = await lookupTransactionWithRetry(String(transactionId));
   } catch (e) {
     console.error("notify: lookup failed", sanitizeForLog(String(e)));
+    // Same ambiguous-outcome gap as /api/checkout/verify: don't let this
+    // vanish untraced. payment_status is left untouched (still 'pending') —
+    // Tranzila's own webhook retry, or the browser's verify call, may still
+    // resolve it correctly.
+    await supabase
+      .from("orders")
+      .update({
+        payment_attempts: (order.payment_attempts ?? 0) + 1,
+        last_payment_error: sanitizeForLog(`notify_lookup_error transactionId=${transactionId} :: ${String(e)}`),
+      })
+      .eq("id", order.id)
+      .eq("payment_status", "pending");
     return new NextResponse("OK", { status: 200 });
   }
 
