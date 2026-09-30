@@ -38,10 +38,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   return (
     <div className="min-h-screen bg-navy-950 pt-24" dir="rtl">
       {/* Hero bar */}
-      <div className="relative bg-navy-900 border-b border-white/[0.06] py-12 overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-50" />
-        <div className="orb w-64 h-64 bg-cyan/8 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
+      <div className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <span className="inline-block text-cyan text-xs font-bold uppercase tracking-widest mb-2">
             חנות
           </span>
