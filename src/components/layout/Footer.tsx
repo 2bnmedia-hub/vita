@@ -128,7 +128,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-white/30 text-xs">
-            © 2026 <a href="https://www.2bnmedia.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan transition-colors">2bnmedia.com</a> · כל הזכויות שמורות
+            בנייה, עיצוב, פיתוח ותחזוקה: <a href="https://www.2bnmedia.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan transition-colors">2BNmedia.com</a>
           </p>
           <p className="text-white/20 text-xs">
             תוסף תזונה — יש לשמור במקום קריר ויבש · להרחיק מהישג ידם של ילדים
