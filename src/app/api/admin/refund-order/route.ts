@@ -46,7 +46,9 @@ export async function POST(req: NextRequest) {
     p_order_id: orderId,
     p_amount: refundAmount,
     p_full: full !== false,
-    p_auth_number: result.authNumber ?? null,
+    // Keep the credit transaction's own id next to its auth number, so the
+    // refund can be looked up at Tranzila later.
+    p_auth_number: `${result.authNumber ?? ""} txn ${result.transactionId ?? "?"}`,
   });
   if (rpcError) {
     console.error("record_tranzila_refund RPC error:", sanitizeForLog(rpcError.message));

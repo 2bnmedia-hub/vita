@@ -46,6 +46,9 @@ export async function POST(req: NextRequest) {
   if (order.payment_status === "paid") {
     return NextResponse.json({ ok: true, message: "התשלום כבר אושר" });
   }
+  if (order.payment_status === "refunded" || order.payment_status === "partially_refunded") {
+    return NextResponse.json({ ok: false, message: "ההזמנה זוכתה. לא בוצע חיוב נוסף." });
+  }
 
   // Reconciliation trace only — never used to decide the outcome.
   const snapshot = hostedFieldsSnapshot(body?.raw);
