@@ -130,6 +130,30 @@ export async function lookupTransactionWithRetry(
   return tracked;
 }
 
+export type PaymentOutcome = "approved" | "declined" | "unconfirmed";
+
+/**
+ * Single decision point for what a Tranzila lookup result means for an order.
+ * "unconfirmed" is NOT a failure: a transaction id exists at Tranzila but we
+ * could not prove it approved for this order's amount (no record in the
+ * report API, or a record with a different amount). The card may well have
+ * been charged, so callers must neither mark the order failed nor offer a
+ * second charge. `reportedCode` (browser/webhook-reported) can only ever
+ * turn a missing record into "declined" — it is never able to approve.
+ */
+export function classifyPayment(
+  tracked: TrackedTransaction | null,
+  orderTotal: number | string,
+  reportedCode?: string | null
+): PaymentOutcome {
+  if (!tracked) {
+    return reportedCode && !TRANZILA_SUCCESS_CODES.has(reportedCode) ? "declined" : "unconfirmed";
+  }
+  if (tracked.transtatus == null) return "unconfirmed";
+  if (!TRANZILA_SUCCESS_CODES.has(String(tracked.transtatus))) return "declined";
+  return Math.abs(Number(tracked.amount) - Number(orderTotal)) < 0.01 ? "approved" : "unconfirmed";
+}
+
 export interface RefundResult {
   ok: boolean;
   errorCode?: number;

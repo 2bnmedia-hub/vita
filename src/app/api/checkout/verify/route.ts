@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { lookupTransactionWithRetry, TRANZILA_SUCCESS_CODES, hebrewMessageForCode, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
+import { lookupTransactionWithRetry, classifyPayment, hebrewMessageForCode, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
 import { notifyOrderPaid } from "@/lib/orderNotify";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 
@@ -34,7 +34,9 @@ export async function POST(req: NextRequest) {
   }
   if (!RPC_SECRET) {
     console.error("TRANZILA_WEBHOOK_SECRET not configured — cannot confirm payments");
-    return NextResponse.json({ ok: false, message: "שגיאת הגדרות שרת" }, { status: 500 });
+    // The browser only calls this after a charge was submitted — our own
+    // misconfiguration says nothing about whether the card was charged.
+    return NextResponse.json({ ok: false, pending: true, message: "לא ניתן לאמת את התשלום כרגע. אין לבצע תשלום נוסף — פנה/י אלינו לבדיקה." }, { status: 500 });
   }
 
   const { data: order } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
@@ -64,16 +66,37 @@ export async function POST(req: NextRequest) {
       .eq("id", orderId)
       .eq("payment_status", "pending");
     return NextResponse.json(
-      { ok: false, message: "לא ניתן לאמת את העסקה כרגע. אם נגבה סכום בכרטיס, אל תנסה/י שוב לפני בדיקת מצב ההזמנה — פנה/י אלינו לבדיקה." },
+      { ok: false, pending: true, message: "לא ניתן לאמת את העסקה כרגע. אם נגבה סכום בכרטיס, אל תנסה/י שוב לפני בדיקת מצב ההזמנה — פנה/י אלינו לבדיקה." },
       { status: 502 }
     );
   }
 
   const status = tracked?.transtatus != null ? String(tracked.transtatus) : undefined;
   const amountOk = tracked ? Math.abs(Number(tracked.amount) - Number(order.total)) < 0.01 : false;
-  const success = !!tracked && status !== undefined && TRANZILA_SUCCESS_CODES.has(status) && amountOk;
+  const outcome = classifyPayment(tracked, order.total, clientProcessorCode);
 
-  if (!success) {
+  if (outcome === "unconfirmed") {
+    // A transaction exists at Tranzila but we could not prove its result.
+    // Never mark this failed and never invite a second charge: keep the order
+    // pending and leave a trace (incl. the transaction id) for reconciliation.
+    await supabase
+      .from("orders")
+      .update({
+        payment_attempts: (order.payment_attempts ?? 0) + 1,
+        last_payment_error: sanitizeForLog(
+          `verify_unconfirmed transactionId=${transactionId} status=${status ?? "none"} clientCode=${clientProcessorCode ?? "none"} amountOk=${amountOk}`
+        ),
+      })
+      .eq("id", orderId)
+      .eq("payment_status", "pending");
+    return NextResponse.json({
+      ok: false,
+      pending: true,
+      message: "העסקה התקבלה אצל חברת הסליקה ואנו משלימים את אימות התשלום. אין לבצע תשלום נוסף — ניצור איתך קשר לאישור ההזמנה.",
+    });
+  }
+
+  if (outcome === "declined") {
     const { error: rpcError } = await supabase.rpc("mark_tranzila_payment_failed", {
       p_secret: RPC_SECRET,
       p_order_id: orderId,
@@ -106,7 +129,12 @@ export async function POST(req: NextRequest) {
     if (refreshed?.payment_status === "paid") {
       return NextResponse.json({ ok: true, message: "התשלום אושר בהצלחה." });
     }
-    return NextResponse.json({ ok: false, message: "אירעה שגיאה באישור התשלום." }, { status: 500 });
+    // Tranzila confirmed the charge; only our own order update failed. That is
+    // not a failed payment — the customer must not be sent to pay again.
+    return NextResponse.json(
+      { ok: false, pending: true, message: "התשלום אושר אך עדכון ההזמנה לא הושלם. אין לבצע תשלום נוסף — ניצור איתך קשר לאישור ההזמנה." },
+      { status: 500 }
+    );
   }
 
   await notifyOrderPaid(req, order);

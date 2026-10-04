@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { lookupTransactionWithRetry, TRANZILA_SUCCESS_CODES, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
+import { lookupTransactionWithRetry, classifyPayment, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
 import { notifyOrderPaid } from "@/lib/orderNotify";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 
@@ -100,9 +100,20 @@ export async function POST(req: NextRequest) {
 
   const status = tracked?.transtatus != null ? String(tracked.transtatus) : undefined;
   const amountOk = tracked ? Math.abs(Number(tracked.amount) - Number(order.total)) < 0.01 : false;
-  const success = !!tracked && status !== undefined && TRANZILA_SUCCESS_CODES.has(status) && amountOk;
+  const outcome = classifyPayment(tracked, order.total);
 
-  if (success && RPC_SECRET) {
+  if (outcome === "unconfirmed") {
+    // Same rule as /api/checkout/verify: an unprovable result is not a failure.
+    // Leave the order pending with a trace instead of flipping it to failed.
+    await supabase
+      .from("orders")
+      .update({
+        payment_attempts: (order.payment_attempts ?? 0) + 1,
+        last_payment_error: sanitizeForLog(`notify_unconfirmed transactionId=${transactionId} status=${status ?? "none"} amountOk=${amountOk}`),
+      })
+      .eq("id", order.id)
+      .eq("payment_status", "pending");
+  } else if (outcome === "approved" && RPC_SECRET) {
     const { data: confirmed, error: rpcError } = await supabase.rpc("confirm_tranzila_payment", {
       p_secret: RPC_SECRET,
       p_order_id: order.id,

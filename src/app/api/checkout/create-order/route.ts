@@ -69,6 +69,15 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
+    // payment_attempts only rises on a still-pending order when a charge was
+    // already sent to Tranzila and its result could not be confirmed. Opening a
+    // new handshake here would let the same order be charged a second time.
+    if ((existing.payment_attempts ?? 0) > 0) {
+      return NextResponse.json(
+        { error: "קיים תשלום בבדיקה עבור הזמנה זו. אין לבצע תשלום נוסף.", orderNumber: existing.order_number, paymentStatus: "pending" },
+        { status: 409 }
+      );
+    }
     const handshake = await createHandshake(Number(existing.total), {
       order_id: existing.id,
       order_number: existing.order_number,

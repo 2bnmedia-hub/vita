@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import Link from "next/link";
-import { ArrowRight, ShoppingBag, Loader2, CheckCircle, XCircle, Lock } from "lucide-react";
+import { ArrowRight, ShoppingBag, Loader2, CheckCircle, XCircle, Lock, Clock } from "lucide-react";
 import { useCartStore, selectTotal, SHIPPING_COST, SHIPPING_LABEL } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import toast from "react-hot-toast";
@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-type Phase = "form" | "paying" | "success" | "failure";
+type Phase = "form" | "paying" | "success" | "failure" | "unconfirmed";
 
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
@@ -51,6 +51,44 @@ export default function CheckoutPage() {
     typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`
   );
   const hostedFieldsRef = useRef<any>(null);
+  // Payload of the last /api/checkout/verify call, kept so the "unconfirmed"
+  // screen can re-ask the server for the status. Verify only ever reads from
+  // Tranzila — re-sending it can never create another charge.
+  const verifyPayloadRef = useRef<Record<string, unknown> | null>(null);
+  const [checking, setChecking] = useState(false);
+
+  const applyVerifyResult = (verifyData: any, newOrderNumber: string | null) => {
+    if (newOrderNumber) setOrderNumber(newOrderNumber);
+    if (verifyData.ok) {
+      clearCart();
+      setPhase("success");
+    } else if (verifyData.pending) {
+      // The charge may already have gone through — empty the cart so a page
+      // refresh lands on "cart is empty" instead of a ready-to-pay form.
+      clearCart();
+      setErrorMsg(verifyData.message || null);
+      setPhase("unconfirmed");
+    } else {
+      setErrorMsg(verifyData.message || "אירעה שגיאה באישור התשלום.");
+      setPhase("failure");
+    }
+  };
+
+  const recheckStatus = async () => {
+    if (checking || !verifyPayloadRef.current) return;
+    setChecking(true);
+    try {
+      const res = await fetch("/api/checkout/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(verifyPayloadRef.current),
+      });
+      applyVerifyResult(await res.json(), null);
+    } catch {
+      // Network error while checking — stay on this screen, nothing changed.
+    }
+    setChecking(false);
+  };
 
   const field =
     "w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-white/25 text-sm focus:border-cyan/40 focus:outline-none focus:ring-2 focus:ring-cyan/10 transition-all";
@@ -109,6 +147,27 @@ export default function CheckoutPage() {
     );
   }
 
+  if (phase === "unconfirmed") {
+    return (
+      <div className="min-h-screen bg-navy-950 pt-28 flex flex-col items-center justify-center gap-6 text-center px-4">
+        <div className="w-20 h-20 rounded-2xl bg-cyan/10 border border-cyan/30 flex items-center justify-center">
+          <Clock className="w-10 h-10 text-cyan" aria-hidden="true" />
+        </div>
+        <h1 className="text-3xl font-black">התשלום בבדיקה</h1>
+        {orderNumber && <p className="text-white/60">מספר הזמנה: <span className="font-bold text-cyan">{orderNumber}</span></p>}
+        <p className="text-white/50 max-w-sm">{errorMsg ?? "אנו משלימים את אימות התשלום. אין לבצע תשלום נוסף."}</p>
+        <button
+          onClick={recheckStatus}
+          disabled={checking}
+          className="btn-primary bg-cyan text-navy-900 font-black px-8 py-3 rounded-xl hover:bg-cyan-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {checking && <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />}
+          בדיקת סטטוס
+        </button>
+      </div>
+    );
+  }
+
   if (phase === "failure") {
     return (
       <div className="min-h-screen bg-navy-950 pt-28 flex flex-col items-center justify-center gap-6 text-center px-4">
@@ -118,7 +177,7 @@ export default function CheckoutPage() {
         <h1 className="text-3xl font-black">התשלום נכשל</h1>
         <p className="text-white/50 max-w-sm">{errorMsg ?? "אירעה שגיאה בביצוע התשלום."}</p>
         <button
-          onClick={() => setPhase("form")}
+          onClick={() => window.location.reload()}
           className="btn-primary bg-cyan text-navy-900 font-black px-8 py-3 rounded-xl hover:bg-cyan-600 transition-colors"
         >
           נסה/י שוב
@@ -212,29 +271,32 @@ export default function CheckoutPage() {
           const processorCode =
             txResult.processor_response_code != null ? String(txResult.processor_response_code).slice(0, 10) : null;
 
-          const verifyRes = await fetch("/api/checkout/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              orderId,
-              transactionId,
-              cardBrand: txResult.card_type_name,
-              last4: txResult.credit_card_last_4_digits,
-              installments: txResult.total_installments_number,
-              processorCode,
-            }),
-          });
-          const verifyData = await verifyRes.json();
+          verifyPayloadRef.current = {
+            orderId,
+            transactionId,
+            cardBrand: txResult.card_type_name,
+            last4: txResult.credit_card_last_4_digits,
+            installments: txResult.total_installments_number,
+            processorCode,
+          };
+
+          // From here on a charge was already submitted to Tranzila. If our own
+          // verify call can't be reached or answers garbage, the result is
+          // unknown — never "failed", and never an invitation to pay again.
+          let verifyData: any;
+          try {
+            const verifyRes = await fetch("/api/checkout/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(verifyPayloadRef.current),
+            });
+            verifyData = await verifyRes.json();
+          } catch {
+            verifyData = { ok: false, pending: true };
+          }
 
           setSubmitting(false);
-          if (verifyData.ok) {
-            clearCart();
-            setOrderNumber(newOrderNumber);
-            setPhase("success");
-          } else {
-            setErrorMsg(verifyData.message || "אירעה שגיאה באישור התשלום.");
-            setPhase("failure");
-          }
+          applyVerifyResult(verifyData, newOrderNumber);
         }
       );
     } catch {
