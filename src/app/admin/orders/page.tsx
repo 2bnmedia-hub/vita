@@ -247,6 +247,9 @@ export default function AdminOrders() {
                       </td>
                       <td className="px-5 py-4">
                         <span className="font-bold text-white">₪{Number(o.total).toLocaleString("he-IL")}</span>
+                        {o.coupon_code && (
+                          <p className="text-cyan/70 text-xs mt-0.5">קופון {o.coupon_code} · ‎-₪{Number(o.discount_amount ?? 0).toLocaleString("he-IL")}</p>
+                        )}
                       </td>
                       <td className="px-5 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${paymentColors[paymentStatus] ?? "bg-white/10 text-white/50 border-white/10"}`}>

@@ -67,3 +67,30 @@ describe("priceOrder", () => {
     expect(result.shipping).toBe(0);
   });
 });
+
+describe("coupon discount", () => {
+  it("takes the percentage off the products subtotal only — shipping is not discounted", () => {
+    const result = priceOrder([{ product_id: "p1", quantity: 2 }], products, "center", 15);
+    if (!result.ok) throw new Error("unreachable");
+    expect(result.subtotal).toBe(178);
+    expect(result.discount).toBe(26.7);
+    expect(result.shipping).toBe(39);
+    expect(result.total).toBe(190.3); // 178 - 26.70 + 39
+  });
+
+  it("rounds the discount to a whole agora and the total stays exact", () => {
+    const odd: PriceableProduct[] = [{ id: "o1", name: "odd", price: 94.99, in_stock: true, stock_quantity: null }];
+    const result = priceOrder([{ product_id: "o1", quantity: 1 }], odd, "pickup", 15);
+    if (!result.ok) throw new Error("unreachable");
+    expect(result.discount).toBe(14.25); // 14.2485 → 14.25
+    expect(result.total).toBe(80.74);
+    expect(Number.isInteger(Math.round(result.total * 100))).toBe(true);
+  });
+
+  it("no coupon means no discount", () => {
+    const result = priceOrder([{ product_id: "p1", quantity: 1 }], products, "pickup");
+    if (!result.ok) throw new Error("unreachable");
+    expect(result.discount).toBe(0);
+    expect(result.total).toBe(89);
+  });
+});

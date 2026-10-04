@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { lookupTransactionWithRetry, classifyPayment, hebrewMessageForCode, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
+import { lookupTransactionWithRetry, classifyPayment, hebrewMessageForCode, hostedFieldsSnapshot, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
 import { notifyOrderPaid } from "@/lib/orderNotify";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 
@@ -45,6 +45,12 @@ export async function POST(req: NextRequest) {
   }
   if (order.payment_status === "paid") {
     return NextResponse.json({ ok: true, message: "התשלום כבר אושר" });
+  }
+
+  // Reconciliation trace only — never used to decide the outcome.
+  const snapshot = hostedFieldsSnapshot(body?.raw);
+  if (snapshot) {
+    await supabase.from("orders").update({ tranzila_response: snapshot }).eq("id", orderId).eq("payment_status", "pending");
   }
 
   let tracked;

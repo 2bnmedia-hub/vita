@@ -162,6 +162,19 @@ begin
         and stock_quantity is not null;
   end loop;
 
+  -- Coupon (see supabase-coupons-migration.sql): a redemption is counted only
+  -- here, i.e. only once the payment is verified. Runs at most once per order
+  -- because only a 'pending' order gets this far, so a repeated notification
+  -- can never count a second redemption. Refunds never give it back.
+  if v_order.coupon_code is not null then
+    update public.coupons set
+      redeemed_count    = redeemed_count + 1,
+      redeemed_order_id = p_order_id,
+      redeemed_at       = now(),
+      reserved_order_id = case when reserved_order_id = p_order_id then null else reserved_order_id end
+    where code = v_order.coupon_code;
+  end if;
+
   return true;
 end;
 $$;

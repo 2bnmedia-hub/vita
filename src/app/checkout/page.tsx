@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, ShoppingBag, Loader2, CheckCircle, XCircle, Lock, Clock } from "lucide-react";
 import { useCartStore, selectTotal, SHIPPING_COST, SHIPPING_LABEL } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
+import { couponDiscount } from "@/lib/orderPricing";
 import toast from "react-hot-toast";
 
 declare global {
@@ -24,7 +25,13 @@ export default function CheckoutPage() {
   const region = useCartStore((s) => s.shippingRegion);
   const setRegion = useCartStore((s) => s.setShippingRegion);
   const shipping = SHIPPING_COST[region];
-  const grandTotal = total + shipping;
+  // Display only — the amount actually charged is always recomputed by the server.
+  const [coupon, setCoupon] = useState<{ code: string; percent: number } | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponMsg, setCouponMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [couponChecking, setCouponChecking] = useState(false);
+  const discount = coupon ? couponDiscount(total, coupon.percent) : 0;
+  const grandTotal = total - discount + shipping;
   const clearCart = useCartStore((s) => s.clearCart);
 
   const [phase, setPhase] = useState<Phase>("form");
@@ -88,6 +95,25 @@ export default function CheckoutPage() {
       // Network error while checking — stay on this screen, nothing changed.
     }
     setChecking(false);
+  };
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code || couponChecking) return;
+    setCouponChecking(true);
+    try {
+      const res = await fetch("/api/checkout/coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      setCoupon(data.ok ? { code, percent: Number(data.percent) } : null);
+      setCouponMsg({ ok: !!data.ok, text: data.message || "לא ניתן לבדוק את הקופון כרגע." });
+    } catch {
+      setCouponMsg({ ok: false, text: "שגיאת רשת. נסה/י שוב." });
+    }
+    setCouponChecking(false);
   };
 
   const field =
@@ -207,9 +233,23 @@ export default function CheckoutPage() {
           customer: form,
           shippingRegion: region,
           idempotencyKey: idempotencyKeyRef.current,
+          couponCode: coupon?.code,
         }),
       });
       const createData = await createRes.json();
+
+      // The coupon stopped being available between "apply" and "pay". Nothing
+      // was charged: drop it, show why, and let the customer decide — with a
+      // fresh idempotency key, since the rejected attempt's order is closed.
+      if (!createRes.ok && createData.couponStatus) {
+        setCoupon(null);
+        setCouponMsg({ ok: false, text: createData.error });
+        toast.error(createData.error);
+        idempotencyKeyRef.current = crypto.randomUUID();
+        setPhase("form");
+        setSubmitting(false);
+        return;
+      }
 
       if (!createRes.ok) {
         setErrorMsg(createData.error || "יצירת ההזמנה נכשלה.");
@@ -221,7 +261,18 @@ export default function CheckoutPage() {
       const { orderId, orderNumber: newOrderNumber, amount, thtk } = createData;
 
       hostedFieldsRef.current.charge(
-        { terminal_name: createData.terminalName, amount: Number(amount).toFixed(2), thtk },
+        {
+          terminal_name: createData.terminalName,
+          amount: Number(amount).toFixed(2),
+          thtk,
+          // Non-card fields: shown on the transaction in Tranzila so a charge can
+          // be matched to its order by hand, and used for the receipt if the
+          // terminal has Tranzila's invoice service.
+          contact: form.name,
+          email: form.email,
+          pdesc: `הזמנה ${newOrderNumber}`,
+          myid: orderId,
+        },
         async (err: any, response: any) => {
           if (err) {
             // TzlaHostedFields' `err` callback fires for SDK/field-validation
@@ -278,6 +329,7 @@ export default function CheckoutPage() {
             last4: txResult.credit_card_last_4_digits,
             installments: txResult.total_installments_number,
             processorCode,
+            raw: response,
           };
 
           // From here on a charge was already submitted to Tranzila. If our own
@@ -493,14 +545,59 @@ export default function CheckoutPage() {
                   <span>סכום ביניים</span>
                   <span className="text-white/70">{formatPrice(total)}</span>
                 </div>
+                {coupon && (
+                  <div className="flex justify-between text-sm text-cyan" data-testid="coupon-discount">
+                    <span>הנחת קופון ({coupon.percent}%)</span>
+                    <span dir="ltr">-{formatPrice(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-white/50">
                   <span>משלוח ({SHIPPING_LABEL[region]})</span>
                   <span className="text-white/70">{formatPrice(shipping)}</span>
                 </div>
                 <div className="flex justify-between font-black text-lg pt-1">
                   <span>סה&quot;כ</span>
-                  <span className="text-white">{formatPrice(grandTotal)}</span>
+                  <span className="text-white" data-testid="grand-total">{formatPrice(grandTotal)}</span>
                 </div>
+              </div>
+
+              <div className="border-t border-white/[0.06] mt-4 pt-4 space-y-2">
+                <label htmlFor="checkout-coupon" className="text-white/50 text-xs font-bold uppercase tracking-wider">קוד קופון</label>
+                <div className="flex gap-2">
+                  <input
+                    id="checkout-coupon"
+                    type="text"
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    value={couponInput}
+                    disabled={!!coupon || submitting}
+                    onChange={(e) => setCouponInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
+                    className={`${field} disabled:opacity-60`}
+                  />
+                  {coupon ? (
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => { setCoupon(null); setCouponInput(""); setCouponMsg(null); }}
+                      className="shrink-0 px-4 rounded-xl border border-white/[0.08] text-white/60 text-sm font-bold hover:border-white/20 transition-colors disabled:opacity-50"
+                    >
+                      הסר
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={applyCoupon}
+                      disabled={couponChecking || !couponInput.trim()}
+                      className="shrink-0 px-4 rounded-xl bg-cyan/10 border border-cyan/40 text-cyan text-sm font-bold hover:bg-cyan/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {couponChecking ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : "החל"}
+                    </button>
+                  )}
+                </div>
+                {couponMsg && (
+                  <p role="status" className={`text-xs ${couponMsg.ok ? "text-cyan" : "text-red-400"}`}>{couponMsg.text}</p>
+                )}
               </div>
             </div>
           </div>

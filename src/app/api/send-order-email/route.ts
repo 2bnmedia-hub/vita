@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
         <thead><tr><th style="text-align:right;padding:6px 10px;">מוצר</th><th style="text-align:right;padding:6px 10px;">כמות</th><th style="text-align:right;padding:6px 10px;">מחיר</th></tr></thead>
         <tbody>${itemsHtml}</tbody>
       </table>
+      ${order.coupon_code ? `<p><b>קופון:</b> ${order.coupon_code} (הנחה ₪${order.discount_amount})</p>` : ""}
       <p style="margin-top:14px;font-size:16px;"><b>סה"כ: ₪${order.total}</b></p>
     </div>
   `;

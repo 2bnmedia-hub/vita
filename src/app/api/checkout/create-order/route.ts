@@ -4,6 +4,7 @@ import { SHIPPING_COST, SHIPPING_LABEL, isShippingRegion } from "@/lib/shipping"
 import { createHandshake, tranzilaTerminal, sanitizeForLog } from "@/lib/tranzila";
 import { priceOrder } from "@/lib/orderPricing";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
+import { COUPON_MESSAGES, normalizeCouponCode, reserveCoupon } from "@/lib/coupons";
 
 interface RequestItem {
   product_id: string;
@@ -78,6 +79,14 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
+    // The order was priced with a coupon: it may only go to payment while it
+    // still holds that coupon's reservation.
+    if (existing.coupon_code) {
+      const held = await reserveCoupon(existing.coupon_code, existing.id);
+      if (held.status !== "ok") {
+        return NextResponse.json({ error: COUPON_MESSAGES[held.status], couponStatus: held.status }, { status: 409 });
+      }
+    }
     const handshake = await createHandshake(Number(existing.total), {
       order_id: existing.id,
       order_number: existing.order_number,
@@ -106,7 +115,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "אחד המוצרים בסל אינו קיים יותר" }, { status: 400 });
   }
 
-  const pricing = priceOrder(items as RequestItem[], products, shippingRegion);
+  // Coupon: availability and percentage come from the DB, never from the client.
+  // This first call only checks; the reservation itself happens once the order exists.
+  const couponCode = normalizeCouponCode(body?.couponCode);
+  let discountPercent = 0;
+  if (couponCode) {
+    const coupon = await reserveCoupon(couponCode, null);
+    if (coupon.status !== "ok") {
+      return NextResponse.json({ error: COUPON_MESSAGES[coupon.status], couponStatus: coupon.status }, { status: 409 });
+    }
+    discountPercent = coupon.percent;
+  }
+
+  const pricing = priceOrder(items as RequestItem[], products, shippingRegion, discountPercent);
   if (!pricing.ok) {
     const err = pricing.error;
     if (err.code === "unknown_product") return NextResponse.json({ error: "אחד המוצרים בסל אינו קיים יותר" }, { status: 400 });
@@ -141,6 +162,8 @@ export async function POST(req: NextRequest) {
         currency: "ILS",
         idempotency_key: idempotencyKey,
         payment_attempts: 0,
+        coupon_code: couponCode || null,
+        discount_amount: pricing.discount,
       },
     ])
     .select()
@@ -149,6 +172,19 @@ export async function POST(req: NextRequest) {
   if (insertError || !order) {
     console.error("create-order insert failed:", sanitizeForLog(insertError?.message));
     return NextResponse.json({ error: "יצירת ההזמנה נכשלה. נסה/י שוב." }, { status: 500 });
+  }
+
+  // Atomic reservation: of two simultaneous checkouts with the same coupon,
+  // only one gets past this line. The loser's order is closed unpaid.
+  if (couponCode) {
+    const reserved = await reserveCoupon(couponCode, order.id);
+    if (reserved.status !== "ok") {
+      await supabase
+        .from("orders")
+        .update({ payment_status: "payment_failed", last_payment_error: `coupon_${reserved.status}` })
+        .eq("id", order.id);
+      return NextResponse.json({ error: COUPON_MESSAGES[reserved.status], couponStatus: reserved.status }, { status: 409 });
+    }
   }
 
   const handshake = await createHandshake(total, { order_id: order.id, order_number: orderNumber });
@@ -165,6 +201,7 @@ export async function POST(req: NextRequest) {
     orderId: order.id,
     orderNumber,
     amount: total,
+    discount: pricing.discount,
     currency: "ILS",
     terminalName: tranzilaTerminal(),
     thtk: handshake.thtk,

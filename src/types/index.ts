@@ -94,4 +94,6 @@ export interface Order {
   last_payment_error: string | null;
   paid_at: string | null;
   created_at: string;
+  coupon_code?: string | null;
+  discount_amount?: number;
 }

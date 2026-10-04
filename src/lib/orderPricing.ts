@@ -28,8 +28,17 @@ export type PricingError =
   | { code: "insufficient_stock"; productName: string; available: number };
 
 export type PricingResult =
-  | { ok: true; items: PricedItem[]; subtotal: number; shipping: number; total: number }
+  | { ok: true; items: PricedItem[]; subtotal: number; shipping: number; discount: number; total: number }
   | { ok: false; error: PricingError };
+
+/**
+ * Percentage discount on the products subtotal only (shipping is never
+ * discounted), rounded once to a whole agora. Shared by the server pricing
+ * below and the checkout summary so both always show the same number.
+ */
+export function couponDiscount(subtotal: number, percent: number): number {
+  return Math.round((Math.round(subtotal * 100) * percent) / 100) / 100;
+}
 
 /**
  * Server-side source of truth for order pricing. Never trust price/quantity
@@ -39,7 +48,8 @@ export type PricingResult =
 export function priceOrder(
   requested: RequestedItem[],
   products: PriceableProduct[],
-  shippingRegion: ShippingRegion
+  shippingRegion: ShippingRegion,
+  discountPercent = 0
 ): PricingResult {
   const byId = new Map(products.map((p) => [p.id, p]));
   const items: PricedItem[] = [];
@@ -60,6 +70,7 @@ export function priceOrder(
   }
 
   const shipping = SHIPPING_COST[shippingRegion];
-  const total = Math.round((subtotal + shipping) * 100) / 100;
-  return { ok: true, items, subtotal, shipping, total };
+  const discount = couponDiscount(subtotal, discountPercent);
+  const total = Math.round((subtotal - discount + shipping) * 100) / 100;
+  return { ok: true, items, subtotal, shipping, discount, total };
 }

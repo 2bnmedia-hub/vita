@@ -220,6 +220,28 @@ export function hebrewMessageForCode(code: string | undefined): string {
   return HEBREW_DECLINE_MESSAGES[code] ?? "העסקה נדחתה. בדוק/י את פרטי הכרטיס ונסה/י שוב, או פנה/י לחברת האשראי.";
 }
 
+const SNAPSHOT_KEYS = [
+  "success", "error", "processor_response_code", "transaction_id", "auth_number", "amount", "currency_code",
+  "credit_card_last_4_digits", "card_type_name", "txn_type", "tranmode", "payment_plan", "total_installments_number",
+  "user_form_data",
+];
+
+/**
+ * What the browser received from Hosted Fields, reduced to an allow-list with
+ * no card data (no token, mask or expiry). Stored on the order so a charge
+ * whose server-side lookup came back empty can still be matched by hand
+ * against Tranzila — it is evidence for a human, never proof of payment.
+ */
+export function hostedFieldsSnapshot(raw: unknown): Record<string, unknown> | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, any>;
+  const tr = r.transaction_response && typeof r.transaction_response === "object" ? r.transaction_response : {};
+  const snapshot: Record<string, unknown> = { response_keys: Object.keys(tr).slice(0, 60) };
+  for (const key of SNAPSHOT_KEYS) if (tr[key] !== undefined) snapshot[key] = tr[key];
+  if (typeof r.response_hash === "string") snapshot.response_hash = r.response_hash.slice(0, 128);
+  return JSON.stringify(snapshot).length <= 4000 ? snapshot : null;
+}
+
 /** Strip anything that could be a PAN/CVV before it's ever logged or stored. */
 export function sanitizeForLog(input: unknown): string {
   let s = typeof input === "string" ? input : JSON.stringify(input);
