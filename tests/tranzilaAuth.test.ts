@@ -74,7 +74,7 @@ describe("lookupTransactionWithRetry", () => {
       const body =
         calls < 3
           ? { transactions: [] }
-          : { transactions: [{ index: "1", amount: "10", currency: "ILS", authorization_number: "a", transtatus: "000" }] };
+          : { transactions: [{ index: 1, amount: 1000, currency: "1", authorization_number: "a", processor_response_code: "000", transtatus: 0 }] };
       return { json: async () => body } as unknown as Response;
     });
 

@@ -90,23 +90,46 @@ export interface TrackedTransaction {
   [key: string]: unknown;
 }
 
+// Single-transaction lookup lives on the report host, singular path. The
+// plural /v1/transactions on api.tranzila.com answers 200 with zero rows for
+// this terminal, which is why no payment was ever confirmed before 4/10/2026
+// (endpoint confirmed by Tranzila support).
+const REPORT_BASE = "https://report.tranzila.com";
+
+/**
+ * Turns a raw report row into the shape classifyPayment() expects:
+ * - amount arrives in agorot (10795 = ₪107.95) → shekels
+ * - the approval code is processor_response_code ("000"); the row's own
+ *   transtatus is a record state where 0 = normal. Anything else (or a
+ *   non-ILS currency) leaves the code undefined, which classifies as
+ *   "unconfirmed" — a human looks at it, it is never auto-approved.
+ */
+export function normalizeTracked(raw: Record<string, unknown>): TrackedTransaction {
+  const clean = Number(raw.transtatus) === 0 && String(raw.currency) === "1" && raw.processor_response_code != null;
+  return {
+    ...raw,
+    index: String(raw.index),
+    amount: (Number(raw.amount) / 100).toFixed(2),
+    currency: String(raw.currency),
+    authorization_number: String(raw.authorization_number ?? ""),
+    transtatus: (clean ? String(raw.processor_response_code) : undefined) as unknown as string,
+  };
+}
+
 /**
  * Server-side reconciliation: independently ask Tranzila for the transaction
  * instead of trusting anything the browser reported.
- * docs.tranzila.com/docs/reports/track-transaction-data
  */
 export async function lookupTransaction(transactionIndex: string): Promise<TrackedTransaction | null> {
-  const json = await callTranzila<{ transactions?: TrackedTransaction[] }>(
-    "/v1/transactions",
-    {
-      terminal_name: tranzilaTerminal(),
-      // docs.tranzila.com/docs/reports/track-transaction-data: transaction_index is an
-      // integer. Sending it as a string silently returns zero matches — every verify
-      // call (including successful ones) was failing this lookup because of this.
-      transaction_index: Number(transactionIndex),
-    }
-  );
-  return json.transactions?.[0] ?? null;
+  const res = await fetch(`${REPORT_BASE}/v1/transaction`, {
+    method: "POST",
+    headers: authHeaders(),
+    // transaction_index must be an integer — as a string it matches nothing.
+    body: JSON.stringify({ terminal_name: tranzilaTerminal(), transaction_index: Number(transactionIndex) }),
+  });
+  const json = (await res.json()) as { transactions?: Record<string, unknown>[] };
+  const raw = json.transactions?.[0];
+  return raw ? normalizeTracked(raw) : null;
 }
 
 /**

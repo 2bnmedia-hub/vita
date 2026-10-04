@@ -35,8 +35,9 @@ Path: /Volumes/Haytham Salim/פרויקטים פיתוח אתרים/  V FORM/vit
 - `nimry15` — 15%, מימוש אחד בכל האתר. הוספת קופון חדש: `insert into coupons (code, percent_off, max_redemptions)` (קוד באותיות קטנות).
 
 ## Tranzila — מצב (04/10/2026)
-- מסוף `fxpvythtvspy`. ה-handshake וה-Hosted Fields עובדים, אבל דוח העסקאות (`/v1/transactions`) מחזיר 0 שורות למסוף בכל טווח תאריכים, ולכן שום הזמנה לא מאומתת אוטומטית ל"שולם" — היא נשארת "בבדיקה" (`pending` + `verify_unconfirmed transactionId=…`). נדרש טיפול של תמיכת טרנזילה.
-- עד אז: התאמה ידנית לפי `orders.tranzila_response` (תמצית התשובה מהדפדפן, ללא פרטי כרטיס) ולפי תיאור העסקה "הזמנה VF-…" בטרנזילה.
+- מסוף `fxpvythtvspy`, מסוף אמיתי (עסקאות מאושרות דרך SHVA).
+- אימות עסקה בשרת: `POST https://report.tranzila.com/v1/transaction` (יחיד, שרת הדוחות). הנתיב `/v1/transactions` מחזיר 0 שורות למסוף הזה — זו הייתה הסיבה שאף הזמנה לא סומנה "שולם" עד 04/10/2026. הסכום בתשובה באגורות.
+- חשבוניות: לפי טרנזילה אין הפקה אוטומטית במסוף; מסמכים מופקים ידנית.
 
 ## Open
 - Cart placeholder images

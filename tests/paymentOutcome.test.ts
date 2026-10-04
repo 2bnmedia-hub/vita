@@ -198,3 +198,23 @@ describe("POST /api/checkout/verify", () => {
     expect(h.notify).not.toHaveBeenCalled();
   });
 });
+
+describe("normalizeTracked — real report row shape", () => {
+  // Field values copied from a real approved transaction (card fields omitted).
+  const row = { index: 498762, amount: 10795, currency: "1", authorization_number: "0057530", processor_response_code: "000", transtatus: 0 };
+
+  it("converts agorot to shekels and approves against the order total", async () => {
+    const { normalizeTracked, classifyPayment: classify } = await vi.importActual<typeof import("@/lib/tranzila")>("@/lib/tranzila");
+    const t = normalizeTracked(row);
+    expect(t.amount).toBe("107.95");
+    expect(classify(t, "107.95")).toBe("approved");
+    expect(classify(t, 127)).toBe("unconfirmed"); // paid the discounted price for a full-price order
+  });
+
+  it("a declined processor code is declined; an abnormal record state or foreign currency is never auto-approved", async () => {
+    const { normalizeTracked, classifyPayment: classify } = await vi.importActual<typeof import("@/lib/tranzila")>("@/lib/tranzila");
+    expect(classify(normalizeTracked({ ...row, processor_response_code: "004" }), "107.95")).toBe("declined");
+    expect(classify(normalizeTracked({ ...row, transtatus: 3 }), "107.95")).toBe("unconfirmed");
+    expect(classify(normalizeTracked({ ...row, currency: "2" }), "107.95")).toBe("unconfirmed");
+  });
+});
