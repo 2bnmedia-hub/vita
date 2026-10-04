@@ -25,7 +25,7 @@ const CHALLENGE_3DS_CARD = process.env.E2E_3DS_CHALLENGE_CARD;
 
 async function addFirstProductToCart(page: import("@playwright/test").Page) {
   await page.goto("/shop");
-  await page.getByRole("button", { name: /הוסף לסל|הוספה לסל/ }).first().click();
+  await page.locator('button[aria-label^="הוסף "]:not([disabled])').first().click();
 }
 
 async function fillCheckoutForm(page: import("@playwright/test").Page, email: string) {

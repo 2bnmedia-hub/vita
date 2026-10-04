@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 async function addFirstProductToCart(page: import("@playwright/test").Page) {
   await page.goto("/shop");
-  const addButton = page.getByRole("button", { name: /הוסף לסל|הוספה לסל/ }).first();
+  const addButton = page.locator('button[aria-label^="הוסף "]:not([disabled])').first();
   await addButton.click();
 }
 

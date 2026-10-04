@@ -26,7 +26,7 @@ test.describe("coupon — availability API", () => {
 
 test("coupon — checkout shows the discount and the reduced total before payment", async ({ page }) => {
   await page.goto("/shop");
-  await page.getByRole("button", { name: /הוסף לסל|הוספה לסל/ }).first().click();
+  await page.locator('button[aria-label^="הוסף "]:not([disabled])').first().click();
   await page.goto("/checkout");
 
   const money = async (testId: string) =>
@@ -37,7 +37,9 @@ test("coupon — checkout shows the discount and the reduced total before paymen
   await page.getByRole("button", { name: "החל" }).click();
   await expect(page.getByText("הקופון הוחל בהצלחה")).toBeVisible();
 
-  const discount = await money("coupon-discount");
+  const discount = Number(
+    (await page.getByTestId("coupon-discount").locator("span").last().textContent())!.replace(/[^\d.]/g, "")
+  );
   expect(discount).toBeGreaterThan(0);
   expect(await money("grand-total")).toBeCloseTo(before - discount, 2);
   await expect(page.getByRole("button", { name: /תשלום מאובטח/ })).toContainText(String(Math.floor(before - discount)));
@@ -49,4 +51,11 @@ test("coupon — checkout shows the discount and the reduced total before paymen
   await page.getByRole("button", { name: "החל" }).click();
   await expect(page.getByText("קוד הקופון אינו תקין")).toBeVisible();
   await expect(page.getByTestId("coupon-discount")).toHaveCount(0);
+
+  // Re-apply and keep a screenshot of the state a customer sees before paying.
+  await page.locator("#checkout-coupon").fill("Nimry15");
+  await page.getByRole("button", { name: "החל" }).click();
+  await expect(page.getByTestId("coupon-discount")).toBeVisible();
+  await page.getByTestId("grand-total").scrollIntoViewIfNeeded();
+  await page.screenshot({ path: test.info().outputPath("coupon-applied.png") });
 });
