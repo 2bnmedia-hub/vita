@@ -72,10 +72,12 @@ test.describe("coupon — API", () => {
 });
 
 const money = async (scope: ReturnType<Page["locator"]>, testId: string) =>
-  Number((await scope.getByTestId(testId).textContent())!.replace(/[^\d.]/g, ""));
+  // The amount is the row's last span (the label may contain digits, e.g. NIMRY21).
+  Number((await scope.getByTestId(testId).locator("xpath=self::span | span[last()]").last().textContent())!.replace(/[^\d.]/g, ""));
 
 test("coupon — cart drawer and checkout breakdown follow the quantity", async ({ page }) => {
   await page.goto("/shop/creatine-chewable");
+  await page.getByRole("region", { name: "הודעת עוגיות" }).getByRole("button", { name: "סגור" }).click();
   await page.getByRole("button", { name: "הגדל כמות", exact: true }).click();
   await page.getByRole("button", { name: "הגדל כמות", exact: true }).click();
   await page.getByRole("button", { name: /הוסף לסל/ }).first().click();
