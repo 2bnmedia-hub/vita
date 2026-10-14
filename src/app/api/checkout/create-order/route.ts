@@ -115,25 +115,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "אחד המוצרים בסל אינו קיים יותר" }, { status: 400 });
   }
 
-  // Coupon: availability and percentage come from the DB, never from the client.
+  // Coupon: availability and terms come from the DB, never from the client.
   // This first call only checks; the reservation itself happens once the order exists.
   const couponCode = normalizeCouponCode(body?.couponCode);
-  let discountPercent = 0;
+  let couponRule = null;
+  let couponTerms: string | null = null;
   if (couponCode) {
     const coupon = await reserveCoupon(couponCode, null);
     if (coupon.status !== "ok") {
       return NextResponse.json({ error: COUPON_MESSAGES[coupon.status], couponStatus: coupon.status }, { status: 409 });
     }
-    discountPercent = coupon.percent;
+    couponRule = coupon.rule;
+    couponTerms = coupon.terms;
   }
 
-  const pricing = priceOrder(items as RequestItem[], products, shippingRegion, discountPercent);
+  const pricing = priceOrder(items as RequestItem[], products, shippingRegion, couponRule);
   if (!pricing.ok) {
     const err = pricing.error;
     if (err.code === "unknown_product") return NextResponse.json({ error: "אחד המוצרים בסל אינו קיים יותר" }, { status: 400 });
     if (err.code === "invalid_quantity") return NextResponse.json({ error: "פריט לא תקין בסל" }, { status: 400 });
     if (err.code === "out_of_stock") return NextResponse.json({ error: `המוצר "${err.productName}" אזל מהמלאי` }, { status: 409 });
     return NextResponse.json({ error: `המוצר "${err.productName}" זמין רק בכמות ${err.available}` }, { status: 409 });
+  }
+  // A coupon the cart doesn't qualify for (e.g. too few eligible units) is
+  // refused rather than silently stored on a full-price order.
+  if (couponCode && pricing.discount <= 0) {
+    return NextResponse.json(
+      { error: couponTerms || COUPON_MESSAGES.not_eligible, couponStatus: "not_eligible" },
+      { status: 409 }
+    );
   }
   const { items: orderItems, total } = pricing;
   const shippingCost = SHIPPING_COST[shippingRegion];

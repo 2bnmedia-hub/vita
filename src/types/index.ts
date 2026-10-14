@@ -1,3 +1,5 @@
+import type { CouponRule } from "@/lib/orderPricing";
+
 export interface Product {
   id: string;
   name: string;
@@ -39,6 +41,15 @@ export interface CartState {
   openCart: () => void;
   closeCart: () => void;
   setShippingRegion: (region: ShippingRegion) => void;
+  /** Applied coupon, display only — the server re-checks it before charging. */
+  coupon: AppliedCoupon | null;
+  setCoupon: (coupon: AppliedCoupon | null) => void;
+}
+
+export interface AppliedCoupon {
+  code: string;
+  rule: CouponRule;
+  terms: string | null;
 }
 
 export interface ContactForm {

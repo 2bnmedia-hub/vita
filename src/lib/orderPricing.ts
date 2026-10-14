@@ -31,13 +31,36 @@ export type PricingResult =
   | { ok: true; items: PricedItem[]; subtotal: number; shipping: number; discount: number; total: number }
   | { ok: false; error: PricingError };
 
+/** Coupon terms as stored in `coupons` (one of percentOff / amountOff is set). */
+export interface CouponRule {
+  percentOff: number | null;
+  amountOff: number | null;
+  /** null = every product counts and is discounted. */
+  productId: string | null;
+  /** Units of the eligible product(s) the cart must hold. */
+  minQuantity: number;
+}
+
+export interface DiscountLine {
+  product_id: string;
+  price: number;
+  quantity: number;
+}
+
 /**
- * Percentage discount on the products subtotal only (shipping is never
- * discounted), rounded once to a whole agora. Shared by the server pricing
- * below and the checkout summary so both always show the same number.
+ * Discount on the eligible products only (shipping is never discounted),
+ * in whole agorot, never more than the eligible lines are worth. 0 when the
+ * cart holds fewer than minQuantity eligible units. Shared by the server
+ * pricing below and the cart/checkout summary so both show the same number.
  */
-export function couponDiscount(subtotal: number, percent: number): number {
-  return Math.round((Math.round(subtotal * 100) * percent) / 100) / 100;
+export function couponDiscount(lines: DiscountLine[], rule: CouponRule | null): number {
+  if (!rule) return 0;
+  const eligible = rule.productId ? lines.filter((l) => l.product_id === rule.productId) : lines;
+  const qty = eligible.reduce((n, l) => n + l.quantity, 0);
+  if (qty === 0 || qty < rule.minQuantity) return 0;
+  const base = Math.round(eligible.reduce((s, l) => s + l.price * l.quantity, 0) * 100);
+  const off = rule.amountOff != null ? Math.round(rule.amountOff * 100) : Math.round((base * (rule.percentOff ?? 0)) / 100);
+  return Math.min(off, base) / 100;
 }
 
 /**
@@ -49,7 +72,7 @@ export function priceOrder(
   requested: RequestedItem[],
   products: PriceableProduct[],
   shippingRegion: ShippingRegion,
-  discountPercent = 0
+  coupon: CouponRule | null = null
 ): PricingResult {
   const byId = new Map(products.map((p) => [p.id, p]));
   const items: PricedItem[] = [];
@@ -70,7 +93,7 @@ export function priceOrder(
   }
 
   const shipping = SHIPPING_COST[shippingRegion];
-  const discount = couponDiscount(subtotal, discountPercent);
+  const discount = couponDiscount(items, coupon);
   const total = Math.round((subtotal - discount + shipping) * 100) / 100;
   return { ok: true, items, subtotal, shipping, discount, total };
 }

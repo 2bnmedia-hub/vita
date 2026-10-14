@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Product } from "@/types";
+import { bestsellersFirst } from "@/lib/utils";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -158,11 +159,9 @@ export async function getProducts(params: GetProductsParams = {}): Promise<Produ
 
   const { data, error } = await query;
   if (error) { console.error("getProducts error:", error.message); return []; }
-  return (data ?? []).map((p: any) => ({
-    ...p,
-    price: Number(p.price) || 0,
-    compare_price: p.compare_price != null ? Number(p.compare_price) : undefined,
-  }));
+  const list = (data ?? []).map(normalizeProduct);
+  // Price sorts are explicit customer choices; otherwise the bestseller leads.
+  return params.sort === "price-asc" || params.sort === "price-desc" ? list : bestsellersFirst(list);
 }
 
 function applySortMock(products: Product[], sort?: string): Product[] {
@@ -201,7 +200,8 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     .select("*")
     .eq("featured", true)
     .eq("in_stock", true)
-    .limit(4);
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
   if (error) { console.error("getFeatured error:", error.message); return []; }
-  return (data ?? []).map(normalizeProduct);
+  return bestsellersFirst((data ?? []).map(normalizeProduct)).slice(0, 4);
 }

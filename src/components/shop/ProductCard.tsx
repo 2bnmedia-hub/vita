@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart, Star, Flame } from "lucide-react";
 import { useCartStore } from "@/store/cart";
-import { formatPrice, calcDiscount } from "@/lib/utils";
+import { formatPrice, calcDiscount, BESTSELLER_BADGE } from "@/lib/utils";
 import type { Product } from "@/types";
 import toast from "react-hot-toast";
 
@@ -44,7 +44,8 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Badges */}
       <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
         {product.badge && (
-          <span className="px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm">
+            {product.badge === BESTSELLER_BADGE && <Flame className="w-3.5 h-3.5" aria-hidden="true" />}
             {product.badge}
           </span>
         )}

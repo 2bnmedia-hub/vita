@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { X, ShoppingCart, Plus, Minus, Trash2, ArrowLeft } from "lucide-react";
-import { useCartStore, selectTotal, selectItemCount } from "@/store/cart";
+import { useCartStore, selectItemCount } from "@/store/cart";
+import { CouponSummary } from "@/components/shop/CouponSummary";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 
@@ -14,7 +15,6 @@ export function CartDrawer() {
   const closeCart = useCartStore((s) => s.closeCart);
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const total = useCartStore(selectTotal);
   const itemCount = useCartStore(selectItemCount);
   const drawerRef = useRef<HTMLElement>(null);
 
@@ -195,19 +195,10 @@ export function CartDrawer() {
         {items.length > 0 && (
           <div className="px-5 py-5 border-t border-white/[0.08] space-y-4">
 
-            {/* Subtotal */}
-            <div className="space-y-1.5">
-              {items.map((item) => (
-                <div key={item.product.id} className="flex justify-between text-xs text-white/40">
-                  <span>{item.product.name} × {item.quantity}</span>
-                  <span>{formatPrice(item.product.price * item.quantity)}</span>
-                </div>
-              ))}
-              <div className="flex justify-between font-black text-lg border-t border-white/[0.06] pt-3">
-                <span>סה&quot;כ</span>
-                <span className="text-white">{formatPrice(total)}</span>
-              </div>
-              <p className="text-xs text-white/30 text-left">+ משלוח לפי אזור — יחושב בתשלום</p>
+            {/* Totals + coupon */}
+            <div>
+              <CouponSummary />
+              <p className="text-xs text-white/30 text-left mt-2">אזור המשלוח ניתן לשינוי בעמוד התשלום</p>
             </div>
 
             <Link

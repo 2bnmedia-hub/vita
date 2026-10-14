@@ -32,7 +32,11 @@ Path: /Volumes/Haytham Salim/פרויקטים פיתוח אתרים/  V FORM/vit
 - טבלת `coupons` + פונקציית `reserve_coupon()` — ראה `supabase-coupons-migration.sql`. הקוד: `src/lib/coupons.ts`, `/api/checkout/coupon` (בדיקה בלבד), שריון בתוך `/api/checkout/create-order`.
 - אחוז הנחה על סכום המוצרים בלבד (לא על משלוח), קוד אחד להזמנה, לא תלוי רישיות.
 - מימוש נספר רק בתוך `confirm_tranzila_payment()` (תשלום מאומת). זיכוי לא מחזיר את הקופון.
-- `nimry15` — 15%, מימוש אחד בכל האתר. הוספת קופון חדש: `insert into coupons (code, percent_off, max_redemptions)` (קוד באותיות קטנות).
+- `nimry15` — בוטל (`active=false`) ב־14/10/2026. השורה נשמרת להיסטוריית ההזמנות.
+- `nimry21` — ‎155 ₪ הנחה (קופסה אחת) רק כשבסל 3+ קופסאות `creatine-chewable` (id `88c99155-…`). ללא הגבלת מימושים. ראה `supabase-coupons-nimry21-migration.sql`.
+- קופון = `percent_off` או `amount_off`, אופציונלית `product_id` + `min_quantity` + `terms_message`. `max_redemptions` ריק = ללא הגבלה, בלי שריון.
+- החישוב המשותף: `couponDiscount()` ב־`src/lib/orderPricing.ts`. תצוגה בסל ובקופה: `src/components/shop/CouponSummary.tsx`.
+- מוצר עם תג `הנמכר ביותר` מוצג ראשון בדף הבית ובחנות (`bestsellersFirst` ב־`src/lib/utils.ts`).
 
 ## Tranzila — מצב (04/10/2026)
 - מסוף `fxpvythtvspy`, מסוף אמיתי (עסקאות מאושרות דרך SHVA).

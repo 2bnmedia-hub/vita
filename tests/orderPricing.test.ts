@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { priceOrder, type PriceableProduct } from "@/lib/orderPricing";
+import { priceOrder, type PriceableProduct, type CouponRule } from "@/lib/orderPricing";
+
+const pct15: CouponRule = { percentOff: 15, amountOff: null, productId: null, minQuantity: 1 };
 
 const products: PriceableProduct[] = [
   { id: "p1", name: "קריאטין רגיל", price: 89, in_stock: true, stock_quantity: null },
@@ -70,7 +72,7 @@ describe("priceOrder", () => {
 
 describe("coupon discount", () => {
   it("takes the percentage off the products subtotal only — shipping is not discounted", () => {
-    const result = priceOrder([{ product_id: "p1", quantity: 2 }], products, "center", 15);
+    const result = priceOrder([{ product_id: "p1", quantity: 2 }], products, "center", pct15);
     if (!result.ok) throw new Error("unreachable");
     expect(result.subtotal).toBe(178);
     expect(result.discount).toBe(26.7);
@@ -80,7 +82,7 @@ describe("coupon discount", () => {
 
   it("rounds the discount to a whole agora and the total stays exact", () => {
     const odd: PriceableProduct[] = [{ id: "o1", name: "odd", price: 94.99, in_stock: true, stock_quantity: null }];
-    const result = priceOrder([{ product_id: "o1", quantity: 1 }], odd, "pickup", 15);
+    const result = priceOrder([{ product_id: "o1", quantity: 1 }], odd, "pickup", pct15);
     if (!result.ok) throw new Error("unreachable");
     expect(result.discount).toBe(14.25); // 14.2485 → 14.25
     expect(result.total).toBe(80.74);
@@ -92,5 +94,58 @@ describe("coupon discount", () => {
     if (!result.ok) throw new Error("unreachable");
     expect(result.discount).toBe(0);
     expect(result.total).toBe(89);
+  });
+});
+
+describe("NIMRY21 — 155 ₪ off with 3+ chewable creatine boxes", () => {
+  const CHEW = "88c99155-29a8-42aa-85fa-d7f05eba4fcb";
+  const catalog: PriceableProduct[] = [
+    { id: CHEW, name: "קריאטין טבליות לעיסה", price: 155, in_stock: true, stock_quantity: null },
+    { id: "other", name: "קריאטין ענבים", price: 94, in_stock: true, stock_quantity: null },
+  ];
+  const nimry21: CouponRule = { percentOff: null, amountOff: 155, productId: CHEW, minQuantity: 3 };
+  const price = (lines: { product_id: string; quantity: number }[], rule: CouponRule | null = nimry21) => {
+    const r = priceOrder(lines, catalog, "pickup", rule);
+    if (!r.ok) throw new Error("unreachable");
+    return r;
+  };
+
+  it("3 boxes without the coupon = 465, no automatic discount", () => {
+    const r = price([{ product_id: CHEW, quantity: 3 }], null);
+    expect(r.discount).toBe(0);
+    expect(r.total).toBe(465);
+  });
+
+  it("3 boxes with the coupon = 310", () => {
+    const r = price([{ product_id: CHEW, quantity: 3 }]);
+    expect(r.subtotal).toBe(465);
+    expect(r.discount).toBe(155);
+    expect(r.total).toBe(310);
+  });
+
+  it("1 or 2 boxes get no discount", () => {
+    for (const quantity of [1, 2]) expect(price([{ product_id: CHEW, quantity }]).discount).toBe(0);
+  });
+
+  it("more than 3 boxes still get exactly 155 off", () => {
+    for (const quantity of [4, 6, 9]) {
+      const r = price([{ product_id: CHEW, quantity }]);
+      expect(r.discount).toBe(155);
+      expect(r.total).toBe(155 * quantity - 155);
+    }
+  });
+
+  it("other products neither count toward the 3 nor get discounted", () => {
+    expect(price([{ product_id: CHEW, quantity: 2 }, { product_id: "other", quantity: 5 }]).discount).toBe(0);
+    const mixed = price([{ product_id: CHEW, quantity: 3 }, { product_id: "other", quantity: 2 }]);
+    expect(mixed.subtotal).toBe(465 + 188);
+    expect(mixed.discount).toBe(155);
+    expect(mixed.total).toBe(465 + 188 - 155);
+  });
+
+  it("shipping is added on top, never discounted", () => {
+    const r = priceOrder([{ product_id: CHEW, quantity: 3 }], catalog, "center", nimry21);
+    if (!r.ok) throw new Error("unreachable");
+    expect(r.total).toBe(310 + r.shipping);
   });
 });
