@@ -33,75 +33,82 @@ async function fillCustomer(page: Page) {
   await page.getByRole("checkbox").check();
 }
 
-const codRadio = (page: Page) => page.getByRole("radio", { name: "תשלום לשליח בעת קבלת המוצר" });
-const cardRadio = (page: Page) => page.getByRole("radio", { name: "תשלום באשראי באתר" });
 // The radios are sr-only; a real user clicks the visible label.
-const pick = (page: Page, text: string) => page.locator("label", { hasText: text }).click();
+const group = (page: Page) => page.getByRole("radiogroup", { name: "אזור משלוח *" });
+const codGroup = (page: Page) => page.getByRole("radiogroup", { name: "אזור למסירה *" });
+const pick = (scope: ReturnType<Page["locator"]>, text: string) => scope.locator("label", { hasText: text }).click();
+const COD = "תשלום לשליח בעת קבלת המוצר";
 const cardFields = (page: Page) => page.locator("#tz-card-number");
+const totalRow = (page: Page) => page.getByText("לתשלום לשליח בעת המסירה (כולל משלוח)").locator("..");
 
-test("card is the default, COD hides card fields, switching back restores them", async ({ page }) => {
+test("אזור משלוח has exactly five options; COD is one of them", async ({ page }) => {
   await openCheckout(page);
-  await expect(cardRadio(page)).toBeChecked();
+  const radios = group(page).getByRole("radio");
+  await expect(radios).toHaveCount(5);
+  for (const label of ["צפון", "מרכז", "דרום ואילת", "איסוף עצמי", COD]) {
+    await expect(group(page).locator("label", { hasText: label })).toBeVisible();
+  }
+  await expect(group(page).getByRole("radio", { name: /מרכז/ })).toBeChecked();
   await expect(cardFields(page)).toBeVisible();
-  await expect(page.getByRole("button", { name: /תשלום מאובטח/ })).toBeVisible();
+});
 
-  await pick(page, "תשלום לשליח בעת קבלת המוצר");
+test("COD hides card fields, needs a delivery region, switching away restores card", async ({ page }) => {
+  await openCheckout(page);
+  await fillCustomer(page);
+  await pick(group(page), COD);
+  await expect(group(page).getByRole("radio", { name: new RegExp(COD) })).toBeChecked();
+  await expect(group(page).getByRole("radio", { name: /מרכז/ })).not.toBeChecked();
   await expect(cardFields(page)).toBeHidden();
-  await expect(page.getByText("התשלום יתבצע לשליח בעת קבלת ההזמנה. אין צורך להזין פרטי אשראי באתר.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "אישור הזמנה — תשלום לשליח" })).toBeVisible();
+  await expect(page.getByText("התשלום עבור ההזמנה והמשלוח יתבצע לשליח בעת קבלת המוצר.")).toBeVisible();
+  // No region yet: shipping is not assumed, confirm is blocked.
+  await expect(page.getByText("יש לבחור אזור למסירה").first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "אישור הזמנה — תשלום לשליח" })).toBeDisabled();
+  await pick(codGroup(page), "צפון");
+  await expect(page.getByRole("button", { name: "אישור הזמנה — תשלום לשליח" })).toBeEnabled();
 
-  await pick(page, "תשלום באשראי באתר");
+  await pick(group(page), "איסוף עצמי");
+  await expect(codGroup(page)).toHaveCount(0);
   await expect(cardFields(page)).toBeVisible();
   await expect(page.getByRole("button", { name: /תשלום מאובטח/ })).toBeVisible();
+  // Back to COD: the old delivery region is cleared, it has to be chosen again.
+  await pick(group(page), COD);
+  await expect(codGroup(page).getByRole("radio", { checked: true })).toHaveCount(0);
 });
 
 for (const [label, cost] of Object.entries(SHIPPING).filter(([l]) => l !== "איסוף עצמי")) {
   test(`COD total includes shipping — ${label}`, async ({ page }) => {
     await openCheckout(page);
-    await pick(page, label);
-    await pick(page, "תשלום לשליח בעת קבלת המוצר");
-    const row = page.getByText("לתשלום לשליח בעת המסירה (כולל משלוח)").locator("..");
-    await expect(row).toContainText(String(310 + cost));
+    await pick(group(page), COD);
+    await pick(codGroup(page), label);
+    await expect(totalRow(page)).toContainText(String(310 + cost));
   });
 }
 
-test("self pickup removes COD and falls back to card", async ({ page }) => {
-  await openCheckout(page);
-  await pick(page, "תשלום לשליח בעת קבלת המוצר");
-  await pick(page, "איסוף עצמי");
-  await expect(codRadio(page)).toHaveCount(0);
-  await expect(cardFields(page)).toBeVisible();
-  // Back to delivery: card is still selected, COD has to be chosen again.
-  await pick(page, "צפון");
-  await expect(cardRadio(page)).toBeChecked();
-});
-
-test("COD order: one request with method cod, success screen with amount and status", async ({ page }) => {
+test("COD order: one request with method cod + chosen region, success screen with amount and status", async ({ page }) => {
   let calls = 0;
   let sent: any = null;
   await page.route("**/api/checkout/create-order", async (route: Route) => {
     calls++;
     sent = route.request().postDataJSON();
     await new Promise((r) => setTimeout(r, 400)); // window for a double click
-    await route.fulfill({ json: { orderId: "x", orderNumber: "VF-TESTCOD", amount: 349, paymentMethod: "cod", paymentStatus: "cod_pending" } });
+    await route.fulfill({ json: { orderId: "x", orderNumber: "VF-TESTCOD", amount: 359, paymentMethod: "cod", paymentStatus: "cod_pending" } });
   });
+  await openCheckout(page);
+  await fillCustomer(page);
+  await pick(group(page), COD);
+  await pick(codGroup(page), "דרום ואילת");
   // The hosted-fields script loads on page open; only calls after the click count.
   let tranzilaCalls = 0;
   page.on("request", (r) => { if (/tranzila\.com/.test(r.url())) tranzilaCalls++; });
-
-  await openCheckout(page);
-  await fillCustomer(page);
-  await pick(page, "תשלום לשליח בעת קבלת המוצר");
-  tranzilaCalls = 0;
   await page.getByRole("button", { name: "אישור הזמנה — תשלום לשליח" }).dblclick();
 
   await expect(page.getByRole("heading", { name: "ההזמנה התקבלה בהצלחה!" })).toBeVisible();
   await expect(page.getByText("VF-TESTCOD")).toBeVisible();
-  await expect(page.getByText("ממתין לתשלום בעת המסירה")).toBeVisible();
-  await expect(page.getByText(/סכום לגבייה בעת המסירה/)).toContainText("349");
+  await expect(page.getByText("ממתין לתשלום לשליח")).toBeVisible();
+  await expect(page.getByText(/סכום לגבייה בעת המסירה/)).toContainText("359");
   expect(calls).toBe(1);
   expect(sent.paymentMethod).toBe("cod");
-  expect(sent.shippingRegion).toBe("center");
+  expect(sent.shippingRegion).toBe("south");
   expect(tranzilaCalls).toBe(0);
 });
 
@@ -111,7 +118,8 @@ test("COD server error shows the failure screen, nothing charged", async ({ page
   );
   await openCheckout(page);
   await fillCustomer(page);
-  await pick(page, "תשלום לשליח בעת קבלת המוצר");
+  await pick(group(page), COD);
+  await pick(codGroup(page), "מרכז");
   await page.getByRole("button", { name: "אישור הזמנה — תשלום לשליח" }).click();
   await expect(page.getByRole("heading", { name: "התשלום נכשל" })).toBeVisible();
   await expect(page.getByText("יצירת ההזמנה נכשלה. נסה/י שוב.")).toBeVisible();
@@ -128,11 +136,12 @@ test("COD with a coupon sends the coupon code", async ({ page }) => {
   });
   await openCheckout(page);
   await fillCustomer(page);
-  await pick(page, "תשלום לשליח בעת קבלת המוצר");
+  await pick(group(page), COD);
+  await pick(codGroup(page), "מרכז");
   const couponInput = page.getByLabel("קוד קופון").filter({ visible: true });
   await couponInput.fill("zz-test");
   await couponInput.press("Enter");
-  await expect(page.getByText("לתשלום לשליח בעת המסירה (כולל משלוח)").locator("..")).toContainText("318");
+  await expect(totalRow(page)).toContainText("318");
   await page.getByRole("button", { name: "אישור הזמנה — תשלום לשליח" }).click();
   await expect(page.getByRole("heading", { name: "ההזמנה התקבלה בהצלחה!" })).toBeVisible();
   expect(sent.couponCode).toBe("zz-test");

@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import Link from "next/link";
-import { ArrowRight, ShoppingBag, Loader2, CheckCircle, XCircle, Lock, Clock, CreditCard, Truck } from "lucide-react";
+import { ArrowRight, ShoppingBag, Loader2, CheckCircle, XCircle, Lock, Clock, Truck } from "lucide-react";
 import { useCartStore, useCartTotals, SHIPPING_COST, SHIPPING_LABEL } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import { COD_STATUS_LABEL, type PaymentMethod } from "@/lib/shipping";
+import type { ShippingRegion } from "@/types";
 import { CouponSummary } from "@/components/shop/CouponSummary";
 import toast from "react-hot-toast";
 
@@ -38,8 +39,12 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   // Amount the courier collects, set once a COD order was placed (success screen).
   const [codTotal, setCodTotal] = useState<number | null>(null);
-  // COD is delivery-only: picking up in person always means paying by card.
-  const isCod = paymentMethod === "cod" && region !== "pickup";
+  // COD is the 5th option of the "אזור משלוח" group. It still needs a real
+  // delivery region (north/center/south) for the shipping price — null until
+  // the customer picks one; never assumed.
+  const [codRegion, setCodRegion] = useState<Exclude<ShippingRegion, "pickup"> | null>(null);
+  const isCod = paymentMethod === "cod";
+  const codNeedsRegion = isCod && codRegion === null;
 
   const [form, setForm] = useState({
     name: "",
@@ -59,16 +64,25 @@ export default function CheckoutPage() {
   );
   const hostedFieldsRef = useRef<any>(null);
 
-  useEffect(() => {
-    if (region === "pickup") setPaymentMethod("card");
-  }, [region]);
-
   // A different payment method is a different checkout attempt: the server
   // refuses to reuse an order created for the other method under the same key.
-  const choosePaymentMethod = (m: PaymentMethod) => {
-    if (m === paymentMethod) return;
-    setPaymentMethod(m);
+  const chooseRegion = (r: ShippingRegion) => {
+    if (isCod) {
+      setPaymentMethod("card");
+      setCodRegion(null);
+      idempotencyKeyRef.current = crypto.randomUUID();
+    }
+    setRegion(r);
+  };
+  const chooseCod = () => {
+    if (isCod) return;
+    setPaymentMethod("cod");
+    setCodRegion(null);
     idempotencyKeyRef.current = crypto.randomUUID();
+  };
+  const chooseCodRegion = (r: Exclude<ShippingRegion, "pickup">) => {
+    setCodRegion(r);
+    setRegion(r);
   };
   // Payload of the last /api/checkout/verify call, kept so the "unconfirmed"
   // screen can re-ask the server for the status. Verify only ever reads from
@@ -215,6 +229,10 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting || items.length === 0) return;
+    if (codNeedsRegion) {
+      toast.error("יש לבחור אזור למסירה.");
+      return;
+    }
     if (!isCod && (!fieldsReady || !hostedFieldsRef.current)) {
       toast.error("טופס התשלום עדיין נטען, נסה/י שוב בעוד רגע.");
       return;
@@ -231,7 +249,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
           customer: form,
-          shippingRegion: region,
+          shippingRegion: isCod ? codRegion : region,
           paymentMethod: isCod ? "cod" : "card",
           idempotencyKey: idempotencyKeyRef.current,
           // A coupon the cart doesn't qualify for is not sent: full price.
@@ -445,12 +463,12 @@ export default function CheckoutPage() {
 
             <div className="glass border border-white/[0.08] rounded-2xl p-6 space-y-3">
               <h2 className="font-bold text-white/80 text-sm uppercase tracking-wider mb-1" id="shipping-region-label">אזור משלוח *</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" role="radiogroup" aria-labelledby="shipping-region-label">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3" role="radiogroup" aria-labelledby="shipping-region-label">
                 {(["north", "center", "south", "pickup"] as const).map((r) => (
                   <label
                     key={r}
                     className={`rounded-xl px-4 py-3 text-sm font-bold border transition-all block text-center cursor-pointer focus-within:ring-2 focus-within:ring-cyan focus-within:ring-offset-2 focus-within:ring-offset-navy-900 ${
-                      region === r
+                      !isCod && region === r
                         ? "bg-cyan/10 border-cyan/40 text-cyan"
                         : "bg-navy-800 border-white/[0.08] text-white/60 hover:border-white/20"
                     }`}
@@ -459,50 +477,67 @@ export default function CheckoutPage() {
                       type="radio"
                       name="shippingRegion"
                       value={r}
-                      checked={region === r}
-                      onChange={() => setRegion(r)}
+                      checked={!isCod && region === r}
+                      onChange={() => chooseRegion(r)}
+                      disabled={submitting}
                       className="sr-only"
                     />
                     {SHIPPING_LABEL[r]}
                     <span className="block text-xs font-normal mt-0.5 text-white/40">{formatPrice(SHIPPING_COST[r])}</span>
                   </label>
                 ))}
+                <label className={`col-span-2 rounded-xl px-4 py-3 text-sm font-bold border transition-all block text-center cursor-pointer focus-within:ring-2 focus-within:ring-cyan focus-within:ring-offset-2 focus-within:ring-offset-navy-900 ${
+                      isCod
+                        ? "bg-cyan/10 border-cyan/40 text-cyan"
+                        : "bg-navy-800 border-white/[0.08] text-white/60 hover:border-white/20"
+                    }`}>
+                  <input
+                    type="radio"
+                    name="shippingRegion"
+                    value="cod"
+                    checked={isCod}
+                    onChange={chooseCod}
+                    disabled={submitting}
+                    className="sr-only"
+                  />
+                  <span className="inline-flex items-center gap-1.5">
+                    <Truck className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    תשלום לשליח בעת קבלת המוצר
+                  </span>
+                  <span className="block text-xs font-normal mt-0.5 text-white/40">משלוח לפי אזור המסירה</span>
+                </label>
               </div>
 
-              {region !== "pickup" && (
-                <>
-                  <h2 className="font-bold text-white/80 text-sm uppercase tracking-wider pt-3" id="payment-method-label">אמצעי תשלום *</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-labelledby="payment-method-label">
-                    {([
-                      { value: "card", label: "תשלום באשראי באתר", Icon: CreditCard },
-                      { value: "cod", label: "תשלום לשליח בעת קבלת המוצר", Icon: Truck },
-                    ] as const).map(({ value, label, Icon }) => (
+              {isCod && (
+                <div className="pt-2 space-y-3">
+                  <p className="text-white/60 text-sm">התשלום עבור ההזמנה והמשלוח יתבצע לשליח בעת קבלת המוצר.</p>
+                  <h3 className="font-bold text-white/80 text-sm uppercase tracking-wider" id="cod-region-label">אזור למסירה *</h3>
+                  <div className="grid grid-cols-3 gap-3" role="radiogroup" aria-labelledby="cod-region-label" aria-required="true">
+                    {(["north", "center", "south"] as const).map((r) => (
                       <label
-                        key={value}
-                        className={`rounded-xl px-4 py-3 text-sm font-bold border transition-all flex items-center gap-2 cursor-pointer focus-within:ring-2 focus-within:ring-cyan focus-within:ring-offset-2 focus-within:ring-offset-navy-900 ${
-                          paymentMethod === value
-                            ? "bg-cyan/10 border-cyan/40 text-cyan"
-                            : "bg-navy-800 border-white/[0.08] text-white/60 hover:border-white/20"
-                        }`}
+                        key={r}
+                        className={`rounded-xl px-4 py-3 text-sm font-bold border transition-all block text-center cursor-pointer focus-within:ring-2 focus-within:ring-cyan focus-within:ring-offset-2 focus-within:ring-offset-navy-900 ${
+                      codRegion === r
+                        ? "bg-cyan/10 border-cyan/40 text-cyan"
+                        : "bg-navy-800 border-white/[0.08] text-white/60 hover:border-white/20"
+                    }`}
                       >
                         <input
                           type="radio"
-                          name="paymentMethod"
-                          value={value}
-                          checked={paymentMethod === value}
-                          onChange={() => choosePaymentMethod(value)}
+                          name="codRegion"
+                          value={r}
+                          checked={codRegion === r}
+                          onChange={() => chooseCodRegion(r)}
                           disabled={submitting}
                           className="sr-only"
                         />
-                        <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-                        {label}
+                        {SHIPPING_LABEL[r]}
+                        <span className="block text-xs font-normal mt-0.5 text-white/40">{formatPrice(SHIPPING_COST[r])}</span>
                       </label>
                     ))}
                   </div>
-                  {isCod && (
-                    <p className="text-white/50 text-xs">התשלום יתבצע לשליח בעת קבלת ההזמנה. אין צורך להזין פרטי אשראי באתר.</p>
-                  )}
-                </>
+                  {codNeedsRegion && <p className="text-amber-400/80 text-xs">יש לבחור אזור למסירה לפני אישור ההזמנה.</p>}
+                </div>
               )}
             </div>
 
@@ -555,7 +590,7 @@ export default function CheckoutPage() {
 
             <button
               type="submit"
-              disabled={submitting || !form.agreedToTerms}
+              disabled={submitting || !form.agreedToTerms || codNeedsRegion}
               className="w-full btn-primary bg-cyan text-navy-900 font-black py-4 rounded-xl text-base hover:bg-cyan-600 transition-colors shadow-cyan disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting ? (
@@ -591,7 +626,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
               <div className="border-t border-white/[0.06] pt-4">
-                <CouponSummary disabled={submitting} cod={isCod} />
+                <CouponSummary disabled={submitting} cod={isCod} codRegionMissing={codNeedsRegion} />
               </div>
             </div>
           </div>

@@ -26,4 +26,4 @@ export function isPaymentMethod(v: unknown): v is PaymentMethod {
 }
 
 export const COD_PAYMENT_LABEL = "תשלום לשליח";
-export const COD_STATUS_LABEL = "ממתין לתשלום בעת המסירה";
+export const COD_STATUS_LABEL = "ממתין לתשלום לשליח";

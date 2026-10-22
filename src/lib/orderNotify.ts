@@ -57,7 +57,7 @@ export async function notifyCodOrderPlaced(req: NextRequest, order: Record<strin
         to: order.customer_email,
         customerName: order.customer_name,
         orderId: order.id,
-        message: `תודה על הזמנתך! ההזמנה מספר ${order.order_number ?? ""} התקבלה.\nאמצעי תשלום: תשלום לשליח.\nסכום לגבייה בעת המסירה (כולל משלוח): ₪${order.total}.\nסטטוס תשלום: ממתין לתשלום בעת המסירה.\nנעדכן אותך בהמשך לגבי המשלוח.`,
+        message: `תודה על הזמנתך! ההזמנה מספר ${order.order_number ?? ""} התקבלה.\nאמצעי תשלום: תשלום לשליח.\nסכום לגבייה בעת המסירה (כולל משלוח): ₪${order.total}.\nסטטוס תשלום: ממתין לתשלום לשליח.\nנעדכן אותך בהמשך לגבי המשלוח.`,
       }),
     }).catch((e) => console.error("notifyCodOrderPlaced: customer email failed", e)),
   ]);

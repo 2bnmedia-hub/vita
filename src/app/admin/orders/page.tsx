@@ -32,7 +32,7 @@ const paymentColors: Record<string, string> = {
 
 const paymentLabels: Record<string, string> = {
   pending:            "ממתין לתשלום",
-  cod_pending:        "ממתין לתשלום בעת המסירה",
+  cod_pending:        "ממתין לתשלום לשליח",
   paid:               "שולם",
   payment_failed:     "תשלום נכשל",
   cancelled:          "בוטל",

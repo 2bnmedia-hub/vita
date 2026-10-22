@@ -10,8 +10,11 @@ import { formatPrice } from "@/lib/utils";
  * both always show the same numbers. Display only — create-order re-prices
  * everything (coupon included) from the DB before any charge.
  */
-/** cod = checkout with "תשלום לשליח": the total is what the courier collects. */
-export function CouponSummary({ disabled = false, cod = false }: { disabled?: boolean; cod?: boolean }) {
+/**
+ * cod = checkout with "תשלום לשליח": the total is what the courier collects.
+ * codRegionMissing = no delivery region picked yet, so shipping is unknown.
+ */
+export function CouponSummary({ disabled = false, cod = false, codRegionMissing = false }: { disabled?: boolean; cod?: boolean; codRegionMissing?: boolean }) {
   const { subtotal, discount, shipping, region, coupon, total } = useCartTotals();
   const setCoupon = useCartStore((s) => s.setCoupon);
   const inputId = useId();
@@ -70,8 +73,17 @@ export function CouponSummary({ disabled = false, cod = false }: { disabled?: bo
           </div>
         )}
         <div className="flex justify-between text-sm text-white/50">
-          <span>משלוח ({SHIPPING_LABEL[region]})</span>
-          <span className="text-white/70">{formatPrice(shipping)}</span>
+          {codRegionMissing ? (
+            <>
+              <span>משלוח</span>
+              <span className="text-amber-400/80">יש לבחור אזור למסירה</span>
+            </>
+          ) : (
+            <>
+              <span>משלוח ({SHIPPING_LABEL[region]})</span>
+              <span className="text-white/70">{formatPrice(shipping)}</span>
+            </>
+          )}
         </div>
         {cod && (
           <div className="flex justify-between text-sm text-white/50">
@@ -81,7 +93,7 @@ export function CouponSummary({ disabled = false, cod = false }: { disabled?: bo
         )}
         <div className="flex justify-between gap-3 font-black text-lg pt-1">
           <span>{cod ? "לתשלום לשליח בעת המסירה (כולל משלוח)" : <>סה&quot;כ לתשלום</>}</span>
-          <span className="text-white" data-testid="grand-total">{formatPrice(total)}</span>
+          <span className="text-white" data-testid="grand-total">{codRegionMissing ? "—" : formatPrice(total)}</span>
         </div>
       </div>
 
