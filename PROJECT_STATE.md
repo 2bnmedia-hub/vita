@@ -38,6 +38,14 @@ Path: /Volumes/Haytham Salim/פרויקטים פיתוח אתרים/  V FORM/vit
 - החישוב המשותף: `couponDiscount()` ב־`src/lib/orderPricing.ts`. תצוגה בסל ובקופה: `src/components/shop/CouponSummary.tsx`.
 - מוצר עם תג `הנמכר ביותר` מוצג ראשון בדף הבית ובחנות (`bestsellersFirst` ב־`src/lib/utils.ts`).
 
+## תשלום לשליח / COD (22/10/2026)
+- מיגרציה: `supabase-cod-migration.sql` — עמודות `payment_method` (`card`|`cod`), `stock_allocated`, `cod_collected_at`, `cod_collected_by`; פונקציות `allocate_cod_order`, `cancel_cod_order`, `mark_cod_paid` (service_role בלבד).
+- **יש להריץ את המיגרציה לפני פריסת הקוד** — גם הזמנת אשראי כותבת `payment_method`.
+- הזמנת COD: `payment_status = 'cod_pending'`, ללא Tranzila. מלאי וקופון נלקחים מיד ביצירה; ביטול (סטטוס "בוטל" או מחיקה בניהול) מחזיר אותם פעם אחת. הזמנת COD שבוטלה לא נפתחת מחדש.
+- רק מנהל מסמן "התשלום התקבל" (`/api/admin/mark-cod-paid`), נשמר מי ומתי.
+- איסוף עצמי = אשראי בלבד (גם בשרת).
+- בדיקות: `e2e/cod-ui.spec.ts` (מדמה את השרת, בטוח בייצור), `e2e/cod-api.spec.ts` (דורש את הקוד החדש בפריסה).
+
 ## Tranzila — מצב (04/10/2026)
 - מסוף `fxpvythtvspy`, מסוף אמיתי (עסקאות מאושרות דרך SHVA).
 - אימות עסקה בשרת: `POST https://report.tranzila.com/v1/transaction` (יחיד, שרת הדוחות). הנתיב `/v1/transactions` מחזיר 0 שורות למסוף הזה — זו הייתה הסיבה שאף הזמנה לא סומנה "שולם" עד 04/10/2026. הסכום בתשובה באגורות.

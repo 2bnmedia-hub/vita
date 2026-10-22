@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import Link from "next/link";
-import { ArrowRight, ShoppingBag, Loader2, CheckCircle, XCircle, Lock, Clock } from "lucide-react";
+import { ArrowRight, ShoppingBag, Loader2, CheckCircle, XCircle, Lock, Clock, CreditCard, Truck } from "lucide-react";
 import { useCartStore, useCartTotals, SHIPPING_COST, SHIPPING_LABEL } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
+import { COD_STATUS_LABEL, type PaymentMethod } from "@/lib/shipping";
 import { CouponSummary } from "@/components/shop/CouponSummary";
 import toast from "react-hot-toast";
 
@@ -34,6 +35,11 @@ export default function CheckoutPage() {
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [scriptReady, setScriptReady] = useState(false);
   const [fieldsReady, setFieldsReady] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+  // Amount the courier collects, set once a COD order was placed (success screen).
+  const [codTotal, setCodTotal] = useState<number | null>(null);
+  // COD is delivery-only: picking up in person always means paying by card.
+  const isCod = paymentMethod === "cod" && region !== "pickup";
 
   const [form, setForm] = useState({
     name: "",
@@ -52,6 +58,18 @@ export default function CheckoutPage() {
     typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`
   );
   const hostedFieldsRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (region === "pickup") setPaymentMethod("card");
+  }, [region]);
+
+  // A different payment method is a different checkout attempt: the server
+  // refuses to reuse an order created for the other method under the same key.
+  const choosePaymentMethod = (m: PaymentMethod) => {
+    if (m === paymentMethod) return;
+    setPaymentMethod(m);
+    idempotencyKeyRef.current = crypto.randomUUID();
+  };
   // Payload of the last /api/checkout/verify call, kept so the "unconfirmed"
   // screen can re-ask the server for the status. Verify only ever reads from
   // Tranzila — re-sending it can never create another charge.
@@ -138,8 +156,15 @@ export default function CheckoutPage() {
         <div className="w-20 h-20 rounded-2xl bg-cyan/10 border border-cyan/30 flex items-center justify-center">
           <CheckCircle className="w-10 h-10 text-cyan" aria-hidden="true" />
         </div>
-        <h1 className="text-3xl font-black">התשלום אושר בהצלחה!</h1>
+        <h1 className="text-3xl font-black">{codTotal != null ? "ההזמנה התקבלה בהצלחה!" : "התשלום אושר בהצלחה!"}</h1>
         {orderNumber && <p className="text-white/60">מספר הזמנה: <span className="font-bold text-cyan">{orderNumber}</span></p>}
+        {codTotal != null && (
+          <div className="glass border border-white/[0.08] rounded-2xl px-6 py-4 space-y-1.5 text-sm">
+            <p className="text-white/60">אמצעי תשלום: <span className="font-bold text-white">תשלום לשליח</span></p>
+            <p className="text-white/60">סכום לגבייה בעת המסירה (כולל משלוח): <span className="font-bold text-cyan">{formatPrice(codTotal)}</span></p>
+            <p className="text-white/60">סטטוס תשלום: <span className="font-bold text-white">{COD_STATUS_LABEL}</span></p>
+          </div>
+        )}
         <p className="text-white/50 max-w-sm">תודה על הרכישה. נשלח אליך אישור במייל בהקדם.</p>
         <Link href="/shop" className="btn-primary bg-cyan text-navy-900 font-black px-8 py-3 rounded-xl hover:bg-cyan-600 transition-colors">
           חזרה לחנות
@@ -190,7 +215,7 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting || items.length === 0) return;
-    if (!fieldsReady || !hostedFieldsRef.current) {
+    if (!isCod && (!fieldsReady || !hostedFieldsRef.current)) {
       toast.error("טופס התשלום עדיין נטען, נסה/י שוב בעוד רגע.");
       return;
     }
@@ -207,6 +232,7 @@ export default function CheckoutPage() {
           items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
           customer: form,
           shippingRegion: region,
+          paymentMethod: isCod ? "cod" : "card",
           idempotencyKey: idempotencyKeyRef.current,
           // A coupon the cart doesn't qualify for is not sent: full price.
           couponCode: discount > 0 ? coupon?.code : undefined,
@@ -234,6 +260,16 @@ export default function CheckoutPage() {
       }
 
       const { orderId, orderNumber: newOrderNumber, amount, thtk } = createData;
+
+      // COD: the order is placed and nothing is charged — no Tranzila call at all.
+      if (isCod) {
+        setOrderNumber(newOrderNumber);
+        setCodTotal(Number(amount));
+        clearCart();
+        setPhase("success");
+        setSubmitting(false);
+        return;
+      }
 
       hostedFieldsRef.current.charge(
         {
@@ -432,9 +468,46 @@ export default function CheckoutPage() {
                   </label>
                 ))}
               </div>
+
+              {region !== "pickup" && (
+                <>
+                  <h2 className="font-bold text-white/80 text-sm uppercase tracking-wider pt-3" id="payment-method-label">אמצעי תשלום *</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-labelledby="payment-method-label">
+                    {([
+                      { value: "card", label: "תשלום באשראי באתר", Icon: CreditCard },
+                      { value: "cod", label: "תשלום לשליח בעת קבלת המוצר", Icon: Truck },
+                    ] as const).map(({ value, label, Icon }) => (
+                      <label
+                        key={value}
+                        className={`rounded-xl px-4 py-3 text-sm font-bold border transition-all flex items-center gap-2 cursor-pointer focus-within:ring-2 focus-within:ring-cyan focus-within:ring-offset-2 focus-within:ring-offset-navy-900 ${
+                          paymentMethod === value
+                            ? "bg-cyan/10 border-cyan/40 text-cyan"
+                            : "bg-navy-800 border-white/[0.08] text-white/60 hover:border-white/20"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value={value}
+                          checked={paymentMethod === value}
+                          onChange={() => choosePaymentMethod(value)}
+                          disabled={submitting}
+                          className="sr-only"
+                        />
+                        <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                  {isCod && (
+                    <p className="text-white/50 text-xs">התשלום יתבצע לשליח בעת קבלת ההזמנה. אין צורך להזין פרטי אשראי באתר.</p>
+                  )}
+                </>
+              )}
             </div>
 
-            <div className="glass border border-white/[0.08] rounded-2xl p-6 space-y-4">
+            {/* Hidden, not unmounted: Tranzila's iframes stay alive so switching back to card just works. */}
+            <div className={`glass border border-white/[0.08] rounded-2xl p-6 space-y-4 ${isCod ? "hidden" : ""}`} aria-hidden={isCod}>
               <h2 className="font-bold text-white/80 text-sm uppercase tracking-wider mb-1 flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-cyan" aria-hidden="true" />
                 פרטי תשלום
@@ -486,7 +559,9 @@ export default function CheckoutPage() {
               className="w-full btn-primary bg-cyan text-navy-900 font-black py-4 rounded-xl text-base hover:bg-cyan-600 transition-colors shadow-cyan disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting ? (
-                <><Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />מבצע תשלום...</>
+                <><Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />{isCod ? "שולח הזמנה..." : "מבצע תשלום..."}</>
+              ) : isCod ? (
+                <>אישור הזמנה — תשלום לשליח<ArrowRight className="w-5 h-5" aria-hidden="true" /></>
               ) : (
                 <>תשלום מאובטח — {formatPrice(grandTotal)}<ArrowRight className="w-5 h-5" aria-hidden="true" /></>
               )}
@@ -517,6 +592,12 @@ export default function CheckoutPage() {
               </div>
               <div className="border-t border-white/[0.06] pt-4">
                 <CouponSummary disabled={submitting} />
+                {isCod && (
+                  <div className="mt-3 rounded-xl bg-cyan/5 border border-cyan/20 px-4 py-3 flex items-center justify-between gap-3">
+                    <span className="text-sm text-white/70">לתשלום לשליח בעת המסירה (כולל משלוח)</span>
+                    <span className="font-black text-cyan">{formatPrice(grandTotal)}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

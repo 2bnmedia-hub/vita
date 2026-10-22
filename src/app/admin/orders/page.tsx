@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { ShoppingBag, ChevronDown, Trash2, X, Mail, Phone, User, Clock, Send, Search, CreditCard, RotateCcw } from "lucide-react";
+import { ShoppingBag, ChevronDown, Trash2, X, Mail, Phone, User, Clock, Send, Search, CreditCard, RotateCcw, Banknote } from "lucide-react";
 import toast from "react-hot-toast";
 
 const statusColors: Record<string, string> = {
@@ -22,6 +22,7 @@ const statusLabels: Record<string, string> = {
 
 const paymentColors: Record<string, string> = {
   pending:            "bg-amber-500/15 text-amber-400 border-amber-500/20",
+  cod_pending:        "bg-orange-500/15 text-orange-400 border-orange-500/20",
   paid:               "bg-green-500/15 text-green-400 border-green-500/20",
   payment_failed:     "bg-red-500/15 text-red-400 border-red-500/20",
   cancelled:          "bg-white/10 text-white/50 border-white/10",
@@ -31,6 +32,7 @@ const paymentColors: Record<string, string> = {
 
 const paymentLabels: Record<string, string> = {
   pending:            "ממתין לתשלום",
+  cod_pending:        "ממתין לתשלום בעת המסירה",
   paid:               "שולם",
   payment_failed:     "תשלום נכשל",
   cancelled:          "בוטל",
@@ -55,6 +57,7 @@ export default function AdminOrders() {
   const [emailText, setEmailText] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [refundingId, setRefundingId] = useState<string | null>(null);
+  const [markingPaidId, setMarkingPaidId] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
@@ -80,12 +83,33 @@ export default function AdminOrders() {
   }, []);
 
   const updateStatus = async (id: string, status: string) => {
-    await fetch(`/api/admin/orders/${id}`, {
+    const res = await fetch(`/api/admin/orders/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
+    if (!res.ok) toast.error((await res.json().catch(() => ({}))).error || "עדכון הסטטוס נכשל");
     loadOrders();
+  };
+
+  const markCodPaid = async (o: any) => {
+    if (!window.confirm(`לאשר שהתקבל תשלום של ₪${Number(o.total).toLocaleString("he-IL")} מהשליח עבור הזמנה ${o.order_number ?? ""}?`)) return;
+    setMarkingPaidId(o.id);
+    try {
+      const res = await fetch("/api/admin/mark-cod-paid", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: o.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "עדכון התשלום נכשל");
+      toast.success("התשלום סומן כהתקבל");
+      loadOrders();
+    } catch (e: any) {
+      toast.error(e.message || "עדכון התשלום נכשל");
+    } finally {
+      setMarkingPaidId(null);
+    }
   };
 
   const deleteOrder = async (id: string) => {
@@ -255,6 +279,9 @@ export default function AdminOrders() {
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${paymentColors[paymentStatus] ?? "bg-white/10 text-white/50 border-white/10"}`}>
                           {paymentLabels[paymentStatus] ?? paymentStatus}
                         </span>
+                        {o.payment_method === "cod" && (
+                          <p className="text-white/40 text-xs mt-1">תשלום לשליח{paymentStatus === "cod_pending" ? ` · לגבייה ₪${Number(o.total).toLocaleString("he-IL")}` : ""}</p>
+                        )}
                       </td>
                       <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                         <div className={`relative inline-flex items-center rounded-full border ${statusColors[o.status] ?? "bg-white/10 text-white/50 border-white/10"}`}>
@@ -272,6 +299,21 @@ export default function AdminOrders() {
                       </td>
                       <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-1">
+                          {paymentStatus === "cod_pending" && (
+                            <button
+                              onClick={() => markCodPaid(o)}
+                              disabled={markingPaidId === o.id}
+                              aria-label="סמן שהתשלום התקבל"
+                              title="סמן שהתשלום התקבל"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-green-400 hover:bg-green-500/10 transition-all disabled:opacity-40"
+                            >
+                              {markingPaidId === o.id ? (
+                                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                              ) : (
+                                <Banknote className="w-4 h-4" aria-hidden="true" />
+                              )}
+                            </button>
+                          )}
                           {(paymentStatus === "paid" || paymentStatus === "partially_refunded") && (
                             <button
                               onClick={() => refundOrder(o.id)}
@@ -329,6 +371,15 @@ export default function AdminOrders() {
                               <p className="text-white/40 text-xs font-bold uppercase mb-1 flex items-center gap-1.5">
                                 <CreditCard className="w-3.5 h-3.5" aria-hidden="true" /> פרטי תשלום
                               </p>
+                              {o.payment_method === "cod" && (
+                                <>
+                                  <p className="text-white/60 text-xs">אמצעי תשלום: <span className="font-bold text-white/80">תשלום לשליח</span></p>
+                                  <p className="text-white/60 text-xs">סכום לגבייה בעת המסירה: ₪{Number(o.total).toLocaleString("he-IL")}</p>
+                                  {o.cod_collected_at && (
+                                    <p className="text-green-400/80 text-xs">התקבל ב: {new Date(o.cod_collected_at).toLocaleString("he-IL")} · סומן ע&quot;י {o.cod_collected_by}</p>
+                                  )}
+                                </>
+                              )}
                               <p className="text-white/60 text-xs">מזהה עסקת Tranzila: <span className="font-mono">{o.tranzila_transaction_id ?? "—"}</span></p>
                               <p className="text-white/60 text-xs">מספר אישור: <span className="font-mono">{o.tranzila_confirmation_code ?? "—"}</span></p>
                               <p className="text-white/60 text-xs">אמצעי תשלום: {o.payment_method_brand ?? "—"} {o.card_last4 ? `•••• ${o.card_last4}` : ""}</p>

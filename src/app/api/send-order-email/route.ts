@@ -35,6 +35,9 @@ export async function POST(req: NextRequest) {
       </table>
       ${order.coupon_code ? `<p><b>קופון:</b> ${order.coupon_code} (הנחה ₪${order.discount_amount})</p>` : ""}
       <p style="margin-top:14px;font-size:16px;"><b>סה"כ: ₪${order.total}</b></p>
+      ${order.payment_method === "cod"
+        ? `<p><b>אמצעי תשלום:</b> תשלום לשליח</p><p><b>סכום לגבייה בעת המסירה:</b> ₪${order.total}</p><p><b>סטטוס תשלום:</b> ממתין לתשלום בעת המסירה</p>`
+        : ""}
     </div>
   `;
 

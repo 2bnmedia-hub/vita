@@ -29,10 +29,15 @@ export function createAdminSessionToken(email: string): string {
 
 /** Pure token check, split out from isAdminAuthed() so it's unit-testable without a NextRequest. */
 export function verifyAdminSessionToken(token: string | undefined | null): boolean {
-  if (!token) return false;
+  return adminEmailFromToken(token) !== null;
+}
+
+/** The admin's email from a valid session token, or null. Used to record who did an action. */
+export function adminEmailFromToken(token: string | undefined | null): string | null {
+  if (!token) return null;
 
   const dot = token.indexOf(".");
-  if (dot === -1) return false; // legacy unsigned token format — reject
+  if (dot === -1) return null; // legacy unsigned token format — reject
   const encodedPayload = token.slice(0, dot);
   const providedSig = token.slice(dot + 1);
 
@@ -40,7 +45,7 @@ export function verifyAdminSessionToken(token: string | undefined | null): boole
   try {
     payload = Buffer.from(encodedPayload, "base64").toString("utf8");
   } catch {
-    return false;
+    return null;
   }
 
   const expectedSig = sign(payload);
@@ -48,17 +53,21 @@ export function verifyAdminSessionToken(token: string | undefined | null): boole
     expectedSig.length !== providedSig.length ||
     !crypto.timingSafeEqual(Buffer.from(expectedSig), Buffer.from(providedSig))
   ) {
-    return false;
+    return null;
   }
 
   const [email, issuedAtStr] = payload.split(":");
   const issuedAt = Number(issuedAtStr);
-  if (!ADMIN_EMAILS.includes(email) || !Number.isFinite(issuedAt)) return false;
-  if (Date.now() - issuedAt > SESSION_MAX_AGE_MS) return false;
+  if (!ADMIN_EMAILS.includes(email) || !Number.isFinite(issuedAt)) return null;
+  if (Date.now() - issuedAt > SESSION_MAX_AGE_MS) return null;
 
-  return true;
+  return email;
 }
 
 export function isAdminAuthed(req: NextRequest): boolean {
   return verifyAdminSessionToken(req.cookies.get(ADMIN_SESSION_COOKIE)?.value);
+}
+
+export function adminEmail(req: NextRequest): string | null {
+  return adminEmailFromToken(req.cookies.get(ADMIN_SESSION_COOKIE)?.value);
 }

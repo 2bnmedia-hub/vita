@@ -61,6 +61,7 @@ export interface ContactForm {
 
 export type PaymentStatus =
   | "pending"
+  | "cod_pending"
   | "paid"
   | "payment_failed"
   | "cancelled"
@@ -107,4 +108,8 @@ export interface Order {
   created_at: string;
   coupon_code?: string | null;
   discount_amount?: number;
+  payment_method?: "card" | "cod";
+  stock_allocated?: boolean;
+  cod_collected_at?: string | null;
+  cod_collected_by?: string | null;
 }

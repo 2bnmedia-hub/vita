@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { SHIPPING_COST, SHIPPING_LABEL, isShippingRegion } from "@/lib/shipping";
+import { SHIPPING_COST, SHIPPING_LABEL, isPaymentMethod, isShippingRegion } from "@/lib/shipping";
 import { createHandshake, tranzilaTerminal, sanitizeForLog } from "@/lib/tranzila";
 import { priceOrder } from "@/lib/orderPricing";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 import { COUPON_MESSAGES, normalizeCouponCode, reserveCoupon } from "@/lib/coupons";
+import { notifyCodOrderPlaced } from "@/lib/orderNotify";
 
 interface RequestItem {
   product_id: string;
@@ -36,6 +37,14 @@ export async function POST(req: NextRequest) {
   if (!isShippingRegion(shippingRegion)) {
     return NextResponse.json({ error: "אזור משלוח לא תקין" }, { status: 400 });
   }
+  // Missing = card, so older clients keep working unchanged.
+  const paymentMethod = body?.paymentMethod ?? "card";
+  if (!isPaymentMethod(paymentMethod)) {
+    return NextResponse.json({ error: "אמצעי תשלום לא תקין" }, { status: 400 });
+  }
+  if (paymentMethod === "cod" && shippingRegion === "pickup") {
+    return NextResponse.json({ error: "תשלום לשליח זמין למשלוח בלבד" }, { status: 400 });
+  }
   const name = String(customer?.name ?? "").trim();
   const email = String(customer?.email ?? "").trim();
   const phone = String(customer?.phone ?? "").trim();
@@ -64,6 +73,25 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (existing) {
+    if ((existing.payment_method ?? "card") !== paymentMethod) {
+      return NextResponse.json({ error: "אמצעי התשלום השתנה. רענן/י את העמוד ונסה/י שוב." }, { status: 409 });
+    }
+    // A COD order is complete once placed: a retry just gets the same order back.
+    if (paymentMethod === "cod") {
+      if (existing.payment_status !== "cod_pending") {
+        return NextResponse.json(
+          { error: "ההזמנה הזו כבר טופלה", orderNumber: existing.order_number, paymentStatus: existing.payment_status },
+          { status: 409 }
+        );
+      }
+      return NextResponse.json({
+        orderId: existing.id,
+        orderNumber: existing.order_number,
+        amount: Number(existing.total),
+        paymentMethod: "cod",
+        paymentStatus: "cod_pending",
+      });
+    }
     if (existing.payment_status !== "pending") {
       return NextResponse.json(
         { error: "ההזמנה הזו כבר טופלה", orderNumber: existing.order_number, paymentStatus: existing.payment_status },
@@ -148,6 +176,7 @@ export async function POST(req: NextRequest) {
   const { items: orderItems, total } = pricing;
   const shippingCost = SHIPPING_COST[shippingRegion];
   const orderNumber = makeOrderNumber();
+  const isCod = paymentMethod === "cod";
 
   const { data: order, error: insertError } = await supabase
     .from("orders")
@@ -166,9 +195,10 @@ export async function POST(req: NextRequest) {
         shipping_region: SHIPPING_LABEL[shippingRegion],
         shipping_cost: shippingCost,
         status: "pending",
-        payment_status: "pending",
-        payment_provider: "tranzila",
-        payment_terminal: tranzilaTerminal(),
+        payment_method: paymentMethod,
+        payment_status: isCod ? "cod_pending" : "pending",
+        payment_provider: isCod ? null : "tranzila",
+        payment_terminal: isCod ? null : tranzilaTerminal(),
         currency: "ILS",
         idempotency_key: idempotencyKey,
         payment_attempts: 0,
@@ -189,12 +219,39 @@ export async function POST(req: NextRequest) {
   if (couponCode) {
     const reserved = await reserveCoupon(couponCode, order.id);
     if (reserved.status !== "ok") {
-      await supabase
-        .from("orders")
-        .update({ payment_status: "payment_failed", last_payment_error: `coupon_${reserved.status}` })
-        .eq("id", order.id);
+      if (isCod) {
+        await supabase.rpc("cancel_cod_order", { p_order_id: order.id, p_reason: `coupon_${reserved.status}` });
+      } else {
+        await supabase
+          .from("orders")
+          .update({ payment_status: "payment_failed", last_payment_error: `coupon_${reserved.status}` })
+          .eq("id", order.id);
+      }
       return NextResponse.json({ error: COUPON_MESSAGES[reserved.status], couponStatus: reserved.status }, { status: 409 });
     }
+  }
+
+  // COD: no Tranzila at all. The order goes straight to fulfillment, so its
+  // stock (and coupon) is taken now, atomically, and given back on cancel.
+  if (isCod) {
+    const { data: allocated, error: allocError } = await supabase.rpc("allocate_cod_order", { p_order_id: order.id });
+    if (allocError || allocated !== "ok") {
+      await supabase.rpc("cancel_cod_order", { p_order_id: order.id, p_reason: `allocate_${allocated ?? "error"}` });
+      if (allocError) console.error("allocate_cod_order failed:", sanitizeForLog(allocError.message));
+      return allocated === "insufficient_stock"
+        ? NextResponse.json({ error: "אחד המוצרים בסל אזל מהמלאי. רענן/י את העמוד ונסה/י שוב." }, { status: 409 })
+        : NextResponse.json({ error: "יצירת ההזמנה נכשלה. נסה/י שוב." }, { status: 500 });
+    }
+    await notifyCodOrderPlaced(req, order);
+    return NextResponse.json({
+      orderId: order.id,
+      orderNumber,
+      amount: total,
+      discount: pricing.discount,
+      currency: "ILS",
+      paymentMethod: "cod",
+      paymentStatus: "cod_pending",
+    });
   }
 
   const handshake = await createHandshake(total, { order_id: order.id, order_number: orderNumber });
