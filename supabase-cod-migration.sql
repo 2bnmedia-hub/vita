@@ -33,6 +33,13 @@ create or replace function public.guard_orders_cod_fields() returns trigger
 language plpgsql
 as $$
 begin
+  -- Deleting an unpaid COD order would strand the stock it holds.
+  if tg_op = 'DELETE' then
+    if current_user in ('anon', 'authenticated') and (old.payment_method = 'cod' or old.stock_allocated) then
+      raise exception 'COD orders can only be deleted by the server';
+    end if;
+    return old;
+  end if;
   if current_user in ('anon', 'authenticated') and (
        new.payment_method = 'cod' or new.stock_allocated or new.cod_collected_at is not null or new.cod_collected_by is not null
        or (tg_op = 'UPDATE' and (
@@ -47,7 +54,7 @@ $$;
 
 drop trigger if exists trg_guard_orders_cod_fields on public.orders;
 create trigger trg_guard_orders_cod_fields
-before insert or update on public.orders
+before insert or update or delete on public.orders
 for each row execute function public.guard_orders_cod_fields();
 
 -- ── Take stock (and the coupon) for a freshly inserted COD order ──
