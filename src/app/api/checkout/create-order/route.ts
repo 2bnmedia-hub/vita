@@ -213,7 +213,9 @@ export async function POST(req: NextRequest) {
         shipping_region: SHIPPING_LABEL[shippingRegion],
         shipping_cost: shippingCost,
         status: "pending",
-        payment_method: paymentMethod,
+        // Card orders leave payment_method to its DB default ('card'), so the
+        // card path never depends on the COD migration being applied.
+        ...(isCod ? { payment_method: "cod" } : {}),
         payment_status: isCod ? "cod_pending" : "pending",
         payment_provider: isCod ? null : "tranzila",
         payment_terminal: isCod ? null : tranzilaTerminal(),
@@ -229,6 +231,9 @@ export async function POST(req: NextRequest) {
 
   if (insertError || !order) {
     console.error("create-order insert failed:", sanitizeForLog(insertError?.message));
+    if (isCod) {
+      return NextResponse.json({ error: "תשלום לשליח אינו זמין כרגע. נא לבחור אזור משלוח ולשלם באשראי, או לפנות אלינו." }, { status: 503 });
+    }
     return NextResponse.json({ error: "יצירת ההזמנה נכשלה. נסה/י שוב." }, { status: 500 });
   }
 
