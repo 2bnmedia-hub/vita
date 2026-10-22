@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
+/** Escape customer-typed text before it goes into an HTML email. */
+const esc = (v: unknown) =>
+  String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
 export async function POST(req: NextRequest) {
   const { to, customerName, message, orderId } = await req.json();
 
@@ -12,9 +16,9 @@ export async function POST(req: NextRequest) {
     <div dir="rtl" style="font-family:sans-serif;background:#0B1929;padding:32px;">
       <div style="max-width:480px;margin:0 auto;background:#0F2238;border-radius:16px;padding:28px;border:1px solid rgba(0,212,255,0.15);">
         <h2 style="color:#fff;margin:0 0 4px;">V-FORM NUTRITION</h2>
-        <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0 0 20px;">עדכון להזמנה שלך${orderId ? ` #${String(orderId).slice(0, 8)}` : ""}</p>
-        <p style="color:#fff;font-size:15px;">שלום ${customerName ?? ""},</p>
-        <p style="color:rgba(255,255,255,0.85);font-size:15px;line-height:1.7;white-space:pre-wrap;">${message}</p>
+        <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0 0 20px;">עדכון להזמנה שלך${orderId ? ` #${esc(String(orderId).slice(0, 8))}` : ""}</p>
+        <p style="color:#fff;font-size:15px;">שלום ${esc(customerName ?? "")},</p>
+        <p style="color:rgba(255,255,255,0.85);font-size:15px;line-height:1.7;white-space:pre-wrap;">${esc(message)}</p>
         <p style="color:rgba(255,255,255,0.3);font-size:12px;margin-top:24px;">תודה שבחרת ב-V-FORM NUTRITION</p>
       </div>
     </div>

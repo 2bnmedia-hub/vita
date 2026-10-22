@@ -7,6 +7,8 @@ import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 import { COUPON_MESSAGES, normalizeCouponCode, reserveCoupon } from "@/lib/coupons";
 import { notifyCodOrderPlaced } from "@/lib/orderNotify";
 
+const MAX_OPEN_COD_ORDERS = 2;
+
 interface RequestItem {
   product_id: string;
   quantity: number;
@@ -130,6 +132,22 @@ export async function POST(req: NextRequest) {
       terminalName: tranzilaTerminal(),
       thtk: handshake.thtk,
     });
+  }
+
+  // COD holds stock without any payment, so one customer may only have a few
+  // unpaid COD orders open at a time (stops an anonymous script draining stock).
+  if (paymentMethod === "cod") {
+    const { count } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("payment_status", "cod_pending")
+      .or(`customer_email.eq.${JSON.stringify(email)},customer_phone.eq.${JSON.stringify(phone)}`);
+    if ((count ?? 0) >= MAX_OPEN_COD_ORDERS) {
+      return NextResponse.json(
+        { error: "קיימות כבר הזמנות פתוחות לתשלום לשליח. נא לפנות אלינו או לשלם באשראי." },
+        { status: 429 }
+      );
+    }
   }
 
   // Re-price everything server-side from the DB. Never trust price/quantity from the client.

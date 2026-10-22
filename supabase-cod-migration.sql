@@ -24,6 +24,32 @@ alter table public.orders drop constraint if exists orders_cod_status_check;
 alter table public.orders add constraint orders_cod_status_check
   check (payment_method = 'card' or payment_status in ('cod_pending', 'paid', 'cancelled'));
 
+-- ── Only the server may create or change COD state ──
+-- Checkout inserts through the service role and the RPCs below run as their
+-- owner, so a request made with the public anon key (PostgREST switches to
+-- the anon/authenticated role) can never forge a COD order, flip
+-- stock_allocated to make a cancel inflate stock, or fake a collection record.
+create or replace function public.guard_orders_cod_fields() returns trigger
+language plpgsql
+as $$
+begin
+  if current_user in ('anon', 'authenticated') and (
+       new.payment_method = 'cod' or new.stock_allocated or new.cod_collected_at is not null or new.cod_collected_by is not null
+       or (tg_op = 'UPDATE' and (
+            new.payment_method is distinct from old.payment_method
+         or new.items is distinct from old.items and old.payment_method = 'cod')))
+  then
+    raise exception 'COD order fields can only be written by the server';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_guard_orders_cod_fields on public.orders;
+create trigger trg_guard_orders_cod_fields
+before insert or update on public.orders
+for each row execute function public.guard_orders_cod_fields();
+
 -- ── Take stock (and the coupon) for a freshly inserted COD order ──
 -- Returns 'ok' or 'insufficient_stock'. All-or-nothing: if one product is
 -- short, nothing is decremented. Row locks on products serialize parallel orders.
