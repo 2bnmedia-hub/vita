@@ -591,13 +591,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
               <div className="border-t border-white/[0.06] pt-4">
-                <CouponSummary disabled={submitting} />
-                {isCod && (
-                  <div className="mt-3 rounded-xl bg-cyan/5 border border-cyan/20 px-4 py-3 flex items-center justify-between gap-3">
-                    <span className="text-sm text-white/70">לתשלום לשליח בעת המסירה (כולל משלוח)</span>
-                    <span className="font-black text-cyan">{formatPrice(grandTotal)}</span>
-                  </div>
-                )}
+                <CouponSummary disabled={submitting} cod={isCod} />
               </div>
             </div>
           </div>

@@ -10,7 +10,8 @@ import { formatPrice } from "@/lib/utils";
  * both always show the same numbers. Display only — create-order re-prices
  * everything (coupon included) from the DB before any charge.
  */
-export function CouponSummary({ disabled = false }: { disabled?: boolean }) {
+/** cod = checkout with "תשלום לשליח": the total is what the courier collects. */
+export function CouponSummary({ disabled = false, cod = false }: { disabled?: boolean; cod?: boolean }) {
   const { subtotal, discount, shipping, region, coupon, total } = useCartTotals();
   const setCoupon = useCartStore((s) => s.setCoupon);
   const inputId = useId();
@@ -72,8 +73,14 @@ export function CouponSummary({ disabled = false }: { disabled?: boolean }) {
           <span>משלוח ({SHIPPING_LABEL[region]})</span>
           <span className="text-white/70">{formatPrice(shipping)}</span>
         </div>
-        <div className="flex justify-between font-black text-lg pt-1">
-          <span>סה&quot;כ לתשלום</span>
+        {cod && (
+          <div className="flex justify-between text-sm text-white/50">
+            <span>אמצעי תשלום</span>
+            <span className="text-white/70">תשלום לשליח</span>
+          </div>
+        )}
+        <div className="flex justify-between gap-3 font-black text-lg pt-1">
+          <span>{cod ? "לתשלום לשליח בעת המסירה (כולל משלוח)" : <>סה&quot;כ לתשלום</>}</span>
           <span className="text-white" data-testid="grand-total">{formatPrice(total)}</span>
         </div>
       </div>
