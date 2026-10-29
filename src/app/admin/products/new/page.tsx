@@ -154,7 +154,7 @@ export default function AdminProductNew() {
               </select>
             </div>
           </div>
-          <ProductAutoBadges product={form} admin isNewProduct />
+          <ProductAutoBadges product={form} admin onChangeTags={(tags) => set("tags", tags)} />
           <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.in_stock} onChange={e => set("in_stock", e.target.checked)} className="w-4 h-4 accent-cyan" />
