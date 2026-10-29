@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Loader2, Save, Upload, X, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
+import { ProductAutoBadges } from "@/components/shop/ProductAutoBadges";
 import { BESTSELLER_BADGE } from "@/lib/utils";
 
 const empty = {
@@ -153,6 +154,7 @@ export default function AdminProductNew() {
               </select>
             </div>
           </div>
+          <ProductAutoBadges product={form} admin isNewProduct />
           <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.in_stock} onChange={e => set("in_stock", e.target.checked)} className="w-4 h-4 accent-cyan" />

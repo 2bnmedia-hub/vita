@@ -8,6 +8,7 @@ import { formatPrice, calcDiscount } from "@/lib/utils";
 import type { Product } from "@/types";
 import { ProductCard } from "./ProductCard";
 import toast from "react-hot-toast";
+import { ProductAutoBadges } from "./ProductAutoBadges";
 import { ProductImage } from "./ProductImage";
 
 const guarantees = [
@@ -63,6 +64,9 @@ export function ProductDetailClient({
                 alt={product.name}
                 className="w-full h-full object-contain p-6 drop-shadow-2xl relative z-10"
               />
+              <div className="absolute bottom-4 right-4 left-4 z-20 flex flex-wrap gap-2">
+                <ProductAutoBadges product={product} />
+              </div>
               {product.badge && (
                 <div className="absolute top-4 right-4 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan">
                   {product.badge}
