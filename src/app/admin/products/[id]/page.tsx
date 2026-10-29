@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Loader2, Save, Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { BESTSELLER_BADGE } from "@/lib/utils";
 
 const empty = {
   name: "", slug: "", description: "", long_description: "",
@@ -140,7 +141,7 @@ export default function AdminProductEdit() {
             <div><label className={label}>משקל</label><input value={form.weight} onChange={e => set("weight", e.target.value)} className={field} placeholder="500g" /></div>
             <div><label className={label}>מנות</label><input type="number" value={form.servings} onChange={e => set("servings", e.target.value)} className={field} placeholder="166" /></div>
             <div><label className={label}>גודל מנה</label><input value={form.serving_size} onChange={e => set("serving_size", e.target.value)} className={field} placeholder="3g" /></div>
-            <div><label className={label}>באדג</label><input value={form.badge} onChange={e => set("badge", e.target.value)} className={field} placeholder="פופולרי" /></div>
+            <div><label className={label}>תגית מוצר</label><input value={form.badge ?? ""} onChange={e => set("badge", e.target.value)} className={field} placeholder="פופולרי" /></div>
             <div>
               <label className={label}>קטגוריה</label>
               <select value={form.category} onChange={e => set("category", e.target.value)} className={field + " cursor-pointer"}>
@@ -149,7 +150,7 @@ export default function AdminProductEdit() {
               </select>
             </div>
           </div>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.in_stock} onChange={e => set("in_stock", e.target.checked)} className="w-4 h-4 accent-cyan" />
               <span className="text-white/70 text-sm font-medium">במלאי</span>
@@ -158,7 +159,22 @@ export default function AdminProductEdit() {
               <input type="checkbox" checked={form.featured} onChange={e => set("featured", e.target.checked)} className="w-4 h-4 accent-cyan" />
               <span className="text-white/70 text-sm font-medium">מוצר מומלץ</span>
             </label>
+            {[BESTSELLER_BADGE, "במבצע"].map((badge) => (
+              <label key={badge} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.badge === badge}
+                  onChange={e => set("badge", e.target.checked ? badge : "")}
+                  className="w-4 h-4 accent-cyan"
+                />
+                <span className="text-white/70 text-sm font-medium">{badge}</span>
+              </label>
+            ))}
           </div>
+          <p className="text-white/40 text-xs">
+            ניתן לבחור תגית אחת: הנמכר ביותר או במבצע. היא תוצג בכרטיס המוצר ובעמוד המוצר.
+            סימון במבצע אינו משנה את המחיר — יש לעדכן מחיר ומחיר מקורי באזור המחירים.
+          </p>
         </div>
 
         <div className="flex gap-3">
