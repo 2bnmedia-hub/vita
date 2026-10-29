@@ -50,7 +50,7 @@ export function ProductDetailClient({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
           {/* Image */}
-          <div className="lg:sticky lg:top-28">
+          <div className="lg:sticky lg:top-28 lg:order-2">
             <div className="relative aspect-square rounded-3xl bg-navy-800 border border-white/[0.07] flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 to-transparent" />
               {product.images?.[0] ? (
@@ -77,7 +77,7 @@ export function ProductDetailClient({
           </div>
 
           {/* Info */}
-          <div className="py-4">
+          <div className="py-4 lg:order-1">
             {/* Category & flavor */}
             <div className="flex items-center gap-2 mb-3">
               <span className="text-cyan text-xs font-black uppercase tracking-widest">{product.category}</span>
