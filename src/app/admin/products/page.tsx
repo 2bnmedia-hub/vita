@@ -6,6 +6,7 @@ import { Plus, Edit, Trash2, Search, Package, Upload, Download } from "lucide-re
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
+import { ProductImage } from "@/components/shop/ProductImage";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
@@ -185,8 +186,14 @@ export default function AdminProducts() {
                 <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-navy-700 flex items-center justify-center text-lg flex-shrink-0">
-                        {p.flavor?.includes("ענבים") ? "🍇" : p.flavor?.includes("פירות") ? "🍹" : p.name?.includes("טבליות") ? "💊" : "🏋️"}
+                      <div className="w-12 h-12 rounded-lg bg-navy-700 overflow-hidden flex-shrink-0">
+                        <ProductImage
+                          key={p.images?.[0] ?? p.id}
+                          src={p.images?.[0]}
+                          alt={p.name}
+                          className="w-full h-full object-contain p-1"
+                          loading="lazy"
+                        />
                       </div>
                       <div>
                         <p className="font-semibold text-white text-sm">{p.name}</p>

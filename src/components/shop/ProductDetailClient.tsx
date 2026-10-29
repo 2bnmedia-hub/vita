@@ -8,6 +8,7 @@ import { formatPrice, calcDiscount } from "@/lib/utils";
 import type { Product } from "@/types";
 import { ProductCard } from "./ProductCard";
 import toast from "react-hot-toast";
+import { ProductImage } from "./ProductImage";
 
 const guarantees = [
   { icon: Shield, text: "ייצור מוסמך GMP" },
@@ -23,6 +24,9 @@ export function ProductDetailClient({
   related: Product[];
 }) {
   const [qty, setQty] = useState(1);
+  const images = (product.images ?? []).filter((src) => typeof src === "string" && src.trim());
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const activeImage = images.includes(selectedImage ?? "") ? selectedImage! : images[0];
   const { addItem } = useCartStore();
   const discount = product.compare_price
     ? calcDiscount(product.price, product.compare_price)
@@ -53,16 +57,12 @@ export function ProductDetailClient({
           <div className="lg:sticky lg:top-28 lg:order-2">
             <div className="relative aspect-square rounded-3xl bg-navy-800 border border-white/[0.07] flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 to-transparent" />
-              {product.images?.[0] ? (
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-contain p-6 drop-shadow-2xl relative z-10"
-                  onError={(e) => { (e.target as HTMLImageElement).src = "/creatine-hero.png"; }}
-                />
-              ) : (
-                <img src="/creatine-hero.png" alt={product.name} className="w-full h-full object-contain p-6 relative z-10" />
-              )}
+              <ProductImage
+                key={activeImage ?? product.id}
+                src={activeImage}
+                alt={product.name}
+                className="w-full h-full object-contain p-6 drop-shadow-2xl relative z-10"
+              />
               {product.badge && (
                 <div className="absolute top-4 right-4 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan">
                   {product.badge}
@@ -74,6 +74,22 @@ export function ProductDetailClient({
                 </div>
               )}
             </div>
+            {images.length > 1 && (
+              <div className="mt-4 grid grid-cols-4 sm:grid-cols-5 gap-3" role="group" aria-label="תמונות המוצר">
+                {images.map((src, index) => (
+                  <button
+                    key={src + index}
+                    type="button"
+                    onClick={() => setSelectedImage(src)}
+                    aria-label={`הצג תמונה ${index + 1} של ${product.name}`}
+                    aria-pressed={activeImage === src}
+                    className={`aspect-square rounded-xl overflow-hidden border-2 bg-navy-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan ${activeImage === src ? "border-cyan" : "border-white/10 hover:border-white/40"}`}
+                  >
+                    <ProductImage src={src} alt="" className="w-full h-full object-contain p-2" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Info */}
