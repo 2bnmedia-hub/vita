@@ -403,7 +403,7 @@ export default function CheckoutPage() {
         <h1 className="text-3xl font-black mb-8">סיום הזמנה</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-5">
+          <form onSubmit={handleSubmit} className="order-2 lg:order-none lg:col-span-3 space-y-5">
             <div className="glass border border-white/[0.08] rounded-2xl p-6 space-y-4">
               <h2 className="font-bold text-white/80 text-sm uppercase tracking-wider mb-2">פרטי משלוח</h2>
 
@@ -603,7 +603,7 @@ export default function CheckoutPage() {
             </button>
           </form>
 
-          <div className="lg:col-span-2">
+          <div className="order-1 lg:order-none lg:col-span-2">
             <div className="glass border border-white/[0.08] rounded-2xl p-5 sticky top-28">
               <h2 className="font-bold text-sm text-white/60 uppercase tracking-wider mb-4">סיכום הזמנה</h2>
               <div className="space-y-3 mb-5">
