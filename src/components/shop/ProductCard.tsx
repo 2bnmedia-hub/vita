@@ -43,7 +43,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="product-card group relative bg-navy-800 border border-white/[0.07] rounded-2xl overflow-hidden flex flex-col">
       {/* Badges */}
-      <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
+      <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5">
         <ProductAutoBadges product={product} />
         {product.badge && (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm">
@@ -76,7 +76,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
 
           {/* Scan line */}
-          <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+          <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
             <div className="animate-scan w-full h-8 bg-gradient-to-b from-transparent via-cyan/6 to-transparent" />
           </div>
         </div>

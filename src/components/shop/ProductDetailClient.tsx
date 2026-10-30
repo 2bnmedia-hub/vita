@@ -73,16 +73,16 @@ export function ProductDetailClient({
                 alt={product.name}
                 className="w-full h-full object-contain p-6 drop-shadow-2xl relative z-10"
               />
-              <div className="absolute bottom-4 right-4 left-4 z-20 flex flex-wrap gap-2">
+              <div className="absolute bottom-4 right-4 left-4 z-30 flex flex-wrap gap-2">
                 <ProductAutoBadges product={product} />
               </div>
               {product.badge && (
-                <div className="absolute top-4 right-4 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan">
+                <div className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan">
                   {product.badge}
                 </div>
               )}
               {discount && (
-                <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl bg-red-500 text-white font-black text-sm">
+                <div className="absolute top-4 left-4 z-30 px-3 py-1.5 rounded-xl bg-red-500 text-white font-black text-sm">
                   -{discount}%
                 </div>
               )}
