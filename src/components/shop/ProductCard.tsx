@@ -51,12 +51,14 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.badge}
           </span>
         )}
-        {discount && (
-          <span className="px-2.5 py-1 rounded-lg bg-red-500/90 text-white text-xs font-bold">
-            -{discount}%
-          </span>
-        )}
+
       </div>
+
+      {discount && (
+        <span className="absolute top-3 left-3 z-50 px-2.5 py-1 rounded-lg bg-red-500/85 text-white text-xs font-semibold shadow-sm">
+          -{discount}%
+        </span>
+      )}
 
       {/* Image area */}
       <Link href={`/shop/${product.slug}`} className="block">
