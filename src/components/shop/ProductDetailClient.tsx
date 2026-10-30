@@ -121,13 +121,13 @@ export function ProductDetailClient({
             <h1 className="text-3xl font-black tracking-tight mb-4">{product.name}</h1>
 
             {/* Stars */}
-            <div className="flex items-center gap-2 mb-5" role="img" aria-label="דירוג 4.9 מתוך 5, 12 ביקורות">
+            <div className="flex items-center gap-2 mb-5" role="img" aria-label="דירוג 4.9 מתוך 5">
               <div className="flex items-center gap-0.5" aria-hidden="true">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-cyan/70 text-cyan/70" />
                 ))}
               </div>
-              <span className="text-white/30 text-sm" aria-hidden="true">4.9 (12 ביקורות)</span>
+              <span className="text-white/30 text-sm" aria-hidden="true">4.9</span>
             </div>
 
             {/* Price */}

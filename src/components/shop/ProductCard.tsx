@@ -124,12 +124,12 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Stars */}
-        <div className="flex items-center gap-1 mb-3" role="img" aria-label="דירוג 4.9 מתוך 5, 12 ביקורות">
+        <div className="flex items-center gap-1 mb-3" role="img" aria-label="דירוג 4.9 מתוך 5">
           <div className="flex items-center gap-1" aria-hidden="true">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="w-3 h-3 fill-cyan/60 text-cyan/60" />
             ))}
-            <span className="text-white/30 text-xs mr-1">(12)</span>
+            <span className="text-white/30 text-xs mr-1">(4.9)</span>
           </div>
         </div>
 
