@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShoppingCart, ChevronRight, Star, Shield, Truck, RotateCcw } from "lucide-react";
 import { useCartStore } from "@/store/cart";
@@ -25,6 +25,15 @@ export function ProductDetailClient({
   related: Product[];
 }) {
   const [qty, setQty] = useState(1);
+  useEffect(() => {
+    const key = `vita-viewed-${product.id}`;
+    if (window.localStorage.getItem(key)) return;
+    fetch("/api/product-views", { method: "POST", headers: { "x-product-id": product.id } })
+      .then(response => {
+        if (response.ok) window.localStorage.setItem(key, "1");
+      })
+      .catch(() => undefined);
+  }, [product.id]);
   const images = (product.images ?? []).filter((src) => typeof src === "string" && src.trim());
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const activeImage = images.includes(selectedImage ?? "") ? selectedImage! : images[0];
