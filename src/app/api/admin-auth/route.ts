@@ -9,7 +9,7 @@ const attempts = new Map<string, { n: number; until: number }>();
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000;
 
-const MAX_ACCOUNT_ATTEMPTS = 20; // per admin email, across all IPs (stops IP rotation)
+const MAX_ACCOUNT_FAILURES = 20; // per admin email across all IPs; beyond it each failure is delayed 2s
 
 /** Vercel sets x-real-ip itself and overwrites any client-sent value; x-forwarded-for is not trusted. */
 function clientIp(req: NextRequest): string {
@@ -34,11 +34,12 @@ export async function POST(req: NextRequest) {
   let body: any;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "בקשה לא תקינה" }, { status: 400 }); }
   const normalizedEmail = typeof body?.email === "string" ? body.email.toLowerCase().trim() : "";
-  if (ADMIN_EMAILS.includes(normalizedEmail) && hit(`acct:${normalizedEmail}`, MAX_ACCOUNT_ATTEMPTS, Date.now())) {
-    return NextResponse.json({ error: "יותר מדי ניסיונות. נסה שוב בעוד 15 דקות." }, { status: 429 });
-  }
-
   if (!ADMIN_EMAILS.includes(normalizedEmail) || !verifyAdminPassword(body?.password)) {
+    // Account bucket counts failures only and slows them down — it never blocks a correct
+    // password, so an attacker rotating IPs can't lock the owner out.
+    if (ADMIN_EMAILS.includes(normalizedEmail) && hit(`acct:${normalizedEmail}`, MAX_ACCOUNT_FAILURES, Date.now())) {
+      await new Promise((r) => setTimeout(r, 2000));
+    }
     console.warn(`[admin-auth] failed login ip=${ip}`);
     return NextResponse.json({ error: "אימייל או סיסמה שגויים" }, { status: 401 });
   }
