@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { lookupTransactionWithRetry, classifyPayment, tranzilaEnv, sanitizeForLog } from "@/lib/tranzila";
 import { notifyOrderPaid } from "@/lib/orderNotify";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
@@ -21,7 +22,8 @@ const RPC_SECRET = process.env.TRANZILA_WEBHOOK_SECRET;
  */
 export async function POST(req: NextRequest) {
   const providedSecret = req.nextUrl.searchParams.get("ws");
-  if (!RPC_SECRET || providedSecret !== RPC_SECRET) {
+  if (!RPC_SECRET || !providedSecret || providedSecret.length !== RPC_SECRET.length ||
+      !timingSafeEqual(Buffer.from(providedSecret), Buffer.from(RPC_SECRET))) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

@@ -1,4 +1,5 @@
 "use client";
+import { adminWrite } from "@/lib/adminApi";
 import { supabase } from "@/lib/auth";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -31,7 +32,7 @@ export default function AdminProducts() {
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm("למחוק את " + name + "?")) return;
-    await supabase.from("products").delete().eq("id", id);
+    await adminWrite("products", { op: "delete", id });
     fetchProducts();
   };
 
@@ -116,7 +117,7 @@ export default function AdminProducts() {
       return;
     }
 
-    const { error } = await supabase.from("products").upsert(filteredRows, { onConflict: "slug" });
+    const { error } = await adminWrite("products", { op: "upsert", values: filteredRows, onConflict: "slug" });
     
     if (error) {
       toast.error("שגיאה בייבוא: " + error.message);
@@ -228,7 +229,7 @@ export default function AdminProducts() {
                         onBlur={async (e) => {
                           const raw = e.target.value.trim();
                           const value = raw === "" ? null : Math.max(0, parseInt(raw, 10));
-                          await supabase.from("products").update({ stock_quantity: value }).eq("id", p.id);
+                          await adminWrite("products", { op: "update", id: p.id, values: { stock_quantity: value } });
                           fetchProducts();
                         }}
                         className="w-20 bg-navy-800 border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-white placeholder-white/25 focus:border-cyan/40 focus:outline-none"

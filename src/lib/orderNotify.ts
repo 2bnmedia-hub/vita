@@ -19,13 +19,13 @@ export async function notifyOrderPaid(req: NextRequest, order: Record<string, an
   await Promise.allSettled([
     fetch(`${origin}/api/send-order-email`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-vform-internal": process.env.ADMIN_SESSION_SECRET ?? "" },
       body: JSON.stringify(order),
     }).catch((e) => console.error("notifyOrderPaid: owner alert failed", e)),
 
     fetch(`${origin}/api/send-customer-email`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-vform-internal": process.env.ADMIN_SESSION_SECRET ?? "" },
       body: JSON.stringify({
         to: order.customer_email,
         customerName: order.customer_name,
@@ -46,13 +46,13 @@ export async function notifyCodOrderPlaced(req: NextRequest, order: Record<strin
   await Promise.allSettled([
     fetch(`${origin}/api/send-order-email`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-vform-internal": process.env.ADMIN_SESSION_SECRET ?? "" },
       body: JSON.stringify(order),
     }).catch((e) => console.error("notifyCodOrderPlaced: owner alert failed", e)),
 
     fetch(`${origin}/api/send-customer-email`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-vform-internal": process.env.ADMIN_SESSION_SECRET ?? "" },
       body: JSON.stringify({
         to: order.customer_email,
         customerName: order.customer_name,

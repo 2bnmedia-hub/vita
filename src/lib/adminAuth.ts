@@ -71,3 +71,29 @@ export function isAdminAuthed(req: NextRequest): boolean {
 export function adminEmail(req: NextRequest): string | null {
   return adminEmailFromToken(req.cookies.get(ADMIN_SESSION_COOKIE)?.value);
 }
+
+/**
+ * Admin password check against ADMIN_PASSWORD_HASH = "scrypt$<saltHex>$<hashHex>".
+ * The password used to be a string literal in the (public) repo; now only a
+ * salted scrypt hash lives in server env. Missing/malformed env → login refused.
+ */
+export function verifyAdminPassword(password: unknown, stored = process.env.ADMIN_PASSWORD_HASH): boolean {
+  if (typeof password !== "string" || !password || password.length > 200 || !stored) return false;
+  const [algo, saltHex, hashHex] = stored.split("$");
+  if (algo !== "scrypt" || !saltHex || !hashHex) return false;
+  const expected = Buffer.from(hashHex, "hex");
+  const actual = crypto.scryptSync(password, Buffer.from(saltHex, "hex"), expected.length);
+  return crypto.timingSafeEqual(actual, expected);
+}
+
+export function hashAdminPassword(password: string): string {
+  const salt = crypto.randomBytes(16);
+  return `scrypt$${salt.toString("hex")}$${crypto.scryptSync(password, salt, 32).toString("hex")}`;
+}
+
+/** Shared-secret check for server-to-server calls to our own API routes (order emails). */
+export function isInternalCall(req: NextRequest): boolean {
+  const got = req.headers.get("x-vform-internal") ?? "";
+  const want = process.env.ADMIN_SESSION_SECRET ?? "";
+  return !!want && got.length === want.length && crypto.timingSafeEqual(Buffer.from(got), Buffer.from(want));
+}

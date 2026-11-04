@@ -1,4 +1,5 @@
 "use client";
+import { adminWrite } from "@/lib/adminApi";
 import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
 
@@ -29,11 +30,11 @@ export default function AdminCategories() {
     const payload = { ...form, slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-") };
     
     if (editing) {
-      const { error } = await supabase.from("categories").update(payload).eq("id", editing.id);
+      const { error } = await adminWrite("categories", { op: "update", id: editing.id, values: payload });
       if (error) toast.error("שגיאה בעדכון: " + error.message);
       else toast.success("הקטגוריה עודכנה בהצלחה ✓");
     } else {
-      const { error } = await supabase.from("categories").insert(payload);
+      const { error } = await adminWrite("categories", { op: "insert", values: payload });
       if (error) toast.error("שגיאה בהוספה: " + error.message);
       else toast.success("הקטגוריה נוספה בהצלחה ✓");
     }
@@ -46,7 +47,7 @@ export default function AdminCategories() {
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm("למחוק את " + name + "?")) return;
-    const { error } = await supabase.from("categories").delete().eq("id", id);
+    const { error } = await adminWrite("categories", { op: "delete", id });
     if (error) toast.error("שגיאה במחיקה: " + error.message);
     else toast.success("הקטגוריה נמחקה");
     fetchCats();

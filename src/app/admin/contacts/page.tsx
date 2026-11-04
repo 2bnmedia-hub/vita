@@ -1,5 +1,5 @@
 "use client";
-import { supabase } from "@/lib/auth";
+import { adminList } from "@/lib/adminApi";
 import { useEffect, useState } from "react";
 
 import { MessageSquare, Phone, Mail } from "lucide-react";
@@ -12,7 +12,7 @@ export default function AdminContacts() {
   const [selected, setSelected] = useState<any>(null);
 
   useEffect(() => {
-    supabase.from("contact_submissions").select("*").order("created_at", { ascending: false })
+    adminList("contact_submissions")
       .then(({ data }) => { setContacts(data ?? []); setLoading(false); });
   }, []);
 

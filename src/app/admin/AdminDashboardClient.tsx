@@ -1,4 +1,5 @@
 "use client";
+import { adminWrite } from "@/lib/adminApi";
 import { supabase } from "@/lib/auth";
 import { useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -81,7 +82,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
   const toggle = (s: string) => setOpenSection(p => p === s ? null : s);
 
   const markRead = async (id: string) => {
-    await supabase.from("contact_submissions").update({ read: true }).eq("id", id);
+    await adminWrite("contact_submissions", { op: "update", id, values: { read: true } });
     toast.success("סומן כנקרא");
     router.refresh();
   };
@@ -89,7 +90,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
   const addCategory = async () => {
     if (!newCategory.trim()) return;
     const slug = newCategory.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    const { error } = await supabase.from("categories").insert({ name: newCategory.trim(), slug });
+    const { error } = await adminWrite("categories", { op: "insert", values: { name: newCategory.trim(), slug } });
     if (error) { toast.error("שגיאה"); return; }
     toast.success("קטגוריה נוספה!");
     setNewCategory("");

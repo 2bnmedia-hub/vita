@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { isAdminAuthed, isInternalCall } from "@/lib/adminAuth";
 
 /** Escape customer-typed text before it goes into an HTML email. */
 const esc = (v: unknown) =>
   String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 export async function POST(req: NextRequest) {
+  // Was open to anyone: an arbitrary-recipient mail relay under the V-FORM name.
+  if (!isAdminAuthed(req) && !isInternalCall(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const { to, customerName, message, orderId } = await req.json();
 
-  if (!to || !message?.trim()) {
+  if (typeof to !== "string" || !/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(to) || typeof message !== "string" || !message.trim() || message.length > 5000) {
     return NextResponse.json({ error: "missing to/message" }, { status: 400 });
   }
 

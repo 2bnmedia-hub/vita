@@ -50,3 +50,16 @@ describe("admin session token", () => {
     expect(verifyAdminSessionToken("")).toBe(false);
   });
 });
+
+describe("admin password hash", () => {
+  it("accepts the right password and rejects wrong/empty/missing-env", async () => {
+    const { hashAdminPassword, verifyAdminPassword } = await import("@/lib/adminAuth");
+    const stored = hashAdminPassword("correct horse");
+    expect(verifyAdminPassword("correct horse", stored)).toBe(true);
+    expect(verifyAdminPassword("wrong", stored)).toBe(false);
+    expect(verifyAdminPassword("", stored)).toBe(false);
+    expect(verifyAdminPassword(undefined, stored)).toBe(false);
+    expect(verifyAdminPassword("correct horse", "")).toBe(false);
+    expect(verifyAdminPassword("correct horse", "plain$text")).toBe(false);
+  });
+});

@@ -1,4 +1,5 @@
 "use client";
+import { adminWrite, adminUpload } from "@/lib/adminApi";
 import { supabase } from "@/lib/auth";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -39,12 +40,9 @@ export default function AdminProductEdit() {
     setUploading(true);
     const uploadedUrls: string[] = [];
     for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
-      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from("product-images").upload(path, file);
-      if (error) { toast.error("שגיאה בהעלאת תמונה"); continue; }
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      uploadedUrls.push(data.publicUrl);
+      const url = await adminUpload(file);
+      if (!url) { toast.error("שגיאה בהעלאת תמונה"); continue; }
+      uploadedUrls.push(url);
     }
     setForm((f: any) => ({ ...f, images: [...(f.images || []), ...uploadedUrls] }));
     setUploading(false);
@@ -66,7 +64,7 @@ export default function AdminProductEdit() {
       servings: form.servings ? Number(form.servings) : null,
       slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, ""),
     };
-    const { error } = await supabase.from("products").update(payload).eq("id", params.id);
+    const { error } = await adminWrite("products", { op: "update", id: String(params.id), values: payload });
     if (error) { toast.error("שגיאה בשמירה"); setSaving(false); return; }
     toast.success("מוצר עודכן!");
     router.push("/admin/products");

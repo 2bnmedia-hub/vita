@@ -1,4 +1,5 @@
 "use client";
+import { adminWrite, adminUpload, adminRedeploy } from "@/lib/adminApi";
 import { supabase } from "@/lib/auth";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -36,12 +37,9 @@ export default function AdminProductNew() {
 
     const uploadedUrls: string[] = [];
     for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
-      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from("product-images").upload(path, file);
-      if (error) { toast.error("שגיאה בהעלאת תמונה"); continue; }
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      uploadedUrls.push(data.publicUrl);
+      const url = await adminUpload(file);
+      if (!url) { toast.error("שגיאה בהעלאת תמונה"); continue; }
+      uploadedUrls.push(url);
     }
 
     setForm((f: any) => ({ ...f, images: [...(f.images || []), ...uploadedUrls] }));
@@ -64,12 +62,10 @@ export default function AdminProductNew() {
       servings: form.servings ? Number(form.servings) : null,
       slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, ""),
     };
-    const { error } = await supabase.from("products").insert(payload);
+    const { error } = await adminWrite("products", { op: "insert", values: payload });
     if (error) { toast.error("שגיאה בשמירה"); setSaving(false); return; }
     // Trigger production deploy so the new product publishes to the live site
-    const hook = process.env.NEXT_PUBLIC_DEPLOY_HOOK_URL;
-    if (hook) {
-      try { await fetch(hook, { method: "POST" }); } catch (_) {}
+    if (await adminRedeploy()) {
       toast.success("מוצר נוסף! מתפרסם לאתר (~דקה)");
     } else {
       toast.success("מוצר נוסף!");

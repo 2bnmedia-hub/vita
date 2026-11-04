@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { isInternalCall } from "@/lib/adminAuth";
 
 /** Escape customer-typed text before it goes into an HTML email. */
 const esc = (v: unknown) =>
@@ -15,6 +16,8 @@ interface OrderItem {
 }
 
 export async function POST(req: NextRequest) {
+  // Server-to-server only (lib/orderNotify). Was open: anyone could spam the owner with fake orders.
+  if (!isInternalCall(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const order = await req.json();
 
   const itemsHtml = (order.items as OrderItem[])
