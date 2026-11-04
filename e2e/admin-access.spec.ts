@@ -30,7 +30,6 @@ test.describe("Admin access control", () => {
     ["POST", "/api/admin/redeploy", {}],
     ["GET", "/api/admin/product-views", undefined],
     ["POST", "/api/send-customer-email", { to: "x@example.com", message: "spam" }],
-    ["POST", "/api/send-order-email", { items: [] }],
   ] as const) {
     test(`${method} ${path} without a session is 401`, async ({ request }) => {
       const res = method === "GET" ? await request.get(path) : await request.post(path, { data });

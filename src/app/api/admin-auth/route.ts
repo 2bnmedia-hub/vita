@@ -9,30 +9,42 @@ const attempts = new Map<string, { n: number; until: number }>();
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000;
 
+const MAX_ACCOUNT_ATTEMPTS = 20; // per admin email, across all IPs (stops IP rotation)
+
+/** Vercel sets x-real-ip itself and overwrites any client-sent value; x-forwarded-for is not trusted. */
 function clientIp(req: NextRequest): string {
-  return req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  return req.headers.get("x-real-ip") ?? "unknown";
+}
+
+/** Counts one attempt for `key` synchronously (no await between read and write); true = over the limit. */
+function hit(key: string, max: number, now: number): boolean {
+  const rec = attempts.get(key);
+  const cur = rec && rec.until > now ? rec : { n: 0, until: now + WINDOW_MS };
+  cur.n += 1;
+  attempts.set(key, cur);
+  return cur.n > max;
 }
 
 export async function POST(req: NextRequest) {
   const ip = clientIp(req);
-  const now = Date.now();
-  const rec = attempts.get(ip);
-  if (rec && rec.until > now && rec.n >= MAX_ATTEMPTS) {
+  if (hit(`ip:${ip}`, MAX_ATTEMPTS, Date.now())) {
     return NextResponse.json({ error: "יותר מדי ניסיונות. נסה שוב בעוד 15 דקות." }, { status: 429 });
   }
 
   let body: any;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "בקשה לא תקינה" }, { status: 400 }); }
   const normalizedEmail = typeof body?.email === "string" ? body.email.toLowerCase().trim() : "";
+  if (ADMIN_EMAILS.includes(normalizedEmail) && hit(`acct:${normalizedEmail}`, MAX_ACCOUNT_ATTEMPTS, Date.now())) {
+    return NextResponse.json({ error: "יותר מדי ניסיונות. נסה שוב בעוד 15 דקות." }, { status: 429 });
+  }
 
   if (!ADMIN_EMAILS.includes(normalizedEmail) || !verifyAdminPassword(body?.password)) {
-    const cur = rec && rec.until > now ? rec : { n: 0, until: now + WINDOW_MS };
-    attempts.set(ip, { n: cur.n + 1, until: cur.until });
     console.warn(`[admin-auth] failed login ip=${ip}`);
     return NextResponse.json({ error: "אימייל או סיסמה שגויים" }, { status: 401 });
   }
 
-  attempts.delete(ip);
+  attempts.delete(`ip:${ip}`);
+  attempts.delete(`acct:${normalizedEmail}`);
   console.info(`[admin-auth] login ok email=${normalizedEmail} ip=${ip}`);
   const res = NextResponse.json({ ok: true });
   res.cookies.set(SESSION_TOKEN, createAdminSessionToken(normalizedEmail), {
