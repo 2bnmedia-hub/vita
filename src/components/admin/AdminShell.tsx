@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu, Users, Bell, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Package, Tag, ShoppingBag, MessageSquare, LogOut, Menu, Users, Bell, ExternalLink, X } from "lucide-react";
 
 
 
@@ -56,49 +56,67 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     router.push("/admin/login");
   };
 
-  if (loading) return <div className="min-h-screen bg-navy-950 flex items-center justify-center"><div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" /></div>;
+  const current = navItems.find((n) => n.href === pathname) ?? navItems.find((n) => n.href !== "/admin" && pathname?.startsWith(n.href));
+
+  // Login screen: no sidebar, no logout — just the page.
+  if (pathname === "/admin/login") return <div className="admin-ui min-h-screen bg-slate-100 text-slate-900" dir="rtl">{children}</div>;
+
+  if (loading) return <div className="admin-ui min-h-screen bg-slate-100 flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-700 border-t-transparent rounded-full animate-spin" role="status" aria-label="טוען" /></div>;
 
   return (
-    <div className="min-h-screen bg-navy-950 flex">
-      {menuOpen && <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setMenuOpen(false)} />}
-      <aside className={`fixed top-0 right-0 h-full w-64 bg-navy-900 border-l border-white/[0.06] z-40 flex flex-col transition-transform duration-300 ${menuOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}`}>
-        <div className="p-5 border-b border-white/[0.06]">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="V-FORM NUTRITION" className="h-8 w-auto object-contain mix-blend-screen" />
-            <span className="font-black text-lg"><span className="text-white/30 text-xs mr-1">ADMIN</span></span>
+    <div className="admin-ui min-h-screen bg-slate-100 text-slate-900 flex" dir="rtl">
+      {menuOpen && <div className="fixed inset-0 bg-slate-900/40 z-30 md:hidden" onClick={() => setMenuOpen(false)} aria-hidden="true" />}
+      <aside id="admin-sidebar" aria-label="תפריט ניהול" className={`fixed top-0 right-0 h-full w-64 bg-navy-900 z-40 flex flex-col transition-transform duration-300 ${menuOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}`}>
+        <div className="h-16 px-5 flex items-center justify-between border-b border-white/10">
+          <Link href="/admin" className="flex items-center gap-2.5" aria-label="לוח בקרה">
+            <img src="/logo.png" alt="V-FORM NUTRITION" className="h-7 w-auto object-contain" />
+            <span className="text-[11px] font-semibold tracking-wider text-white/60 border border-white/15 rounded px-1.5 py-0.5">ניהול</span>
           </Link>
+          <button className="md:hidden text-white/70 hover:text-white p-2 rounded-lg" onClick={() => setMenuOpen(false)} aria-label="סגירת תפריט"><X className="w-5 h-5" aria-hidden="true" /></button>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} onClick={() => setMenuOpen(false)}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${pathname === href ? "bg-cyan/10 text-cyan border border-cyan/20" : "text-white/50 hover:text-white hover:bg-white/5"}`}>
-              <Icon className="w-4 h-4 flex-shrink-0" />{label}
-            </Link>
-          ))}
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {navItems.map(({ href, label, icon: Icon }) => {
+            const active = current?.href === href;
+            return (
+              <Link key={href} href={href} onClick={() => setMenuOpen(false)} aria-current={active ? "page" : undefined}
+                className={`relative flex items-center gap-3 h-11 px-3.5 rounded-lg text-[15px] font-medium transition-colors ${active ? "bg-white/10 text-white" : "text-white/70 hover:text-white hover:bg-white/5"}`}>
+                {active && <span className="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-cyan" aria-hidden="true" />}
+                <Icon className="w-[18px] h-[18px] flex-shrink-0" aria-hidden="true" />{label}
+                {href === "/admin/orders" && unreadOrders > 0 && (
+                  <span className="mr-auto min-w-[20px] h-5 px-1.5 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center">{unreadOrders > 9 ? "9+" : unreadOrders}</span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
-        <div className="p-4 border-t border-white/[0.06] space-y-1">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-white/50 hover:text-cyan hover:bg-cyan/10 transition-all w-full">
-            <ExternalLink className="w-4 h-4" />צפייה באתר
+        <div className="p-3 border-t border-white/10 space-y-1">
+          <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 h-11 px-3.5 rounded-lg text-[15px] font-medium text-white/70 hover:text-white hover:bg-white/5 transition-colors">
+            <ExternalLink className="w-[18px] h-[18px]" aria-hidden="true" />צפייה באתר
           </a>
-          <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-white/50 hover:text-red-400 hover:bg-red-400/10 transition-all w-full">
-            <LogOut className="w-4 h-4" /><span className="text-red-400">התנתקות מאובטחת</span>
+          <button onClick={handleLogout} className="flex items-center gap-3 h-11 px-3.5 rounded-lg text-[15px] font-medium hover:bg-white/5 transition-colors w-full">
+            <LogOut className="w-[18px] h-[18px] text-red-400" aria-hidden="true" /><span className="text-red-400">התנתקות מאובטחת</span>
           </button>
         </div>
       </aside>
-      <div className="flex-1 md:mr-64 flex flex-col min-h-screen">
-        <header className="sticky top-0 z-20 bg-navy-900/80 backdrop-blur border-b border-white/[0.06] px-6 h-20 flex items-center justify-between">
-          <button className="md:hidden" onClick={() => setMenuOpen(true)}><Menu className="w-5 h-5 text-white" /></button>
-          <Link href="/admin/orders" aria-label="הזמנות חדשות" className="relative w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-cyan hover:bg-white/5 transition-all">
-            <Bell className={`w-5 h-5 ${unreadOrders > 0 ? "animate-pulse text-cyan" : ""}`} aria-hidden="true" />
-            {unreadOrders > 0 && (
-              <span className="absolute top-1 left-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center">
-                {unreadOrders > 9 ? "9+" : unreadOrders}
-              </span>
-            )}
-          </Link>
-          <Link href="/" className="text-xs text-cyan hover:underline">← לאתר</Link>
+      <div className="flex-1 min-w-0 md:mr-64 flex flex-col min-h-screen">
+        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 md:px-8 h-16 flex items-center gap-3">
+          <button className="md:hidden p-2 -mr-2 rounded-lg text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(true)} aria-label="פתיחת תפריט" aria-controls="admin-sidebar" aria-expanded={menuOpen}><Menu className="w-5 h-5" aria-hidden="true" /></button>
+          <h1 className="text-lg font-bold text-slate-900 truncate">{current?.label ?? "ניהול"}</h1>
+          <div className="mr-auto flex items-center gap-1">
+            <Link href="/admin/orders" aria-label={unreadOrders > 0 ? `${unreadOrders} הזמנות חדשות` : "הזמנות"} className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+              <Bell className="w-5 h-5" aria-hidden="true" />
+              {unreadOrders > 0 && (
+                <span className="absolute top-1.5 left-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[11px] font-bold flex items-center justify-center">
+                  {unreadOrders > 9 ? "9+" : unreadOrders}
+                </span>
+              )}
+            </Link>
+            <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 h-10 px-3 rounded-lg text-sm font-medium text-slate-700 hover:text-teal-700 hover:bg-slate-100 transition-colors">
+              <ExternalLink className="w-4 h-4" aria-hidden="true" /><span className="hidden sm:inline">צפייה באתר</span>
+            </a>
+          </div>
         </header>
-        <main className="flex-1 p-6">{children}</main>
+        <div className="flex-1 min-w-0 p-4 md:p-8">{children}</div>
       </div>
     </div>
   );

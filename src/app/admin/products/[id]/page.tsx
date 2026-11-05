@@ -1,4 +1,5 @@
 "use client";
+import { ADMIN_FIELD, ADMIN_LABEL } from "@/components/admin/ui";
 import { adminWrite, adminUpload } from "@/lib/adminApi";
 import { supabase } from "@/lib/auth";
 import { useEffect, useState, useRef } from "react";
@@ -70,33 +71,33 @@ export default function AdminProductEdit() {
     router.push("/admin/products");
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
 
-  const field = "w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20";
-  const label = "text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5";
+  const field = ADMIN_FIELD;
+  const label = ADMIN_LABEL;
 
   return (
     <div className="max-w-3xl space-y-6" dir="rtl">
       <div className="flex items-center gap-3">
-        <Link href="/admin/products" className="w-9 h-9 rounded-xl glass flex items-center justify-center hover:border-white/20 transition-all">
+        <Link href="/admin/products" className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center hover:border-slate-300 transition-all">
           <ArrowRight className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-black text-white">עריכת מוצר</h1>
-          <p className="text-white/40 text-sm">{form.name}</p>
+          <h1 className="text-2xl font-black text-slate-900">עריכת מוצר</h1>
+          <p className="text-slate-600 text-sm">{form.name}</p>
         </div>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
 
         {/* תמונות */}
-        <div className="glass border border-white/[0.07] rounded-2xl p-6 space-y-4">
-          <h2 className="font-bold text-white/60 text-sm uppercase tracking-wider">תמונות מוצר</h2>
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+          <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">תמונות מוצר</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {(form.images || []).map((url: string, i: number) => (
-              <div key={url} className="relative group aspect-square rounded-xl overflow-hidden bg-navy-700">
+              <div key={url} className="relative group aspect-square rounded-xl overflow-hidden bg-slate-100">
                 <img src={url} alt="" className="w-full h-full object-cover" />
-                {i === 0 && <span className="absolute top-1 right-1 bg-cyan text-navy-900 text-[10px] font-black px-1.5 py-0.5 rounded">ראשית</span>}
+                {i === 0 && <span className="absolute top-1 right-1 bg-teal-700 text-white text-[10px] font-black px-1.5 py-0.5 rounded">ראשית</span>}
                 <button type="button" onClick={() => removeImage(url)}
                   className="absolute top-1 left-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
@@ -104,17 +105,17 @@ export default function AdminProductEdit() {
               </div>
             ))}
             <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-              className="aspect-square rounded-xl border-2 border-dashed border-white/20 hover:border-cyan/40 flex flex-col items-center justify-center gap-1 text-white/30 hover:text-cyan transition-all">
+              className="aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-teal-500 flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-teal-700 transition-all">
               {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Upload className="w-5 h-5" /><span className="text-xs">העלה</span></>}
             </button>
           </div>
           <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
-          <p className="text-white/20 text-xs">התמונה הראשונה תהיה תמונת הכריכה.</p>
+          <p className="text-slate-500 text-xs">התמונה הראשונה תהיה תמונת הכריכה.</p>
         </div>
 
         {/* Basic info */}
-        <div className="glass border border-white/[0.07] rounded-2xl p-6 space-y-4">
-          <h2 className="font-bold text-white/60 text-sm uppercase tracking-wider">פרטים בסיסיים</h2>
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+          <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">פרטים בסיסיים</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className={label}>שם מוצר *</label><input required value={form.name} onChange={e => set("name", e.target.value)} className={field} placeholder="קריאטין מונוהידראט" /></div>
             <div><label className={label}>Slug</label><input value={form.slug} onChange={e => set("slug", e.target.value)} className={field} placeholder="creatine-unflavored" /></div>
@@ -124,8 +125,8 @@ export default function AdminProductEdit() {
         </div>
 
         {/* Pricing */}
-        <div className="glass border border-white/[0.07] rounded-2xl p-6 space-y-4">
-          <h2 className="font-bold text-white/60 text-sm uppercase tracking-wider">תמחור</h2>
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+          <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">תמחור</h2>
           <div className="grid grid-cols-2 gap-4">
             <div><label className={label}>מחיר ₪ *</label><input required type="number" value={form.price} onChange={e => set("price", e.target.value)} className={field} placeholder="89" /></div>
             <div><label className={label}>מחיר מקורי ₪</label><input type="number" value={form.compare_price} onChange={e => set("compare_price", e.target.value)} className={field} placeholder="109" /></div>
@@ -133,8 +134,8 @@ export default function AdminProductEdit() {
         </div>
 
         {/* Details */}
-        <div className="glass border border-white/[0.07] rounded-2xl p-6 space-y-4">
-          <h2 className="font-bold text-white/60 text-sm uppercase tracking-wider">פרטי מוצר</h2>
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+          <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">פרטי מוצר</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div><label className={label}>טעם</label><input value={form.flavor} onChange={e => set("flavor", e.target.value)} className={field} placeholder="ענבים" /></div>
             <div><label className={label}>משקל</label><input value={form.weight} onChange={e => set("weight", e.target.value)} className={field} placeholder="500g" /></div>
@@ -152,12 +153,12 @@ export default function AdminProductEdit() {
           <ProductAutoBadges product={form} admin onChangeTags={(tags) => set("tags", tags)} />
           <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.in_stock} onChange={e => set("in_stock", e.target.checked)} className="w-4 h-4 accent-cyan" />
-              <span className="text-white/70 text-sm font-medium">במלאי</span>
+              <input type="checkbox" checked={form.in_stock} onChange={e => set("in_stock", e.target.checked)} className="w-4 h-4 accent-teal-700" />
+              <span className="text-slate-700 text-sm font-medium">במלאי</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.featured} onChange={e => set("featured", e.target.checked)} className="w-4 h-4 accent-cyan" />
-              <span className="text-white/70 text-sm font-medium">מוצר מומלץ</span>
+              <input type="checkbox" checked={form.featured} onChange={e => set("featured", e.target.checked)} className="w-4 h-4 accent-teal-700" />
+              <span className="text-slate-700 text-sm font-medium">מוצר מומלץ</span>
             </label>
             {[BESTSELLER_BADGE, "במבצע"].map((badge) => (
               <label key={badge} className="flex items-center gap-2 cursor-pointer">
@@ -165,13 +166,13 @@ export default function AdminProductEdit() {
                   type="checkbox"
                   checked={form.badge === badge}
                   onChange={e => set("badge", e.target.checked ? badge : "")}
-                  className="w-4 h-4 accent-cyan"
+                  className="w-4 h-4 accent-teal-700"
                 />
-                <span className="text-white/70 text-sm font-medium">{badge}</span>
+                <span className="text-slate-700 text-sm font-medium">{badge}</span>
               </label>
             ))}
           </div>
-          <p className="text-white/40 text-xs">
+          <p className="text-slate-600 text-xs">
             ניתן לבחור תגית אחת: הנמכר ביותר או במבצע. היא תוצג בכרטיס המוצר ובעמוד המוצר.
             סימון במבצע אינו משנה את המחיר — יש לעדכן מחיר ומחיר מקורי באזור המחירים.
           </p>
@@ -179,11 +180,11 @@ export default function AdminProductEdit() {
 
         <div className="flex gap-3">
           <button type="submit" disabled={saving}
-            className="flex items-center gap-2 bg-cyan text-navy-900 font-black px-6 py-3 rounded-xl hover:bg-cyan-600 transition-colors disabled:opacity-50">
+            className="flex items-center gap-2 bg-teal-700 text-white font-black px-6 py-3 rounded-xl hover:bg-teal-800 transition-colors disabled:opacity-50">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "שומר..." : "שמור שינויים"}
           </button>
-          <Link href="/admin/products" className="glass border border-white/[0.08] text-white/60 hover:text-white font-medium px-6 py-3 rounded-xl transition-all">
+          <Link href="/admin/products" className="bg-white border border-slate-200 text-slate-700 hover:text-slate-900 font-medium px-6 py-3 rounded-xl transition-all">
             ביטול
           </Link>
         </div>

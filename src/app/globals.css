@@ -353,3 +353,21 @@ html[data-copy-guard="on"] main :is(input, textarea, select, [contenteditable="t
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* ==========================================================================
+   Admin area (light theme) — scoped to .admin-ui so the store is untouched
+   ========================================================================== */
+.admin-ui { font-size: 16px; color-scheme: light; }
+.admin-ui ::selection { background: rgba(15, 118, 110, 0.18); color: #0f172a; }
+.admin-ui input, .admin-ui select, .admin-ui textarea { font-size: 16px; }
+.admin-ui input:focus, .admin-ui textarea:focus, .admin-ui select:focus {
+  border-color: #0f766e !important;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+}
+.admin-ui a:focus-visible, .admin-ui button:focus-visible, .admin-ui input:focus-visible,
+.admin-ui textarea:focus-visible, .admin-ui select:focus-visible, .admin-ui [tabindex]:focus-visible {
+  outline: 3px solid #0f766e;
+  outline-offset: 2px;
+}
+.admin-ui aside a:focus-visible, .admin-ui aside button:focus-visible { outline-color: #67e8f9; }
+.admin-ui th { color: #334155; font-weight: 600; }

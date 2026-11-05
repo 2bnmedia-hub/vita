@@ -37,7 +37,7 @@ export function ProductAutoBadges({
         <div className="flex flex-wrap gap-6">
           {options.map(({ tag, label }) => (
             <label key={tag}
-              className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
+              className="flex items-center gap-2 text-base text-slate-700 cursor-pointer">
               <input
                 type="checkbox"
                 checked={tags.includes(tag)}
@@ -47,13 +47,13 @@ export function ProductAutoBadges({
                     event.target.checked ? [...remaining, tag] : remaining
                   );
                 }}
-                className="w-4 h-4 accent-cyan"
+                className="w-4 h-4 accent-teal-700"
               />
               {label}
             </label>
           ))}
         </div>
-        <p className="text-xs text-white/40">
+        <p className="text-sm text-slate-600">
           סימון ידני בלבד. ניתן לבחור את שתי התגיות יחד.
           יש ללחוץ על שמירה כדי לעדכן את האתר.
         </p>

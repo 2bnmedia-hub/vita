@@ -6,6 +6,7 @@ import { CartDrawer } from "@/components/shop/CartDrawer";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { AccessibilityWidget } from "@/components/layout/AccessibilityWidget";
 import { CopyGuard } from "@/components/layout/CopyGuard";
+import { HideOnAdmin } from "@/components/layout/HideOnAdmin";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
@@ -60,10 +61,9 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           דילוג לתוכן הראשי
         </a>
-        <Navbar />
+        <HideOnAdmin><Navbar /></HideOnAdmin>
         <main id="main-content" className="min-h-screen">{children}</main>
-        <Footer />
-        <CartDrawer />
+        <HideOnAdmin><Footer /><CartDrawer /></HideOnAdmin>
         <CookieConsent />
         <AccessibilityWidget />
         <CopyGuard />
