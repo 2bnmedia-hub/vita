@@ -134,7 +134,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
         <div className="flex flex-wrap gap-2">
           {quick.map(({ href, label, icon: Icon, primary }) => (
             <Link key={href} href={href}
-              className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold transition-colors ${primary ? "bg-teal-700 text-white hover:bg-teal-800" : "bg-white border border-slate-300 text-slate-800 hover:bg-slate-50"}`}>
+              className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-full text-sm font-semibold transition-colors ${primary ? "bg-teal-700 text-white hover:bg-teal-800" : "bg-white border border-slate-300 text-slate-800 hover:bg-slate-50"}`}>
               <Icon className="w-4 h-4" aria-hidden="true" />{label}
             </Link>
           ))}
@@ -182,7 +182,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
                     <p className="text-slate-700 text-sm line-clamp-1">{c.message}</p>
                   </div>
                   <button onClick={() => markRead(c.id)}
-                    className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-semibold bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 transition-colors shrink-0">
+                    className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-sm font-semibold bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 transition-colors shrink-0">
                     <CheckCircle className="w-4 h-4 text-green-700" aria-hidden="true" /> נקרא
                   </button>
                 </li>
@@ -236,7 +236,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
             onKeyDown={e => e.key === "Enter" && addCategory()}
             placeholder="שם קטגוריה חדשה..."
             className={ADMIN_FIELD + " flex-1"} />
-          <button onClick={addCategory} className="h-11 px-4 rounded-lg bg-teal-700 text-white text-sm font-semibold hover:bg-teal-800 transition-colors shrink-0">
+          <button onClick={addCategory} className="h-11 px-5 rounded-full bg-teal-700 text-white text-sm font-semibold hover:bg-teal-800 transition-colors shrink-0">
             + הוסף
           </button>
         </div>
