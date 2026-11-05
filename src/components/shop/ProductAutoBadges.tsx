@@ -8,16 +8,21 @@ type Props = {
   onChangeTags?: (tags: string[]) => void;
 };
 
+/** Shared look for every product tag: same size, weight, padding, radius. No glow. */
+export const TAG_BASE = "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold leading-none whitespace-nowrap shadow-none";
+export const SALE_TAG = "bg-[#FEE2E2] text-[#B91C1C]";
+export const BESTSELLER_TAG = "bg-[#EDE9FE] text-[#6D28D9]";
+
 const options = [
   {
     tag: "manual:new",
     label: "חדש באתר",
-    color: "bg-cyan text-navy-900",
+    color: "bg-[#CCFBF1] text-[#0F766E]",
   },
   {
     tag: "manual:limited-stock",
     label: "מלאי מוגבל",
-    color: "bg-amber-400 text-navy-900",
+    color: "bg-[#FEF3C7] text-[#92400E]",
   },
 ];
 
@@ -61,7 +66,7 @@ export function ProductAutoBadges({
       {options.filter(option => tags.includes(option.tag)).map(
         ({ tag, label, color }) => (
           <span key={tag}
-            className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-bold ${color}`}>
+            className={`${TAG_BASE} ${color}`}>
             {label}
           </span>
         )

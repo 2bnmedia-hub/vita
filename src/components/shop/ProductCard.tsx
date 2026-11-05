@@ -7,7 +7,7 @@ import { useCartStore } from "@/store/cart";
 import { formatPrice, calcDiscount, BESTSELLER_BADGE } from "@/lib/utils";
 import type { Product } from "@/types";
 import toast from "react-hot-toast";
-import { ProductAutoBadges } from "./ProductAutoBadges";
+import { ProductAutoBadges, TAG_BASE, SALE_TAG, BESTSELLER_TAG } from "./ProductAutoBadges";
 
 interface ProductCardProps {
   product: Product;
@@ -43,10 +43,10 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="product-card group relative bg-navy-800 border border-white/[0.07] rounded-2xl overflow-hidden flex flex-col">
       {/* Badges */}
-      <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5">
+      <div className="absolute top-3 right-3 z-30 flex flex-col items-start gap-1.5">
         <ProductAutoBadges product={product} />
         {product.badge && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm">
+          <span className={product.badge === "במבצע" ? `${TAG_BASE} ${SALE_TAG}` : product.badge === BESTSELLER_BADGE ? `${TAG_BASE} ${BESTSELLER_TAG}` : "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm"}>
             {product.badge === BESTSELLER_BADGE && <Flame className="w-3.5 h-3.5" aria-hidden="true" />}
             {product.badge}
           </span>
