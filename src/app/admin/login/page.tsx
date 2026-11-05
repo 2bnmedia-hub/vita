@@ -64,10 +64,10 @@ export default function AdminLogin() {
                 id="admin-password"
                 type={showPw ? "text" : "password"} required value={password} autoComplete="current-password"
                 onChange={e => setPassword(e.target.value)}
-                className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 pl-11 text-white text-sm placeholder-white/20"
+                className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 pl-14 text-white text-sm placeholder-white/20"
                 placeholder="••••••••"
               />
-              <button type="button" onClick={() => setShowPw(v => !v)} aria-label={showPw ? "הסתר סיסמה" : "הצג סיסמה"} aria-pressed={showPw} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1">{showPw ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}</button>
+              <button type="button" onClick={() => setShowPw(v => !v)} aria-label={showPw ? "הסתר סיסמה" : "הצג סיסמה"} aria-pressed={showPw} className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-navy-900 text-cyan hover:text-white cursor-pointer">{showPw ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}</button>
             </div>
           </div>
           <button
