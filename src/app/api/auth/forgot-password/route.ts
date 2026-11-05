@@ -11,8 +11,10 @@ const MAX = 5;
 const WINDOW_MS = 15 * 60 * 1000;
 const EMAIL_RE = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
 
-// Same answer whether or not the account exists, so the form can't be used to probe emails.
-const DONE = NextResponse.json({ ok: true });
+// Same answer, and same minimum time, whether or not the account exists,
+// so the form can't be used to probe which emails are registered.
+// ponytail: fixed floor; a slow Resend call above it still leaks. Upgrade = send via a queue.
+const MIN_MS = 2500;
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-real-ip") ?? "unknown";
@@ -27,15 +29,22 @@ export async function POST(req: NextRequest) {
   try { email = String((await req.json())?.email ?? "").trim().toLowerCase(); } catch { /* fallthrough */ }
   if (!EMAIL_RE.test(email) || email.length > 254) return NextResponse.json({ error: "אימייל לא תקין" }, { status: 400 });
 
-  const origin = req.nextUrl.origin;
+  const started = Date.now();
+  await work(email, req.nextUrl.origin);
+  const wait = MIN_MS - (Date.now() - started);
+  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+  return NextResponse.json({ ok: true });
+}
+
+async function work(email: string, origin: string) {
 
   // Primary: our own link carrying the token hash. Doesn't depend on Supabase's
   // redirect allow-list; verifying it also confirms an unconfirmed email.
   const { data, error } = await supabaseAdmin.auth.admin.generateLink({ type: "recovery", email });
-  if (error || !data?.properties?.hashed_token) return DONE; // unknown user: say nothing
+  if (error || !data?.properties?.hashed_token) return; // unknown user: say nothing
   const link = `${origin}/account/reset-password?token_hash=${encodeURIComponent(data.properties.hashed_token)}&type=recovery`;
   const sent = await sendPasswordResetEmail(email, link);
-  if (sent.ok) return DONE;
+  if (sent.ok) return;
 
   // Fallback: Supabase's own mailer (Resend sandbox only delivers to its account owner).
   const anon = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
@@ -43,5 +52,4 @@ export async function POST(req: NextRequest) {
   });
   const { error: e2 } = await anon.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/account/reset-password` });
   if (e2) console.error("[forgot-password] both senders failed:", e2.status); // no PII in logs
-  return DONE;
 }

@@ -12,6 +12,7 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [pw, setPw] = useState({ a: "", b: "" });
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -27,6 +28,7 @@ export default function ResetPasswordPage() {
       // Supabase-mailer links land with #access_token…; supabase-js picks that up itself.
       await new Promise(r => setTimeout(r, 300));
       const { data } = await supabase.auth.getSession();
+      setEmail(data.session?.user.email ?? "");
       setReady(data.session ? "ok" : "invalid");
     })();
   }, []);
@@ -61,6 +63,8 @@ export default function ResetPasswordPage() {
           )}
           {ready === "ok" && (
             <form onSubmit={submit} className="space-y-4">
+              {/* Shows whose account this link opens, so a link sent by someone else is noticed. */}
+              <p className="text-white/60 text-sm text-center">איפוס סיסמה עבור <span dir="ltr" className="text-white font-bold">{email}</span></p>
               <div>
                 <label htmlFor="new-password" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה חדשה</label>
                 <div className="relative">
