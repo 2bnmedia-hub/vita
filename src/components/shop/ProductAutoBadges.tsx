@@ -10,19 +10,19 @@ type Props = {
 
 /** Shared look for every product tag: same size, weight, padding, radius. No glow. */
 export const TAG_BASE = "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold leading-none whitespace-nowrap shadow-none";
-export const SALE_TAG = "bg-[#FEE2E2] text-[#B91C1C]";
-export const BESTSELLER_TAG = "bg-[#EDE9FE] text-[#6D28D9]";
+export const SALE_TAG = "bg-red-500/85 text-white";
+export const BESTSELLER_TAG = "bg-[#7C3AED] text-white";
 
 const options = [
   {
     tag: "manual:new",
     label: "חדש באתר",
-    color: "bg-[#CCFBF1] text-[#0F766E]",
+    color: "bg-[#0F766E] text-white",
   },
   {
     tag: "manual:limited-stock",
     label: "מלאי מוגבל",
-    color: "bg-[#FEF3C7] text-[#92400E]",
+    color: "bg-[#B45309] text-white",
   },
 ];
 
