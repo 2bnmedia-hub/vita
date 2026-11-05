@@ -11,7 +11,6 @@ import { ProductImage } from "@/components/shop/ProductImage";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
-  const [views, setViews] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [search, setSearch] = useState("");
@@ -20,11 +19,6 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     const { data } = await supabase.from("products").select("*").order("created_at", { ascending: false });
     setProducts(data ?? []);
-    const response = await fetch("/api/admin/product-views", { cache: "no-store" });
-    if (response.ok) {
-      const result = await response.json();
-      setViews(result.views ?? {});
-    }
     setLoading(false);
   };
 
@@ -238,9 +232,6 @@ export default function AdminProducts() {
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2 justify-end">
-                      <span className="inline-flex items-center gap-1 text-xs text-slate-600 px-2" title="צפיות ייחודיות">
-                        <Eye className="w-3.5 h-3.5" /> {views[p.id] ?? 0}
-                      </span>
                       <Link href={"/shop/" + encodeURIComponent(p.slug)} target="_blank" rel="noreferrer"
                         aria-label={`צפה באתר במוצר ${p.name}`} title="צפייה באתר"
                         className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:border-teal-300 hover:text-teal-700 transition-all">
