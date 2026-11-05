@@ -34,12 +34,17 @@ export default function RegisterPage() {
     }
 
     // Save to contact_submissions as fallback (works even with rate limit)
-    await supabase.from("contact_submissions").insert({
-      name: form.full_name,
-      email: form.email,
-      phone: form.phone,
-      message: `הרשמה חדשה לאתר | סיסמה נשמרת אצל הלקוח`,
-    });
+    // Via the server route (validation + rate limit); the browser has no direct DB access.
+    await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.full_name,
+        email: form.email,
+        phone: form.phone,
+        message: `הרשמה חדשה לאתר | סיסמה נשמרת אצל הלקוח`,
+      }),
+    }).catch(() => {});
 
     if (!error || isRateLimit) {
       // Also try saving to customers if we got a user

@@ -18,7 +18,18 @@ export async function generateMetadata({
   if (!product) return { title: "מוצר לא נמצא" };
   return {
     title: product.name,
-    description: product.description,
+    // Some products have no description in the DB: fall back to the site default (meta-description audit).
+    description: product.description || undefined,
+    alternates: { canonical: `/shop/${encodeURIComponent(product.slug)}` },
+    // Full object: a page-level openGraph replaces the layout's instead of merging.
+    openGraph: {
+      type: "website",
+      locale: "he_IL",
+      siteName: "V-FORM NUTRITION",
+      title: product.name,
+      description: product.description || undefined,
+      images: [product.images?.[0] || "/creatine-hero.png"],
+    },
   };
 }
 

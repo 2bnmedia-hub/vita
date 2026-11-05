@@ -5,6 +5,10 @@ const esc = (v: unknown) =>
   String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 const OWNER_EMAIL = "vformnutrition@gmail.com";
+// onboarding@resend.dev is Resend's sandbox sender: it only delivers to the Resend account
+// owner, so customer emails fail. Once vform-nutrition.com is verified in Resend, set
+// EMAIL_FROM_ADDRESS (e.g. orders@vform-nutrition.com) in Vercel. Unset = old behaviour.
+const FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS || "onboarding@resend.dev";
 const EMAIL_RE = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
 
 type SendResult = { ok: true } | { ok: false; error: string };
@@ -61,7 +65,7 @@ export function sendOwnerOrderEmail(order: Record<string, any>): Promise<SendRes
   `;
 
   return send(
-    { from: "VITA Orders <onboarding@resend.dev>", to: OWNER_EMAIL, subject: `הזמנה חדשה מ-${esc(order.customer_name)}`, html },
+    { from: `VITA Orders <${FROM_ADDRESS}>`, to: OWNER_EMAIL, subject: `הזמנה חדשה מ-${esc(order.customer_name)}`, html },
     "owner-order-email"
   );
 }
@@ -83,7 +87,7 @@ export function sendCustomerEmail(p: { to: unknown; customerName?: unknown; mess
     </div>
   `;
   return send(
-    { from: "V-FORM NUTRITION <onboarding@resend.dev>", to: p.to, subject: "עדכון להזמנתך — V-FORM NUTRITION", html },
+    { from: `V-FORM NUTRITION <${FROM_ADDRESS}>`, to: p.to, subject: "עדכון להזמנתך — V-FORM NUTRITION", html },
     "customer-email"
   );
 }

@@ -11,7 +11,7 @@ Path: /Volumes/Haytham Salim/פרויקטים פיתוח אתרים/  V FORM/vit
 
 ## Supabase
 - Project URL: https://uixfwazfrtcakzeghgml.supabase.co
-- Admin user: 2bnbussiness@gmail.com / pass: 123456
+- Admin user: 2bnbussiness@gmail.com (password removed 5/11/2026 — it was in a public repo; rotate it)
 - IMPORTANT: env vars in Vercel must point to uixfwazf (NOT old exsgjnixzreh)
 
 ## Fixed

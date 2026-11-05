@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Send, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
-import { supabase } from "@/lib/supabase";
 
 export function ContactForm() {
   const [loading, setLoading] = useState(false);
@@ -17,16 +16,23 @@ export function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    if (loading) return; // no double submit
     try {
-      const { error } = await supabase.from("contact_submissions").insert([
-        {
-          name: form.name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim() || null,
-          message: form.message.trim(),
-        },
-      ]);
-      if (error) throw error;
+      // Server route validates, rate-limits and stores; the browser no longer writes to the DB.
+      const website = (e.currentTarget as HTMLFormElement).elements.namedItem("website") as HTMLInputElement | null;
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, website: website?.value ?? "" }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 400 || res.status === 429) {
+          toast.error(data.error || "אירעה שגיאה בשליחת ההודעה. נסה שוב.");
+          return;
+        }
+        throw new Error(String(res.status));
+      }
       toast.success("ההודעה נשלחה בהצלחה! נחזור אליך בהקדם.");
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch {
@@ -110,6 +116,12 @@ export function ContactForm() {
           onChange={(e) => setForm({ ...form, message: e.target.value })}
           className={`${field} resize-none`}
         />
+      </div>
+
+      {/* Honeypot for bots: off-screen, not focusable, hidden from assistive tech. */}
+      <div aria-hidden="true" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clipPath: "inset(50%)", whiteSpace: "nowrap" }}>
+        <label htmlFor="contact-website">Website</label>
+        <input id="contact-website" name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
       </div>
 
       <button

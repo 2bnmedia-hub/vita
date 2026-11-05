@@ -30,20 +30,35 @@ export function CartDrawer() {
     if (!isOpen) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const drawer = drawerRef.current;
-    const focusables = drawer?.querySelectorAll<HTMLElement>(
+    // Re-queried on every Tab: cart lines can be added/removed while the drawer is open.
+    const getFocusables = () => drawer?.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
-    focusables?.[0]?.focus();
+    // Children with `transition-all` keep an inherited `visibility: hidden` for the first
+    // frames after opening, so focus() is silently ignored. Retry each frame (max ~0.5s).
+    let cancelled = false;
+    let tries = 0;
+    const focusFirst = () => {
+      if (cancelled) return;
+      const first = getFocusables()?.[0];
+      first?.focus();
+      if (first && document.activeElement !== first && ++tries < 30) requestAnimationFrame(focusFirst);
+    };
+    requestAnimationFrame(focusFirst);
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         closeCart();
         return;
       }
+      const focusables = getFocusables();
       if (e.key === "Tab" && focusables && focusables.length > 0) {
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
+        if (!drawer?.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+        } else if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
           last.focus();
         } else if (!e.shiftKey && document.activeElement === last) {
@@ -54,6 +69,7 @@ export function CartDrawer() {
     };
     document.addEventListener("keydown", onKeyDown, true);
     return () => {
+      cancelled = true;
       document.removeEventListener("keydown", onKeyDown, true);
       previouslyFocused?.focus();
     };

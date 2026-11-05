@@ -17,6 +17,10 @@ const guarantees = [
   { icon: RotateCcw, text: "מדיניות החזרה" },
 ];
 
+function analyticsConsent(): boolean {
+  try { return JSON.parse(localStorage.getItem("vform_cookie_consent") || "null")?.analytics === true; } catch { return false; }
+}
+
 export function ProductDetailClient({
   product,
   related,
@@ -28,7 +32,11 @@ export function ProductDetailClient({
   useEffect(() => {
     const key = `vita-viewed-${product.id}`;
     if (window.localStorage.getItem(key)) return;
-    fetch("/api/product-views", { method: "POST", headers: { "x-product-id": product.id } })
+    fetch("/api/product-views", {
+      method: "POST",
+      // The 1-year visitor cookie is analytics: only allowed after the visitor opted in.
+      headers: { "x-product-id": product.id, "x-analytics-consent": analyticsConsent() ? "1" : "0" },
+    })
       .then(response => {
         if (response.ok) window.localStorage.setItem(key, "1");
       })

@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/shop/CartDrawer";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { AccessibilityWidget } from "@/components/layout/AccessibilityWidget";
+import { CopyGuard } from "@/components/layout/CopyGuard";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "he_IL",
     siteName: "V-FORM NUTRITION",
+    images: [{ url: "/creatine-hero.png", width: 868, height: 954, alt: "V-FORM NUTRITION" }],
   },
   robots: { index: true, follow: true },
   metadataBase: new URL("https://www.vform-nutrition.com"),
@@ -64,6 +66,7 @@ export default function RootLayout({
         <CartDrawer />
         <CookieConsent />
         <AccessibilityWidget />
+        <CopyGuard />
         <Toaster
           position="bottom-center"
           toastOptions={{

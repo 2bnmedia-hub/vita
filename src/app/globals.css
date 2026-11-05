@@ -339,3 +339,17 @@ html.a11y-focus-strong [tabindex]:focus-visible {
   outline-offset: 3px !important;
   box-shadow: 0 0 0 7px rgba(255, 212, 0, 0.35) !important;
 }
+
+/* --- Copy deterrence (CopyGuard.tsx sets data-copy-guard on marketing pages only) --- */
+html[data-copy-guard="on"] main {
+  -webkit-user-select: none;
+  user-select: none;
+}
+html[data-copy-guard="on"] main img {
+  -webkit-user-drag: none;
+}
+/* Always copyable: fields, contact details, and anything marked .copy-ok */
+html[data-copy-guard="on"] main :is(input, textarea, select, [contenteditable="true"], a[href^="tel:"], a[href^="mailto:"], a[href^="https://wa.me"], .copy-ok, .copy-ok *) {
+  -webkit-user-select: text;
+  user-select: text;
+}

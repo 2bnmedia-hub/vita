@@ -8,6 +8,10 @@ import { CtaBanner } from "@/components/sections/CtaBanner";
 import { InstagramSection } from "@/components/sections/InstagramSection";
 import AboutSection from "@/components/sections/AboutSection";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -95,12 +96,17 @@ export function HeroSection() {
             className="relative flex flex-col items-center justify-center gap-5"
           >
             {/* Product image */}
-            <img
+            <Image
               src="/creatine-hero.png"
               alt="V-FORM Creatine"
+              width={868}
+              height={954}
+              priority
+              sizes="(min-width: 1024px) 30vw, 57vw"
               className="animate-float"
               style={{
                 width: "57%",
+                height: "auto",
                 objectFit: "contain",
                 filter: "drop-shadow(0 0 8px rgba(0,212,255,0.8)) drop-shadow(0 0 18px rgba(0,180,255,0.4))",
                 animation: "float 6s ease-in-out infinite, lava 3s ease-in-out infinite"

@@ -33,6 +33,18 @@ export function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Escape closes the mobile menu and returns focus to its toggle (WCAG 2.1.2 / 2.4.3).
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMenuOpen(false);
+      document.querySelector<HTMLElement>('[aria-controls="mobile-menu"]')?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
   const handleLogout = async () => { await supabase.auth.signOut(); setUser(null); };
 
   return (

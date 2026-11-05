@@ -4,6 +4,7 @@ import { Accessibility, Keyboard, MonitorSmartphone, AlertTriangle, Mail, Phone 
 export const metadata: Metadata = {
   title: "הצהרת נגישות",
   description: "הצהרת הנגישות של אתר V-FORM NUTRITION — התאמות שבוצעו, תקנים ורמת הנגישות, ופרטי יצירת קשר לדיווח על בעיות נגישות.",
+  alternates: { canonical: "/accessibility" },
 };
 
 export default function AccessibilityPage() {

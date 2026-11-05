@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
   if (error) return NextResponse.json({ error: "Could not record view" }, { status: 503 });
 
   const response = NextResponse.json({ ok: true });
-  if (!visitorCookie) {
+  // No consent: count the view but don't store a persistent identifier.
+  if (!visitorCookie && request.headers.get("x-analytics-consent") === "1") {
     response.cookies.set("vita_visitor", visitorId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

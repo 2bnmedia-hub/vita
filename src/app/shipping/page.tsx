@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Truck, Clock, MapPin, Phone, CheckCircle } from "lucide-react";
 
-export const metadata: Metadata = { title: "מדיניות אספקה" };
+export const metadata: Metadata = { title: "מדיניות אספקה", alternates: { canonical: "/shipping" } };
 
 const items = [
   { icon: Truck, title: "משלוח חינם מעל ₪199", body: "הזמנות מעל ₪199 זכאיות למשלוח חינם לכל הארץ." },

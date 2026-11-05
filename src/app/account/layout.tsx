@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "האזור האישי | VITA",
+  robots: { index: false, follow: false },
 };
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {

@@ -13,6 +13,7 @@ export const fetchCache = "force-no-store";
 export const metadata: Metadata = {
   title: "חנות | V-FORM Nutrition",
   description: "כל מוצרי V-FORM NUTRITION — קריאטין אבקה וטבליות לעיסה.",
+  alternates: { canonical: "/shop" },
 };
 
 // Force dynamic so searchParams always fresh

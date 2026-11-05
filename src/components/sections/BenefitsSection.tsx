@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const benefits = [
   {
@@ -81,7 +82,7 @@ export function BenefitsSection() {
               <div className="w-full lg:w-1/2">
                 <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${b.color} border ${b.border} h-72 flex items-center justify-center glass`}>
                   <div className="absolute inset-0 bg-grid opacity-30" />
-                  <>{b.image ? <img src={b.image} alt={b.title} className="w-full h-full object-cover absolute inset-0 rounded-2xl" /> : <span className="text-[100px] relative z-10">{b.emoji}</span>}</>
+                  <>{b.image ? <Image src={b.image} alt={b.title} fill loading="eager" sizes="(min-width: 1024px) 50vw, 100vw" className="w-full h-full object-cover absolute inset-0 rounded-2xl" /> : <span className="text-[100px] relative z-10">{b.emoji}</span>}</>
                   <div className="absolute top-4 right-4 w-10 h-10 rounded-full glass-cyan border border-cyan/30 flex items-center justify-center">
                     <span className="text-cyan text-xs font-black">{b.id}</span>
                   </div>

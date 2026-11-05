@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { RefreshCcw, Clock, AlertCircle, Phone, CheckCircle } from "lucide-react";
 
-export const metadata: Metadata = { title: "מדיניות החזרות" };
+export const metadata: Metadata = { title: "מדיניות החזרות", alternates: { canonical: "/returns" } };
 
 const items = [
   {

@@ -5,6 +5,7 @@ import { MapPin, Phone, Mail, Instagram, Clock } from "lucide-react";
 export const metadata: Metadata = {
   title: "צור קשר",
   description: "צור קשר עם VFORM NUTRITION — ענו לכל שאלה.",
+  alternates: { canonical: "/contact" },
 };
 
 const contacts = [
