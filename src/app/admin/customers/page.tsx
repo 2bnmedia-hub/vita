@@ -92,7 +92,7 @@ export default function AdminCustomers() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-black">לקוחות</h1><p className="text-slate-600 text-sm">{customers.length} לקוחות · {customers.filter(c => c.status === "pending").length} ממתינים לאישור</p></div>
+        <div><h1 className="text-2xl font-semibold">לקוחות</h1><p className="text-slate-600 text-sm">{customers.length} לקוחות · {customers.filter(c => c.status === "pending").length} ממתינים לאישור</p></div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -110,7 +110,7 @@ export default function AdminCustomers() {
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+      <div className="admin-card overflow-hidden">
         {loading ? <div className="h-32 flex items-center justify-center"><div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div> :
         filtered.length === 0 ? <div className="text-center py-12 text-slate-500"><Users className="w-10 h-10 mx-auto mb-3 opacity-30" /><p>לא נמצאו לקוחות</p></div> :
         <div className="overflow-x-auto"><table className="w-full min-w-[640px]">

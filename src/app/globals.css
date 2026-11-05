@@ -357,7 +357,20 @@ html[data-copy-guard="on"] main :is(input, textarea, select, [contenteditable="t
 /* ==========================================================================
    Admin area (light theme) — scoped to .admin-ui so the store is untouched
    ========================================================================== */
-.admin-ui { font-size: 16px; color-scheme: light; }
+.admin-ui { font-size: 16px; color-scheme: light; -webkit-font-smoothing: antialiased; }
+.admin-ui.bg-slate-100, .admin-ui .bg-slate-100.min-h-screen { background-color: #F5F5F7; }
+.admin-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.03);
+}
+.admin-ui h1, .admin-ui h2 { letter-spacing: -0.02em; }
+.admin-ui .text-3xl, .admin-ui .text-2xl { letter-spacing: -0.025em; }
+.admin-ui button, .admin-ui a { transition-property: color, background-color, border-color, transform, box-shadow; transition-duration: 150ms; }
+.admin-ui button:not(:disabled):active, .admin-ui a.rounded-full:active { transform: scale(0.97); }
+.admin-topbar { background: rgba(255, 255, 255, 0.72); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06); }
+@media (prefers-reduced-transparency: reduce) { .admin-topbar { background: #fff; backdrop-filter: none; } }
+@media (prefers-reduced-motion: reduce) { .admin-ui button:active, .admin-ui a:active { transform: none; } }
 .admin-ui ::selection { background: rgba(15, 118, 110, 0.18); color: #0f172a; }
 .admin-ui input, .admin-ui select, .admin-ui textarea { font-size: 16px; }
 .admin-ui input:focus, .admin-ui textarea:focus, .admin-ui select:focus {

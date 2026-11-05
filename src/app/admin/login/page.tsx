@@ -36,13 +36,13 @@ export default function AdminLogin() {
     <div className="min-h-[100dvh] flex items-start sm:items-center justify-center px-4 pt-16 pb-72 sm:py-12" dir="rtl">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <div className="mx-auto mb-5 inline-flex items-center justify-center bg-navy-900 rounded-xl px-5 py-3">
+          <div className="mx-auto mb-5 inline-flex items-center justify-center bg-[#0B1929] rounded-2xl px-5 py-3">
             <img src="/logo.png" alt="V-FORM NUTRITION" className="h-8 w-auto object-contain" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">כניסה לממשק הניהול</h1>
+          <h1 className="text-[28px] font-semibold text-slate-900">כניסה לממשק הניהול</h1>
           <p className="text-slate-600 text-base mt-1">הזינו את פרטי החשבון כדי להמשיך</p>
         </div>
-        <form onSubmit={handleLogin} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4">
+        <form onSubmit={handleLogin} className="admin-card p-6 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-2.5 rounded-lg" role="alert">
               {error}
@@ -73,7 +73,7 @@ export default function AdminLogin() {
           </div>
           <button
             type="submit" disabled={loading}
-            className="w-full h-11 bg-teal-700 text-white text-base font-semibold rounded-lg hover:bg-teal-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full h-11 bg-teal-700 text-white text-base font-semibold rounded-full hover:bg-teal-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />נכנס...</> : "כניסה"}
           </button>

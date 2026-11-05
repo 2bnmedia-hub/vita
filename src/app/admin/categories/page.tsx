@@ -65,7 +65,7 @@ export default function AdminCategories() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div><h1 className="text-2xl font-black">קטגוריות</h1><p className="text-slate-600 text-sm">{cats.length} קטגוריות</p></div>
+      <div><h1 className="text-2xl font-semibold">קטגוריות</h1><p className="text-slate-600 text-sm">{cats.length} קטגוריות</p></div>
       
       <form onSubmit={handleSave} className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
         <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">
@@ -78,7 +78,7 @@ export default function AdminCategories() {
         <div><label className={label}>תיאור</label><input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className={field} placeholder="תיאור הקטגוריה..." /></div>
         <div className="flex gap-3">
           <button type="submit" disabled={saving}
-            className="bg-teal-700 text-white font-black px-5 py-2.5 rounded-xl text-sm hover:bg-teal-800 transition-colors flex items-center gap-2 disabled:opacity-50">
+            className="bg-teal-700 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-teal-800 transition-colors flex items-center gap-2 disabled:opacity-50">
             {saving ? "שומר..." : <><Plus className="w-4 h-4" />{editing ? "עדכן" : "הוסף"}</>}
           </button>
           {editing && (
@@ -90,7 +90,7 @@ export default function AdminCategories() {
         </div>
       </form>
 
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+      <div className="admin-card overflow-hidden">
         {loading ? (
           <div className="h-32 flex items-center justify-center"><div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>
         ) : cats.length === 0 ? (

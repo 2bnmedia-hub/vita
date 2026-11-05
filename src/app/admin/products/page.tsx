@@ -132,7 +132,7 @@ export default function AdminProducts() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">מוצרים</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">מוצרים</h1>
           <p className="text-slate-600 text-sm">{products.length} מוצרים</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -146,7 +146,7 @@ export default function AdminProducts() {
           </button>
           <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleImport} className="hidden" />
           <Link href="/admin/products/new"
-            className="flex items-center gap-2 bg-teal-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-teal-800 transition-colors">
+            className="flex items-center gap-2 bg-teal-700 text-white font-bold px-4 py-2.5 rounded-full text-sm hover:bg-teal-800 transition-colors">
             <Plus className="w-4 h-4" /> מוצר חדש
           </Link>
         </div>
@@ -171,7 +171,7 @@ export default function AdminProducts() {
           {[...Array(4)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-white animate-pulse" />)}
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="admin-card overflow-hidden">
           <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-slate-200">

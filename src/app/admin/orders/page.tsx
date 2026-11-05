@@ -179,11 +179,11 @@ export default function AdminOrders() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <h1 className="text-2xl font-black text-slate-900">הזמנות</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">הזמנות</h1>
         <p className="text-slate-600 text-sm">{filteredOrders.length} מתוך {orders.length} הזמנות</p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap gap-3 items-center">
+      <div className="admin-card p-4 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
           <input
@@ -210,7 +210,7 @@ export default function AdminOrders() {
           className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:border-teal-600 focus:outline-none" />
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden overflow-x-auto">
+      <div className="admin-card overflow-hidden overflow-x-auto">
         {loading ? (
           <div className="h-32 flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
@@ -416,7 +416,7 @@ export default function AdminOrders() {
                   <User className="w-5 h-5 text-teal-700" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-black text-slate-900">{customerModal.name}</p>
+                  <p className="font-semibold text-slate-900">{customerModal.name}</p>
                   <p className="text-slate-600 text-xs flex items-center gap-1.5 mt-0.5">
                     <Mail className="w-3 h-3" aria-hidden="true" />{customerModal.email}
                   </p>
@@ -453,7 +453,7 @@ export default function AdminOrders() {
                           <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${statusColors[o.status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
                             {statusLabels[o.status] ?? o.status}
                           </span>
-                          <span className="font-black text-slate-900 text-sm">₪{Number(o.total).toLocaleString("he-IL")}</span>
+                          <span className="font-semibold text-slate-900 text-sm">₪{Number(o.total).toLocaleString("he-IL")}</span>
                         </div>
                       </div>
                       <div className="mt-2 space-y-1">
@@ -495,7 +495,7 @@ export default function AdminOrders() {
                   <Mail className="w-5 h-5 text-teal-700" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-black text-slate-900">שליחת הודעה ללקוח</p>
+                  <p className="font-semibold text-slate-900">שליחת הודעה ללקוח</p>
                   <p className="text-slate-600 text-xs mt-0.5">{emailModal.name} · {emailModal.email}</p>
                 </div>
               </div>
@@ -542,7 +542,7 @@ export default function AdminOrders() {
               <button
                 onClick={sendCustomerEmail}
                 disabled={sendingEmail || !emailText.trim()}
-                className="flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-black px-5 py-2 rounded-xl text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-semibold px-5 py-2 rounded-full text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {sendingEmail ? (
                   <div className="w-4 h-4 border-2 border-slate-300 border-t-white rounded-full animate-spin" />

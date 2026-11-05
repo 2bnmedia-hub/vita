@@ -24,7 +24,7 @@ const nis = (n: number) => `₪${Number(n).toLocaleString("he-IL")}`;
 
 function Card({ title, action, children, className = "" }: { title?: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`bg-white border border-slate-200 rounded-xl ${className}`}>
+    <section className={`admin-card ${className}`}>
       {title && (
         <div className="flex items-center justify-between gap-3 px-5 h-14 border-b border-slate-100">
           <h2 className="text-base font-bold text-slate-900">{title}</h2>
@@ -47,7 +47,7 @@ function Empty({ icon: Icon, text }: { icon: any; text: string }) {
 
 function Stat({ icon: Icon, label, value, sub, alert }: { icon: any; label: string; value: string | number; sub?: string; alert?: boolean }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 flex flex-col">
+    <div className="admin-card p-4 md:p-5 flex flex-col">
       <div className="flex items-center gap-2 text-slate-600 text-sm font-medium leading-tight mb-3">
         <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${alert ? "bg-amber-50 text-amber-800" : "bg-teal-50 text-teal-700"}`}>
           <Icon className="w-4 h-4" aria-hidden="true" />
@@ -62,7 +62,7 @@ function Stat({ icon: Icon, label, value, sub, alert }: { icon: any; label: stri
 
 function Section({ title, count, open, onToggle, children }: any) {
   return (
-    <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <section className="admin-card overflow-hidden">
       <button onClick={onToggle} aria-expanded={open} className="w-full flex items-center justify-between px-5 h-14 hover:bg-slate-50 transition-colors">
         <span className="flex items-center gap-2.5">
           <span className="font-bold text-slate-900 text-base">{title}</span>

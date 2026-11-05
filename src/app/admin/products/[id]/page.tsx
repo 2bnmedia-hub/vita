@@ -83,7 +83,7 @@ export default function AdminProductEdit() {
           <ArrowRight className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-black text-slate-900">עריכת מוצר</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">עריכת מוצר</h1>
           <p className="text-slate-600 text-sm">{form.name}</p>
         </div>
       </div>
@@ -91,13 +91,13 @@ export default function AdminProductEdit() {
       <form onSubmit={handleSave} className="space-y-6">
 
         {/* תמונות */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+        <div className="admin-card p-6 space-y-4">
           <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">תמונות מוצר</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {(form.images || []).map((url: string, i: number) => (
               <div key={url} className="relative group aspect-square rounded-xl overflow-hidden bg-slate-100">
                 <img src={url} alt="" className="w-full h-full object-cover" />
-                {i === 0 && <span className="absolute top-1 right-1 bg-teal-700 text-white text-[10px] font-black px-1.5 py-0.5 rounded">ראשית</span>}
+                {i === 0 && <span className="absolute top-1 right-1 bg-teal-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">ראשית</span>}
                 <button type="button" onClick={() => removeImage(url)}
                   className="absolute top-1 left-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <X className="w-3 h-3" />
@@ -114,7 +114,7 @@ export default function AdminProductEdit() {
         </div>
 
         {/* Basic info */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+        <div className="admin-card p-6 space-y-4">
           <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">פרטים בסיסיים</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className={label}>שם מוצר *</label><input required value={form.name} onChange={e => set("name", e.target.value)} className={field} placeholder="קריאטין מונוהידראט" /></div>
@@ -125,7 +125,7 @@ export default function AdminProductEdit() {
         </div>
 
         {/* Pricing */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+        <div className="admin-card p-6 space-y-4">
           <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">תמחור</h2>
           <div className="grid grid-cols-2 gap-4">
             <div><label className={label}>מחיר ₪ *</label><input required type="number" value={form.price} onChange={e => set("price", e.target.value)} className={field} placeholder="89" /></div>
@@ -134,7 +134,7 @@ export default function AdminProductEdit() {
         </div>
 
         {/* Details */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+        <div className="admin-card p-6 space-y-4">
           <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">פרטי מוצר</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div><label className={label}>טעם</label><input value={form.flavor} onChange={e => set("flavor", e.target.value)} className={field} placeholder="ענבים" /></div>
@@ -180,7 +180,7 @@ export default function AdminProductEdit() {
 
         <div className="flex gap-3">
           <button type="submit" disabled={saving}
-            className="flex items-center gap-2 bg-teal-700 text-white font-black px-6 py-3 rounded-xl hover:bg-teal-800 transition-colors disabled:opacity-50">
+            className="flex items-center gap-2 bg-teal-700 text-white font-semibold px-6 py-3 rounded-full hover:bg-teal-800 transition-colors disabled:opacity-50">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "שומר..." : "שמור שינויים"}
           </button>
