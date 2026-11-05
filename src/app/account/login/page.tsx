@@ -3,19 +3,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/auth";
-import { Zap, Loader2 } from "lucide-react";
+import { Zap, Loader2, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
+  const [showPw, setShowPw] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword(form);
-    if (error) { toast.error("אימייל או סיסמה שגויים"); setLoading(false); return; }
+    const { error } = await supabase.auth.signInWithPassword({ email: form.email.trim().toLowerCase(), password: form.password });
+    if (error) {
+      const msg = /not confirmed/i.test(error.message)
+        ? "האימייל עדיין לא אומת. לחץ \"שכחתי סיסמה\" כדי לקבל קישור שיאמת אותו ויקבע סיסמה חדשה"
+        : /rate|too many/i.test(error.message) ? "יותר מדי ניסיונות. נסה שוב בעוד כמה דקות" : "אימייל או סיסמה שגויים";
+      toast.error(msg, { duration: 6000 }); setLoading(false); return;
+    }
     const { data: customer } = await supabase.from("customers").select("status").eq("id", (await supabase.auth.getUser()).data.user?.id).single();
     if (customer?.status === "pending") { router.push("/account/pending"); return; }
     toast.success("ברוך הבא! 👋");
@@ -47,7 +53,9 @@ export default function LoginPage() {
         <div className="glass border border-white/[0.08] rounded-2xl p-7 space-y-4">
           <form onSubmit={handleLogin} className="space-y-4">
             <div><label htmlFor="login-email" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">אימייל</label><input id="login-email" required type="email" autoComplete="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className={field} placeholder="you@gmail.com" /></div>
-            <div><label htmlFor="login-password" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label><input id="login-password" required type="password" autoComplete="current-password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className={field} placeholder="••••••••" /></div>
+            <div><label htmlFor="login-password" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label><div className="relative"><input id="login-password" required type={showPw ? "text" : "password"} autoComplete="current-password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className={field + " pl-11"} placeholder="••••••••" />
+              <button type="button" onClick={() => setShowPw(v => !v)} aria-label={showPw ? "הסתר סיסמה" : "הצג סיסמה"} aria-pressed={showPw} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1">{showPw ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}</button></div>
+              <div className="text-left mt-2"><Link href="/account/forgot-password" className="text-cyan/80 hover:text-cyan hover:underline text-xs font-bold">שכחתי סיסמה</Link></div></div>
             <button type="submit" disabled={loading}
               className="w-full bg-cyan text-navy-900 font-black py-3.5 rounded-xl hover:bg-cyan-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />נכנס...</> : "כניסה"}

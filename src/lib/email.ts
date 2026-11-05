@@ -91,3 +91,18 @@ export function sendCustomerEmail(p: { to: unknown; customerName?: unknown; mess
     "customer-email"
   );
 }
+
+/** Password-reset email. `link` is built server-side from a Supabase recovery token. */
+export function sendPasswordResetEmail(to: string, link: string): Promise<SendResult> {
+  const html = `
+    <div dir="rtl" style="font-family:Arial,sans-serif;background:#071526;padding:24px;">
+      <div style="max-width:480px;margin:0 auto;background:#0F2238;border-radius:16px;padding:28px;border:1px solid rgba(0,212,255,0.15);">
+        <h2 style="color:#fff;margin:0 0 16px;">V-FORM NUTRITION</h2>
+        <p style="color:rgba(255,255,255,0.85);font-size:15px;line-height:1.7;">קיבלנו בקשה לאיפוס הסיסמה לחשבון שלך. לחץ על הכפתור כדי לבחור סיסמה חדשה:</p>
+        <p style="text-align:center;margin:24px 0;"><a href="${esc(link)}" style="background:#00D4FF;color:#071526;font-weight:bold;padding:12px 28px;border-radius:12px;text-decoration:none;display:inline-block;">איפוס סיסמה</a></p>
+        <p style="color:rgba(255,255,255,0.4);font-size:12px;">הקישור תקף לזמן מוגבל. אם לא ביקשת איפוס, אפשר להתעלם מהמייל.</p>
+      </div>
+    </div>
+  `;
+  return send({ from: `V-FORM NUTRITION <${FROM_ADDRESS}>`, to, subject: "איפוס סיסמה — V-FORM NUTRITION", html }, "password-reset");
+}
