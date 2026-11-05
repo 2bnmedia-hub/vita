@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,13 +59,16 @@ export default function AdminLogin() {
           </div>
           <div className="space-y-1.5">
             <label htmlFor="admin-password" className="text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5">סיסמה</label>
-            <input
-              id="admin-password"
-              type="password" required value={password} autoComplete="current-password"
-              onChange={e => setPassword(e.target.value)}
-              className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20"
-              placeholder="••••••••"
-            />
+            <div className="relative">
+              <input
+                id="admin-password"
+                type={showPw ? "text" : "password"} required value={password} autoComplete="current-password"
+                onChange={e => setPassword(e.target.value)}
+                className="w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 pl-11 text-white text-sm placeholder-white/20"
+                placeholder="••••••••"
+              />
+              <button type="button" onClick={() => setShowPw(v => !v)} aria-label={showPw ? "הסתר סיסמה" : "הצג סיסמה"} aria-pressed={showPw} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1">{showPw ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}</button>
+            </div>
           </div>
           <button
             type="submit" disabled={loading}
