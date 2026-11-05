@@ -101,7 +101,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       <div className="flex-1 min-w-0 md:mr-64 flex flex-col min-h-screen">
         <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 md:px-8 h-16 flex items-center gap-3">
           <button className="md:hidden p-2 -mr-2 rounded-lg text-slate-700 hover:bg-slate-100" onClick={() => setMenuOpen(true)} aria-label="פתיחת תפריט" aria-controls="admin-sidebar" aria-expanded={menuOpen}><Menu className="w-5 h-5" aria-hidden="true" /></button>
-          <h1 className="text-lg font-bold text-slate-900 truncate">{current?.label ?? "ניהול"}</h1>
+          <p className="text-lg font-bold text-slate-900 truncate">{current?.label ?? "ניהול"}</p>
           <div className="mr-auto flex items-center gap-1">
             <Link href="/admin/orders" aria-label={unreadOrders > 0 ? `${unreadOrders} הזמנות חדשות` : "הזמנות"} className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
               <Bell className="w-5 h-5" aria-hidden="true" />

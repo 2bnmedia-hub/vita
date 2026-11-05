@@ -47,14 +47,14 @@ function Empty({ icon: Icon, text }: { icon: any; text: string }) {
 
 function Stat({ icon: Icon, label, value, sub, alert }: { icon: any; label: string; value: string | number; sub?: string; alert?: boolean }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5">
-      <div className="flex items-center gap-2 text-slate-600 text-sm font-medium mb-3">
+    <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 flex flex-col">
+      <div className="flex items-center gap-2 text-slate-600 text-sm font-medium leading-tight mb-3">
         <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${alert ? "bg-amber-50 text-amber-800" : "bg-teal-50 text-teal-700"}`}>
           <Icon className="w-4 h-4" aria-hidden="true" />
         </span>
         {label}
       </div>
-      <p className="text-3xl font-bold text-slate-900 leading-none tabular-nums">{value}</p>
+      <p className="mt-auto text-3xl font-bold text-slate-900 leading-none tabular-nums">{value}</p>
       {sub && <p className="text-slate-600 text-sm mt-1.5 tabular-nums" dir="ltr" style={{ textAlign: "right" }}>{sub}</p>}
     </div>
   );
@@ -127,6 +127,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
 
   return (
     <div className="space-y-6 max-w-7xl" dir="rtl">
+      <h1 className="sr-only">לוח בקרה</h1>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <p className="text-slate-600 text-base">{new Date().toLocaleDateString("he-IL", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>

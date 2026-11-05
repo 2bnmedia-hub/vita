@@ -252,7 +252,7 @@ export default function AdminOrders() {
                         />
                       </td>
                       <td className="px-5 py-4">
-                        <span className="text-slate-700 text-xs font-mono">{o.order_number ?? `#${String(o.id).slice(0, 8)}`}</span>
+                        <span dir="ltr" className="text-slate-700 text-xs font-mono whitespace-nowrap">{o.order_number ?? `#${String(o.id).slice(0, 8)}`}</span>
                       </td>
                       <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                         <button
@@ -276,7 +276,7 @@ export default function AdminOrders() {
                         )}
                       </td>
                       <td className="px-5 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${paymentColors[paymentStatus] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
+                        <span className={`inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-bold border ${paymentColors[paymentStatus] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
                           {paymentLabels[paymentStatus] ?? paymentStatus}
                         </span>
                         {o.payment_method === "cod" && (
