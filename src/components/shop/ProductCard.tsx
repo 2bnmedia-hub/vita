@@ -80,7 +80,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
 
           {/* New / limited-stock tags: bottom-right of the image */}
-          <div className="absolute bottom-3 right-3 z-30 flex flex-row gap-1.5 empty:hidden">
+          <div className="absolute bottom-3 right-3 left-3 z-30 flex flex-row flex-wrap gap-1.5 empty:hidden">
             <ProductAutoBadges product={product} />
           </div>
 

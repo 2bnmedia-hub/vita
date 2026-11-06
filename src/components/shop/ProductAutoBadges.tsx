@@ -24,6 +24,36 @@ const options = [
     label: "מלאי מוגבל",
     color: "bg-[#B45309] text-white",
   },
+  {
+    tag: "manual:hot-price",
+    label: "🔥 מחיר מבצע",
+    color: SALE_TAG,
+  },
+  {
+    tag: "manual:special-price",
+    label: "מחיר מיוחד",
+    color: SALE_TAG,
+  },
+  {
+    tag: "manual:limited-time",
+    label: "הטבה לזמן מוגבל",
+    color: SALE_TAG,
+  },
+  {
+    tag: "manual:launch-price",
+    label: "מחיר השקה",
+    color: SALE_TAG,
+  },
+  {
+    tag: "manual:special-deal",
+    label: "מבצע מיוחד",
+    color: SALE_TAG,
+  },
+  {
+    tag: "manual:great-price",
+    label: "מחיר משתלם במיוחד",
+    color: SALE_TAG,
+  },
 ];
 
 export function ProductAutoBadges({
@@ -34,7 +64,7 @@ export function ProductAutoBadges({
   if (admin) {
     return (
       <div className="space-y-2">
-        <div className="flex flex-wrap gap-6">
+        <div className="flex flex-wrap gap-x-6 gap-y-3">
           {options.map(({ tag, label }) => (
             <label key={tag}
               className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
@@ -53,10 +83,6 @@ export function ProductAutoBadges({
             </label>
           ))}
         </div>
-        <p className="text-xs text-white/40">
-          סימון ידני בלבד. ניתן לבחור את שתי התגיות יחד.
-          יש ללחוץ על שמירה כדי לעדכן את האתר.
-        </p>
       </div>
     );
   }
