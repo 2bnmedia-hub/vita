@@ -20,6 +20,8 @@ function makeOrderNumber(): string {
   return `VF-${t}${r}`;
 }
 
+const COD_NOTE = "[תשלום לשליח]";
+
 export async function POST(req: NextRequest) {
   let body: any;
   try {
@@ -75,7 +77,19 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (existing) {
-    if ((existing.payment_method ?? "card") !== paymentMethod) {
+    // Legacy COD row (stored before the COD migration): pending, no provider, COD note.
+    const legacyCod = !existing.payment_method && existing.payment_provider == null
+      && String(existing.notes ?? "").startsWith(COD_NOTE);
+    if (legacyCod && paymentMethod === "cod") {
+      return NextResponse.json({
+        orderId: existing.id,
+        orderNumber: existing.order_number,
+        amount: Number(existing.total),
+        paymentMethod: "cod",
+        paymentStatus: "cod_pending",
+      });
+    }
+    if ((existing.payment_method ?? (legacyCod ? "cod" : "card")) !== paymentMethod) {
       return NextResponse.json({ error: "אמצעי התשלום השתנה. רענן/י את העמוד ונסה/י שוב." }, { status: 409 });
     }
     // A COD order is complete once placed: a retry just gets the same order back.
@@ -142,7 +156,15 @@ export async function POST(req: NextRequest) {
       .select("id", { count: "exact", head: true })
       .eq("payment_status", "cod_pending")
       .or(`customer_email.eq.${JSON.stringify(email)},customer_phone.eq.${JSON.stringify(phone)}`);
-    if ((count ?? 0) >= MAX_OPEN_COD_ORDERS) {
+    // Legacy COD rows (see codLegacy below) are stored as pending + COD note.
+    const { count: legacyCount } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("payment_status", "pending")
+      .is("payment_provider", null)
+      .like("notes", `${COD_NOTE}%`)
+      .or(`customer_email.eq.${JSON.stringify(email)},customer_phone.eq.${JSON.stringify(phone)}`);
+    if ((count ?? 0) + (legacyCount ?? 0) >= MAX_OPEN_COD_ORDERS) {
       return NextResponse.json(
         { error: "קיימות כבר הזמנות פתוחות לתשלום לשליח. נא לפנות אלינו או לשלם באשראי." },
         { status: 429 }
@@ -235,7 +257,7 @@ export async function POST(req: NextRequest) {
     ({ data: order, error: insertError } = await insertOrder({
       ...baseRow,
       payment_status: "pending",
-      notes: `[תשלום לשליח]${notes ? " " + notes : ""}`,
+      notes: `${COD_NOTE}${notes ? " " + notes : ""}`,
     }));
   }
 
