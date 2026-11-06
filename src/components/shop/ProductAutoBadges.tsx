@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, Package, BadgePercent, Tag, Clock, Rocket, Gift, Coins, Check, type LucideIcon } from "lucide-react";
+import { Sparkles, Package, BadgePercent, Tag, Clock, Rocket, Gift, Coins, Check, Percent, Flame, type LucideIcon } from "lucide-react";
 
 type Props = {
   product: {
@@ -14,6 +14,15 @@ type Props = {
 export const TAG_BASE = "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold leading-none whitespace-nowrap shadow-none";
 export const SALE_TAG = "bg-red-500/85 text-white";
 export const BESTSELLER_TAG = "bg-[#7C3AED] text-white";
+
+/** Main product badge (product.badge) — one look for card and product page. */
+export function MainBadge({ badge, bestseller, size = "sm" }: { badge: string; bestseller: string; size?: "sm" | "md" }) {
+  const big = size === "md" ? " text-sm px-3 py-1.5" : "";
+  const icon = size === "md" ? "w-4 h-4" : "w-3.5 h-3.5";
+  if (badge === "במבצע") return <span className={`${TAG_BASE} ${SALE_TAG}${big}`}><Percent className={icon} aria-hidden="true" />במבצע</span>;
+  if (badge === bestseller) return <span className={`${TAG_BASE} ${BESTSELLER_TAG}${big}`}><Flame className={icon} aria-hidden="true" />{badge}</span>;
+  return <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm${big}`}>{badge}</span>;
+}
 
 const options: { tag: string; label: string; color: string; icon: LucideIcon; hex: string }[] = [
   {

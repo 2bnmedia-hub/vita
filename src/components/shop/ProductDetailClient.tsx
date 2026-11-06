@@ -8,7 +8,8 @@ import { formatPrice, calcDiscount } from "@/lib/utils";
 import type { Product } from "@/types";
 import { ProductCard } from "./ProductCard";
 import toast from "react-hot-toast";
-import { ProductAutoBadges } from "./ProductAutoBadges";
+import { ProductAutoBadges, MainBadge } from "./ProductAutoBadges";
+import { BESTSELLER_BADGE } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
 
 const guarantees = [
@@ -85,8 +86,8 @@ export function ProductDetailClient({
                 <ProductAutoBadges product={product} />
               </div>
               {product.badge && (
-                <div className={`absolute top-4 right-4 z-30 px-3 py-1.5 rounded-xl font-black text-sm inline-flex items-center gap-1.5 ${product.badge === "במבצע" ? "bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.45)]" : "bg-cyan text-navy-900 shadow-cyan"}`}>
-                  {product.badge === "במבצע" && <Percent className="w-4 h-4" aria-hidden="true" />}{product.badge}
+                <div className="absolute top-4 right-4 z-30">
+                  <MainBadge badge={product.badge} bestseller={BESTSELLER_BADGE} size="md" />
                 </div>
               )}
               {discount && (
