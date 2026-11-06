@@ -153,14 +153,23 @@ export function ProductDetailClient({
               )}
             </div>
 
+            {/* Stock availability */}
+            {product.in_stock && (
+              <p className="inline-flex items-center gap-2 mb-4 px-3.5 py-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 text-sm font-bold">
+                <span className="relative flex w-2.5 h-2.5" aria-hidden="true">
+                  <span className="absolute inset-0 rounded-full bg-green-400 opacity-75 animate-ping motion-reduce:animate-none" />
+                  <span className="relative w-2.5 h-2.5 rounded-full bg-green-500" />
+                </span>
+                זמין במלאי
+              </p>
+            )}
+
             {/* Specs chips */}
             <div className="flex flex-wrap gap-2 mb-6">
               {product.weight && <Chip>{product.weight}</Chip>}
               {product.servings && <Chip>{product.servings} מנות</Chip>}
               {product.serving_size && <Chip>{product.serving_size} / מנה</Chip>}
-              {product.in_stock ? (
-                <Chip className="border-green-500/30 text-green-400">✓ במלאי</Chip>
-              ) : (
+              {!product.in_stock && (
                 <Chip className="border-red-500/30 text-red-400">אזל המלאי</Chip>
               )}
             </div>
