@@ -44,7 +44,12 @@ export function ProductCard({ product }: ProductCardProps) {
     <div className="product-card group relative bg-navy-800 border border-white/[0.07] rounded-2xl overflow-hidden flex flex-col">
       {/* Badges */}
       <div className="absolute top-3 right-3 z-30 flex flex-col items-start gap-1.5">
-        <ProductAutoBadges product={product} />
+        {product.badge === "במבצע" && (
+          <span className={`${TAG_BASE} ${SALE_TAG}`}>במבצע</span>
+        )}
+        <div className="flex flex-row gap-1.5 empty:hidden">
+          <ProductAutoBadges product={product} />
+        </div>
         {product.badge && product.badge !== "במבצע" && (
           <span className={product.badge === BESTSELLER_BADGE ? `${TAG_BASE} ${BESTSELLER_TAG}` : "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm"}>
             {product.badge === BESTSELLER_BADGE && <Flame className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -54,17 +59,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
       </div>
 
-      {(discount || product.badge === "במבצע") && (
-        <div className="absolute top-3 left-3 z-50 flex flex-col items-end gap-1.5">
-          {discount && (
-            <span className="px-2.5 py-1 rounded-lg bg-red-500/85 text-white text-xs font-semibold shadow-sm">
-              -{discount}%
-            </span>
-          )}
-          {product.badge === "במבצע" && (
-            <span className={`${TAG_BASE} ${SALE_TAG}`}>במבצע</span>
-          )}
-        </div>
+      {discount && (
+        <span className="absolute top-3 left-3 z-50 px-2.5 py-1 rounded-lg bg-red-500/85 text-white text-xs font-semibold shadow-sm">
+          -{discount}%
+        </span>
       )}
 
       {/* Image area */}
