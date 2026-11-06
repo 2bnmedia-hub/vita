@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Star, Flame } from "lucide-react";
+import { ShoppingCart, Star, Flame, Percent } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, calcDiscount, BESTSELLER_BADGE } from "@/lib/utils";
 import type { Product } from "@/types";
@@ -45,7 +45,7 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Badges */}
       <div className="absolute top-3 right-3 z-30 flex flex-col items-start gap-1.5">
         {product.badge === "במבצע" && (
-          <span className={`${TAG_BASE} ${SALE_TAG}`}>במבצע</span>
+          <span className={`${TAG_BASE} ${SALE_TAG}`}><Percent className="w-3.5 h-3.5" aria-hidden="true" />במבצע</span>
         )}
         {product.badge && product.badge !== "במבצע" && (
           <span className={product.badge === BESTSELLER_BADGE ? `${TAG_BASE} ${BESTSELLER_TAG}` : "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm"}>

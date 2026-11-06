@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, ChevronRight, Star, Shield, Truck, RotateCcw } from "lucide-react";
+import { ShoppingCart, ChevronRight, Star, Shield, Truck, RotateCcw, Percent } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, calcDiscount } from "@/lib/utils";
 import type { Product } from "@/types";
@@ -85,8 +85,8 @@ export function ProductDetailClient({
                 <ProductAutoBadges product={product} />
               </div>
               {product.badge && (
-                <div className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan">
-                  {product.badge}
+                <div className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan inline-flex items-center gap-1.5">
+                  {product.badge === "במבצע" && <Percent className="w-4 h-4" aria-hidden="true" />}{product.badge}
                 </div>
               )}
               {discount && (
