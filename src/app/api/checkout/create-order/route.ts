@@ -196,38 +196,42 @@ export async function POST(req: NextRequest) {
   const orderNumber = makeOrderNumber();
   const isCod = paymentMethod === "cod";
 
-  const { data: order, error: insertError } = await supabase
-    .from("orders")
-    .insert([
-      {
-        order_number: orderNumber,
-        customer_name: name,
-        customer_email: email,
-        customer_phone: phone,
-        address,
-        city,
-        zip: zip || null,
-        notes: notes || null,
-        items: orderItems,
-        total,
-        shipping_region: SHIPPING_LABEL[shippingRegion],
-        shipping_cost: shippingCost,
-        status: "pending",
-        // Card orders leave payment_method to its DB default ('card'), so the
-        // card path never depends on the COD migration being applied.
-        ...(isCod ? { payment_method: "cod" } : {}),
-        payment_status: isCod ? "cod_pending" : "pending",
-        payment_provider: isCod ? null : "tranzila",
-        payment_terminal: isCod ? null : tranzilaTerminal(),
-        currency: "ILS",
-        idempotency_key: idempotencyKey,
-        payment_attempts: 0,
-        coupon_code: couponCode || null,
-        discount_amount: pricing.discount,
-      },
-    ])
-    .select()
-    .single();
+  const baseRow = {
+    order_number: orderNumber,
+    customer_name: name,
+    customer_email: email,
+    customer_phone: phone,
+    address,
+    city,
+    zip: zip || null,
+    notes: notes || null,
+    items: orderItems,
+    total,
+    shipping_region: SHIPPING_LABEL[shippingRegion],
+    shipping_cost: shippingCost,
+    status: "pending",
+    // Card orders leave payment_method to its DB default ('card'), so the
+    // card path never depends on the COD migration being applied.
+    payment_status: isCod ? "cod_pending" : "pending",
+    payment_provider: isCod ? null : "tranzila",
+    payment_terminal: isCod ? null : tranzilaTerminal(),
+    currency: "ILS",
+    idempotency_key: idempotencyKey,
+    payment_attempts: 0,
+    coupon_code: couponCode || null,
+    discount_amount: pricing.discount,
+  };
+  const insertOrder = (row: Record<string, unknown>) =>
+    supabase.from("orders").insert([row]).select().single();
+  let { data: order, error: insertError } = await insertOrder(isCod ? { ...baseRow, payment_method: "cod" } : baseRow);
+  // ponytail: COD before supabase-cod-migration.sql is applied — the payment_method
+  // column is missing, so store the order without it (payment_status 'cod_pending'
+  // still marks it as COD) and skip the stock RPC. Remove once the migration runs.
+  let codLegacy = false;
+  if (isCod && insertError && /payment_method/.test(insertError.message ?? "")) {
+    codLegacy = true;
+    ({ data: order, error: insertError } = await insertOrder(baseRow));
+  }
 
   if (insertError || !order) {
     console.error("create-order insert failed:", sanitizeForLog(insertError?.message));
@@ -242,7 +246,9 @@ export async function POST(req: NextRequest) {
   if (couponCode) {
     const reserved = await reserveCoupon(couponCode, order.id);
     if (reserved.status !== "ok") {
-      if (isCod) {
+      if (codLegacy) {
+        await supabase.from("orders").update({ payment_status: "cancelled", last_payment_error: `coupon_${reserved.status}` }).eq("id", order.id);
+      } else if (isCod) {
         await supabase.rpc("cancel_cod_order", { p_order_id: order.id, p_reason: `coupon_${reserved.status}` });
       } else {
         await supabase
@@ -257,7 +263,9 @@ export async function POST(req: NextRequest) {
   // COD: no Tranzila at all. The order goes straight to fulfillment, so its
   // stock (and coupon) is taken now, atomically, and given back on cancel.
   if (isCod) {
-    const { data: allocated, error: allocError } = await supabase.rpc("allocate_cod_order", { p_order_id: order.id });
+    const { data: allocated, error: allocError } = codLegacy
+      ? { data: "ok", error: null }
+      : await supabase.rpc("allocate_cod_order", { p_order_id: order.id });
     if (allocError || allocated !== "ok") {
       await supabase.rpc("cancel_cod_order", { p_order_id: order.id, p_reason: `allocate_${allocated ?? "error"}` });
       if (allocError) console.error("allocate_cod_order failed:", sanitizeForLog(allocError.message));
