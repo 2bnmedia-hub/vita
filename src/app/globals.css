@@ -358,7 +358,13 @@ html[data-copy-guard="on"] main :is(input, textarea, select, [contenteditable="t
    Admin area (light theme) — scoped to .admin-ui so the store is untouched
    ========================================================================== */
 .admin-ui { font-size: 16px; color-scheme: light; -webkit-font-smoothing: antialiased; }
-.admin-ui.bg-slate-100, .admin-ui .bg-slate-100.min-h-screen { background-color: #F5F5F7; }
+.admin-ui.bg-slate-100, .admin-ui .bg-slate-100.min-h-screen { background-color: #020B14; } /* site navy-950 */
+/* Text sitting directly on the navy canvas turns light; anything inside a white card keeps dark text. */
+.admin-ui :is(.admin-card, .bg-white) { color: #0f172a; }
+.admin-ui:is(.text-slate-900), .admin-ui :is(.text-slate-900, .text-slate-800, .text-slate-700):not(:is(.admin-card, .bg-white) *) { color: #fff; }
+.admin-ui :is(.text-slate-600, .text-slate-500):not(:is(.admin-card, .bg-white) *) { color: rgba(255, 255, 255, 0.65); }
+.admin-ui .admin-topbar :is(.hover\:text-slate-900, .hover\:text-teal-700):hover { color: #fff; }
+.admin-ui .admin-topbar .hover\:bg-slate-100:hover { background-color: rgba(255, 255, 255, 0.08); }
 .admin-card {
   background: #fff;
   border-radius: 18px;
@@ -368,8 +374,8 @@ html[data-copy-guard="on"] main :is(input, textarea, select, [contenteditable="t
 .admin-ui .text-3xl, .admin-ui .text-2xl { letter-spacing: -0.025em; }
 .admin-ui button, .admin-ui a { transition-property: color, background-color, border-color, transform, box-shadow; transition-duration: 150ms; }
 .admin-ui button:not(:disabled):active, .admin-ui a.rounded-full:active { transform: scale(0.97); }
-.admin-topbar { background: rgba(255, 255, 255, 0.72); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06); }
-@media (prefers-reduced-transparency: reduce) { .admin-topbar { background: #fff; backdrop-filter: none; } }
+.admin-topbar { background: rgba(2, 11, 20, 0.72); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08); }
+@media (prefers-reduced-transparency: reduce) { .admin-topbar { background: #020B14; backdrop-filter: none; } }
 @media (prefers-reduced-motion: reduce) { .admin-ui button:active, .admin-ui a:active { transform: none; } }
 .admin-ui ::selection { background: rgba(15, 118, 110, 0.18); color: #0f172a; }
 .admin-ui input, .admin-ui select, .admin-ui textarea { font-size: 16px; }
