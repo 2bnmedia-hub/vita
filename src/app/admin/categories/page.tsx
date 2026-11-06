@@ -1,5 +1,4 @@
 "use client";
-import { ADMIN_FIELD, ADMIN_LABEL } from "@/components/admin/ui";
 import { adminWrite } from "@/lib/adminApi";
 import { supabase } from "@/lib/auth";
 import { useEffect, useState } from "react";
@@ -60,15 +59,15 @@ export default function AdminCategories() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const field = ADMIN_FIELD;
-  const label = ADMIN_LABEL;
+  const field = "w-full bg-navy-800 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20";
+  const label = "text-white/50 text-xs font-bold uppercase tracking-wider block mb-1.5";
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div><h1 className="text-2xl font-semibold">קטגוריות</h1><p className="text-slate-600 text-sm">{cats.length} קטגוריות</p></div>
+      <div><h1 className="text-2xl font-black">קטגוריות</h1><p className="text-white/40 text-sm">{cats.length} קטגוריות</p></div>
       
-      <form onSubmit={handleSave} className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
-        <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">
+      <form onSubmit={handleSave} className="glass border border-white/[0.07] rounded-2xl p-6 space-y-4">
+        <h2 className="font-bold text-white/60 text-sm uppercase tracking-wider">
           {editing ? "✏️ עריכת: " + editing.name : "➕ קטגוריה חדשה"}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -78,47 +77,47 @@ export default function AdminCategories() {
         <div><label className={label}>תיאור</label><input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className={field} placeholder="תיאור הקטגוריה..." /></div>
         <div className="flex gap-3">
           <button type="submit" disabled={saving}
-            className="bg-teal-700 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-teal-800 transition-colors flex items-center gap-2 disabled:opacity-50">
+            className="bg-cyan text-navy-900 font-black px-5 py-2.5 rounded-xl text-sm hover:bg-cyan-600 transition-colors flex items-center gap-2 disabled:opacity-50">
             {saving ? "שומר..." : <><Plus className="w-4 h-4" />{editing ? "עדכן" : "הוסף"}</>}
           </button>
           {editing && (
             <button type="button" onClick={() => { setEditing(null); setForm({ name: "", slug: "", description: "" }); }}
-              className="bg-white border border-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm hover:text-slate-900 transition-all">
+              className="glass border border-white/[0.08] text-white/60 px-5 py-2.5 rounded-xl text-sm hover:text-white transition-all">
               ביטול
             </button>
           )}
         </div>
       </form>
 
-      <div className="admin-card overflow-hidden">
+      <div className="glass border border-white/[0.07] rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="h-32 flex items-center justify-center"><div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>
+          <div className="h-32 flex items-center justify-center"><div className="w-6 h-6 border-2 border-cyan border-t-transparent rounded-full animate-spin" /></div>
         ) : cats.length === 0 ? (
-          <div className="text-center py-10 text-slate-500"><Tag className="w-8 h-8 mx-auto mb-2 opacity-30" /><p>אין קטגוריות עדיין</p></div>
+          <div className="text-center py-10 text-white/30"><Tag className="w-8 h-8 mx-auto mb-2 opacity-30" /><p>אין קטגוריות עדיין</p></div>
         ) : (
-          <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
-            <thead><tr className="border-b border-slate-200">
-              <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase">שם</th>
-              <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase hidden md:table-cell">Slug</th>
-              <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase hidden md:table-cell">תיאור</th>
+          <table className="w-full">
+            <thead><tr className="border-b border-white/[0.06]">
+              <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase">שם</th>
+              <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase hidden md:table-cell">Slug</th>
+              <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase hidden md:table-cell">תיאור</th>
               <th className="px-5 py-3" />
             </tr></thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.04]">
               {cats.map(c => (
-                <tr key={c.id} className="hover:bg-slate-50">
-                  <td className="px-5 py-4"><span className="font-semibold text-slate-900 text-sm">{c.name}</span></td>
-                  <td className="px-5 py-4 hidden md:table-cell"><span className="text-slate-600 text-xs font-mono">{c.slug}</span></td>
-                  <td className="px-5 py-4 hidden md:table-cell"><span className="text-slate-600 text-xs">{c.description ?? "—"}</span></td>
+                <tr key={c.id} className="hover:bg-white/[0.02]">
+                  <td className="px-5 py-4"><span className="font-semibold text-white text-sm">{c.name}</span></td>
+                  <td className="px-5 py-4 hidden md:table-cell"><span className="text-white/40 text-xs font-mono">{c.slug}</span></td>
+                  <td className="px-5 py-4 hidden md:table-cell"><span className="text-white/40 text-xs">{c.description ?? "—"}</span></td>
                   <td className="px-5 py-4">
                     <div className="flex gap-2 justify-end">
-                      <button onClick={() => startEdit(c)} className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:text-teal-700 hover:border-teal-300 transition-all"><Edit className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => handleDelete(c.id, c.name)} className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:text-red-700 hover:border-red-200 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => startEdit(c)} className="w-8 h-8 rounded-lg glass flex items-center justify-center hover:text-cyan hover:border-cyan/30 transition-all"><Edit className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDelete(c.id, c.name)} className="w-8 h-8 rounded-lg glass flex items-center justify-center hover:text-red-400 hover:border-red-500/30 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table></div>
+          </table>
         )}
       </div>
     </div>

@@ -5,11 +5,11 @@ import { ShoppingBag, ChevronDown, Trash2, X, Mail, Phone, User, Clock, Send, Se
 import toast from "react-hot-toast";
 
 const statusColors: Record<string, string> = {
-  pending:   "bg-amber-50 text-amber-800 border-amber-200",
-  confirmed: "bg-teal-50 text-teal-800 border-teal-200",
-  shipped:   "bg-blue-50 text-blue-800 border-blue-200",
-  delivered: "bg-green-50 text-green-800 border-green-200",
-  cancelled: "bg-red-50 text-red-800 border-red-200",
+  pending:   "bg-amber-500/15 text-amber-400 border-amber-500/20",
+  confirmed: "bg-cyan/15 text-cyan border-cyan/20",
+  shipped:   "bg-blue-500/15 text-blue-400 border-blue-500/20",
+  delivered: "bg-green-500/15 text-green-400 border-green-500/20",
+  cancelled: "bg-red-500/15 text-red-400 border-red-500/20",
 };
 
 const statusLabels: Record<string, string> = {
@@ -21,13 +21,13 @@ const statusLabels: Record<string, string> = {
 };
 
 const paymentColors: Record<string, string> = {
-  pending:            "bg-amber-50 text-amber-800 border-amber-200",
-  cod_pending:        "bg-orange-50 text-orange-800 border-orange-200",
-  paid:               "bg-green-50 text-green-800 border-green-200",
-  payment_failed:     "bg-red-50 text-red-800 border-red-200",
-  cancelled:          "bg-slate-100 text-slate-700 border-slate-200",
-  refunded:           "bg-purple-50 text-purple-800 border-purple-200",
-  partially_refunded: "bg-purple-50 text-purple-800 border-purple-200",
+  pending:            "bg-amber-500/15 text-amber-400 border-amber-500/20",
+  cod_pending:        "bg-orange-500/15 text-orange-400 border-orange-500/20",
+  paid:               "bg-green-500/15 text-green-400 border-green-500/20",
+  payment_failed:     "bg-red-500/15 text-red-400 border-red-500/20",
+  cancelled:          "bg-white/10 text-white/50 border-white/10",
+  refunded:           "bg-purple-500/15 text-purple-400 border-purple-500/20",
+  partially_refunded: "bg-purple-500/15 text-purple-400 border-purple-500/20",
 };
 
 const paymentLabels: Record<string, string> = {
@@ -179,24 +179,24 @@ export default function AdminOrders() {
   return (
     <div className="space-y-6" dir="rtl">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">הזמנות</h1>
-        <p className="text-slate-600 text-sm">{filteredOrders.length} מתוך {orders.length} הזמנות</p>
+        <h1 className="text-2xl font-black text-white">הזמנות</h1>
+        <p className="text-white/40 text-sm">{filteredOrders.length} מתוך {orders.length} הזמנות</p>
       </div>
 
-      <div className="admin-card p-4 flex flex-wrap gap-3 items-center">
+      <div className="glass border border-white/[0.07] rounded-2xl p-4 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
+          <Search className="w-4 h-4 text-white/30 absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="חיפוש לפי שם, אימייל, טלפון, מספר הזמנה..."
-            className="w-full bg-white border border-slate-200 rounded-xl pr-9 pl-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none"
+            className="w-full bg-navy-800 border border-white/[0.08] rounded-xl pr-9 pl-3 py-2 text-sm text-white placeholder-white/25 focus:border-cyan/40 focus:outline-none"
           />
         </div>
         <select
           value={paymentFilter}
           onChange={(e) => setPaymentFilter(e.target.value)}
-          className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:border-teal-600 focus:outline-none"
+          className="bg-navy-800 border border-white/[0.08] rounded-xl px-3 py-2 text-sm text-white focus:border-cyan/40 focus:outline-none"
         >
           <option value="all">כל סטטוסי התשלום</option>
           {Object.entries(paymentLabels).map(([v, l]) => (
@@ -204,37 +204,37 @@ export default function AdminOrders() {
           ))}
         </select>
         <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}
-          className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:border-teal-600 focus:outline-none" />
-        <span className="text-slate-500 text-xs">עד</span>
+          className="bg-navy-800 border border-white/[0.08] rounded-xl px-3 py-2 text-sm text-white focus:border-cyan/40 focus:outline-none" />
+        <span className="text-white/30 text-xs">עד</span>
         <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)}
-          className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:border-teal-600 focus:outline-none" />
+          className="bg-navy-800 border border-white/[0.08] rounded-xl px-3 py-2 text-sm text-white focus:border-cyan/40 focus:outline-none" />
       </div>
 
-      <div className="admin-card overflow-hidden overflow-x-auto">
+      <div className="glass border border-white/[0.07] rounded-2xl overflow-hidden overflow-x-auto">
         {loading ? (
           <div className="h-32 flex items-center justify-center">
-            <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-white/30">
             <ShoppingBag className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p>אין הזמנות תואמות</p>
           </div>
         ) : (
           <table className="w-full min-w-[900px]">
             <thead>
-              <tr className="border-b border-slate-200">
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase w-8"></th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase">מס&apos; הזמנה</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase">לקוח</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase hidden md:table-cell">תאריך</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase">סכום</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase">תשלום</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase">משלוח</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase w-24"></th>
+              <tr className="border-b border-white/[0.06]">
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase w-8"></th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase">מס&apos; הזמנה</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase">לקוח</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase hidden md:table-cell">תאריך</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase">סכום</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase">תשלום</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase">משלוח</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase w-24"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.04]">
               {filteredOrders.map((o) => {
                 const orderItems: any[] = Array.isArray(o.items) ? o.items : [];
                 const isExpanded = expandedId === o.id;
@@ -242,56 +242,56 @@ export default function AdminOrders() {
                 return (
                   <React.Fragment key={o.id}>
                     <tr
-                      className="hover:bg-slate-50 cursor-pointer"
+                      className="hover:bg-white/[0.02] cursor-pointer"
                       onClick={() => setExpandedId(isExpanded ? null : o.id)}
                     >
                       <td className="px-5 py-4">
                         <ChevronDown
-                          className={`w-4 h-4 text-slate-500 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                          className={`w-4 h-4 text-white/30 transition-transform ${isExpanded ? "rotate-180" : ""}`}
                           aria-hidden="true"
                         />
                       </td>
                       <td className="px-5 py-4">
-                        <span dir="ltr" className="text-slate-700 text-xs font-mono whitespace-nowrap">{o.order_number ?? `#${String(o.id).slice(0, 8)}`}</span>
+                        <span className="text-white/60 text-xs font-mono">{o.order_number ?? `#${String(o.id).slice(0, 8)}`}</span>
                       </td>
                       <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => setCustomerModal({ email: o.customer_email, name: o.customer_name, phone: o.customer_phone ?? null })}
                           className="text-right group"
                         >
-                          <p className="font-semibold text-slate-900 text-sm group-hover:text-teal-700 transition-colors underline decoration-slate-300 underline-offset-2 group-hover:decoration-cyan/50">{o.customer_name}</p>
-                          <p className="text-slate-500 text-xs">{o.customer_email}</p>
-                          {o.customer_phone && <p className="text-slate-500 text-xs">{o.customer_phone}</p>}
+                          <p className="font-semibold text-white text-sm group-hover:text-cyan transition-colors underline decoration-white/20 underline-offset-2 group-hover:decoration-cyan/50">{o.customer_name}</p>
+                          <p className="text-white/30 text-xs">{o.customer_email}</p>
+                          {o.customer_phone && <p className="text-white/30 text-xs">{o.customer_phone}</p>}
                         </button>
                       </td>
                       <td className="px-5 py-4 hidden md:table-cell">
-                        <span className="text-slate-600 text-xs">
+                        <span className="text-white/40 text-xs">
                           {new Date(o.created_at).toLocaleDateString("he-IL")} {new Date(o.created_at).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <span className="font-bold text-slate-900">₪{Number(o.total).toLocaleString("he-IL")}</span>
+                        <span className="font-bold text-white">₪{Number(o.total).toLocaleString("he-IL")}</span>
                         {o.coupon_code && (
-                          <p className="text-teal-700 text-xs mt-0.5">קופון {o.coupon_code} · ‎-₪{Number(o.discount_amount ?? 0).toLocaleString("he-IL")}</p>
+                          <p className="text-cyan/70 text-xs mt-0.5">קופון {o.coupon_code} · ‎-₪{Number(o.discount_amount ?? 0).toLocaleString("he-IL")}</p>
                         )}
                       </td>
                       <td className="px-5 py-4">
-                        <span className={`inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-bold border ${paymentColors[paymentStatus] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${paymentColors[paymentStatus] ?? "bg-white/10 text-white/50 border-white/10"}`}>
                           {paymentLabels[paymentStatus] ?? paymentStatus}
                         </span>
                         {o.payment_method === "cod" && (
-                          <p className="text-slate-600 text-xs mt-1">תשלום לשליח{paymentStatus === "cod_pending" ? ` · לגבייה ₪${Number(o.total).toLocaleString("he-IL")}` : ""}</p>
+                          <p className="text-white/40 text-xs mt-1">תשלום לשליח{paymentStatus === "cod_pending" ? ` · לגבייה ₪${Number(o.total).toLocaleString("he-IL")}` : ""}</p>
                         )}
                       </td>
                       <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
-                        <div className={`relative inline-flex items-center rounded-full border ${statusColors[o.status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
+                        <div className={`relative inline-flex items-center rounded-full border ${statusColors[o.status] ?? "bg-white/10 text-white/50 border-white/10"}`}>
                           <select
                             value={o.status}
                             onChange={(e) => updateStatus(o.id, e.target.value)}
                             className="appearance-none bg-transparent pl-7 pr-3 py-1.5 rounded-full text-xs font-bold cursor-pointer outline-none"
                           >
                             {Object.entries(statusLabels).map(([v, l]) => (
-                              <option key={v} value={v} className="bg-white text-slate-900">{l}</option>
+                              <option key={v} value={v} className="bg-navy-800 text-white">{l}</option>
                             ))}
                           </select>
                           <ChevronDown className="w-3 h-3 absolute left-2 pointer-events-none opacity-70" aria-hidden="true" />
@@ -305,10 +305,10 @@ export default function AdminOrders() {
                               disabled={markingPaidId === o.id}
                               aria-label="סמן שהתשלום התקבל"
                               title="סמן שהתשלום התקבל"
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-green-700 hover:bg-green-50 transition-all disabled:opacity-40"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-green-400 hover:bg-green-500/10 transition-all disabled:opacity-40"
                             >
                               {markingPaidId === o.id ? (
-                                <div className="w-4 h-4 border-2 border-slate-300 border-t-white rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                               ) : (
                                 <Banknote className="w-4 h-4" aria-hidden="true" />
                               )}
@@ -319,10 +319,10 @@ export default function AdminOrders() {
                               onClick={() => refundOrder(o.id)}
                               disabled={refundingId === o.id}
                               aria-label="זכה הזמנה"
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-all disabled:opacity-40"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-purple-400 hover:bg-purple-500/10 transition-all disabled:opacity-40"
                             >
                               {refundingId === o.id ? (
-                                <div className="w-4 h-4 border-2 border-slate-300 border-t-white rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                               ) : (
                                 <RotateCcw className="w-4 h-4" aria-hidden="true" />
                               )}
@@ -331,14 +331,14 @@ export default function AdminOrders() {
                           <button
                             onClick={() => { setEmailModal({ id: o.id, email: o.customer_email, name: o.customer_name }); setEmailText(""); }}
                             aria-label="שלח הודעה ללקוח"
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-teal-700 hover:bg-teal-50 transition-all"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-cyan hover:bg-cyan/10 transition-all"
                           >
                             <Mail className="w-4 h-4" aria-hidden="true" />
                           </button>
                           <button
                             onClick={() => deleteOrder(o.id)}
                             aria-label="מחק הזמנה"
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-red-700 hover:bg-red-50 transition-all"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all"
                           >
                             <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </button>
@@ -346,47 +346,47 @@ export default function AdminOrders() {
                       </td>
                     </tr>
                     {isExpanded && (
-                      <tr className="bg-slate-50">
+                      <tr className="bg-white/[0.015]">
                         <td colSpan={8} className="px-5 py-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               {orderItems.length === 0 ? (
-                                <p className="text-slate-500 text-xs">אין פרטי מוצרים להזמנה זו</p>
+                                <p className="text-white/30 text-xs">אין פרטי מוצרים להזמנה זו</p>
                               ) : (
                                 <div className="space-y-2">
-                                  <p className="text-slate-600 text-xs font-bold uppercase mb-2">מוצרים בהזמנה</p>
+                                  <p className="text-white/40 text-xs font-bold uppercase mb-2">מוצרים בהזמנה</p>
                                   {orderItems.map((it, idx) => (
-                                    <div key={idx} className="flex items-center justify-between text-sm bg-slate-50 rounded-lg px-3 py-2">
-                                      <span className="text-slate-700">{it.name ?? it.product_id ?? "—"}</span>
-                                      <span className="text-slate-600 text-xs">כמות: {it.quantity ?? 1}</span>
-                                      <span className="text-slate-900 font-semibold">₪{Number(it.price ?? 0).toLocaleString("he-IL")}</span>
+                                    <div key={idx} className="flex items-center justify-between text-sm bg-white/[0.03] rounded-lg px-3 py-2">
+                                      <span className="text-white/80">{it.name ?? it.product_id ?? "—"}</span>
+                                      <span className="text-white/40 text-xs">כמות: {it.quantity ?? 1}</span>
+                                      <span className="text-white font-semibold">₪{Number(it.price ?? 0).toLocaleString("he-IL")}</span>
                                     </div>
                                   ))}
                                 </div>
                               )}
-                              <p className="text-slate-600 text-xs mt-3">כתובת: {o.address ?? "—"}{o.city ? `, ${o.city}` : ""}{o.zip ? ` (${o.zip})` : ""}</p>
-                              {o.notes && <p className="text-slate-600 text-xs mt-1">הערות: {o.notes}</p>}
+                              <p className="text-white/40 text-xs mt-3">כתובת: {o.address ?? "—"}{o.city ? `, ${o.city}` : ""}{o.zip ? ` (${o.zip})` : ""}</p>
+                              {o.notes && <p className="text-white/40 text-xs mt-1">הערות: {o.notes}</p>}
                             </div>
-                            <div className="bg-slate-50 rounded-lg p-3 space-y-1.5">
-                              <p className="text-slate-600 text-xs font-bold uppercase mb-1 flex items-center gap-1.5">
+                            <div className="bg-white/[0.03] rounded-lg p-3 space-y-1.5">
+                              <p className="text-white/40 text-xs font-bold uppercase mb-1 flex items-center gap-1.5">
                                 <CreditCard className="w-3.5 h-3.5" aria-hidden="true" /> פרטי תשלום
                               </p>
                               {o.payment_method === "cod" && (
                                 <>
-                                  <p className="text-slate-700 text-xs">אמצעי תשלום: <span className="font-bold text-slate-700">תשלום לשליח</span></p>
-                                  <p className="text-slate-700 text-xs">סכום לגבייה בעת המסירה: ₪{Number(o.total).toLocaleString("he-IL")}</p>
+                                  <p className="text-white/60 text-xs">אמצעי תשלום: <span className="font-bold text-white/80">תשלום לשליח</span></p>
+                                  <p className="text-white/60 text-xs">סכום לגבייה בעת המסירה: ₪{Number(o.total).toLocaleString("he-IL")}</p>
                                   {o.cod_collected_at && (
-                                    <p className="text-green-800 text-xs">התקבל ב: {new Date(o.cod_collected_at).toLocaleString("he-IL")} · סומן ע&quot;י {o.cod_collected_by}</p>
+                                    <p className="text-green-400/80 text-xs">התקבל ב: {new Date(o.cod_collected_at).toLocaleString("he-IL")} · סומן ע&quot;י {o.cod_collected_by}</p>
                                   )}
                                 </>
                               )}
-                              <p className="text-slate-700 text-xs">מזהה עסקת Tranzila: <span className="font-mono">{o.tranzila_transaction_id ?? "—"}</span></p>
-                              <p className="text-slate-700 text-xs">מספר אישור: <span className="font-mono">{o.tranzila_confirmation_code ?? "—"}</span></p>
-                              <p className="text-slate-700 text-xs">אמצעי תשלום: {o.payment_method_brand ?? "—"} {o.card_last4 ? `•••• ${o.card_last4}` : ""}</p>
-                              <p className="text-slate-700 text-xs">סביבה: {o.payment_env ?? "—"}</p>
-                              {o.paid_at && <p className="text-slate-700 text-xs">שולם ב: {new Date(o.paid_at).toLocaleString("he-IL")}</p>}
-                              {o.last_payment_error && <p className="text-red-800 text-xs">שגיאה אחרונה: {o.last_payment_error}</p>}
-                              {Number(o.refunded_amount ?? 0) > 0 && <p className="text-purple-800 text-xs">זוכה: ₪{Number(o.refunded_amount).toLocaleString("he-IL")}</p>}
+                              <p className="text-white/60 text-xs">מזהה עסקת Tranzila: <span className="font-mono">{o.tranzila_transaction_id ?? "—"}</span></p>
+                              <p className="text-white/60 text-xs">מספר אישור: <span className="font-mono">{o.tranzila_confirmation_code ?? "—"}</span></p>
+                              <p className="text-white/60 text-xs">אמצעי תשלום: {o.payment_method_brand ?? "—"} {o.card_last4 ? `•••• ${o.card_last4}` : ""}</p>
+                              <p className="text-white/60 text-xs">סביבה: {o.payment_env ?? "—"}</p>
+                              {o.paid_at && <p className="text-white/60 text-xs">שולם ב: {new Date(o.paid_at).toLocaleString("he-IL")}</p>}
+                              {o.last_payment_error && <p className="text-red-400 text-xs">שגיאה אחרונה: {o.last_payment_error}</p>}
+                              {Number(o.refunded_amount ?? 0) > 0 && <p className="text-purple-400 text-xs">זוכה: ₪{Number(o.refunded_amount).toLocaleString("he-IL")}</p>}
                             </div>
                           </div>
                         </td>
@@ -402,26 +402,26 @@ export default function AdminOrders() {
 
       {customerModal && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => setCustomerModal(null)}
         >
           <div
-            className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col"
-            style={{ boxShadow: "0 12px 32px rgba(15,23,42,0.12)" }}
+            className="bg-navy-900 border border-white/[0.08] rounded-2xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col"
+            style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-5 border-b border-slate-200 flex items-start justify-between shrink-0">
+            <div className="px-6 py-5 border-b border-white/[0.06] flex items-start justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center">
-                  <User className="w-5 h-5 text-teal-700" aria-hidden="true" />
+                <div className="w-11 h-11 rounded-xl bg-cyan/10 border border-cyan/20 flex items-center justify-center">
+                  <User className="w-5 h-5 text-cyan" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">{customerModal.name}</p>
-                  <p className="text-slate-600 text-xs flex items-center gap-1.5 mt-0.5">
+                  <p className="font-black text-white">{customerModal.name}</p>
+                  <p className="text-white/40 text-xs flex items-center gap-1.5 mt-0.5">
                     <Mail className="w-3 h-3" aria-hidden="true" />{customerModal.email}
                   </p>
                   {customerModal.phone && (
-                    <p className="text-slate-600 text-xs flex items-center gap-1.5 mt-0.5">
+                    <p className="text-white/40 text-xs flex items-center gap-1.5 mt-0.5">
                       <Phone className="w-3 h-3" aria-hidden="true" />{customerModal.phone}
                     </p>
                   )}
@@ -430,16 +430,16 @@ export default function AdminOrders() {
               <button
                 onClick={() => setCustomerModal(null)}
                 aria-label="סגור"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all shrink-0"
               >
                 <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
-            <div className="overflow-y-auto divide-y divide-slate-100">
+            <div className="overflow-y-auto divide-y divide-white/[0.04]">
               {(() => {
                 const custOrders = orders.filter((o) => o.customer_email === customerModal.email);
                 return custOrders.length === 0 ? (
-                  <div className="text-center py-10 text-slate-500">
+                  <div className="text-center py-10 text-white/30">
                     <Clock className="w-8 h-8 mx-auto mb-2 opacity-30" aria-hidden="true" />
                     <p className="text-sm">אין הזמנות</p>
                   </div>
@@ -448,20 +448,20 @@ export default function AdminOrders() {
                   return (
                     <div key={o.id} className="px-6 py-4">
                       <div className="flex items-center justify-between gap-4">
-                        <p className="text-slate-700 text-xs">{new Date(o.created_at).toLocaleDateString("he-IL")}</p>
+                        <p className="text-white/70 text-xs">{new Date(o.created_at).toLocaleDateString("he-IL")}</p>
                         <div className="flex items-center gap-3 shrink-0">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${statusColors[o.status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${statusColors[o.status] ?? "bg-white/10 text-white/50 border-white/10"}`}>
                             {statusLabels[o.status] ?? o.status}
                           </span>
-                          <span className="font-semibold text-slate-900 text-sm">₪{Number(o.total).toLocaleString("he-IL")}</span>
+                          <span className="font-black text-white text-sm">₪{Number(o.total).toLocaleString("he-IL")}</span>
                         </div>
                       </div>
                       <div className="mt-2 space-y-1">
                         {custItems.length === 0 ? (
-                          <p className="text-slate-500 text-xs">אין פרטי מוצרים</p>
+                          <p className="text-white/30 text-xs">אין פרטי מוצרים</p>
                         ) : custItems.map((it, idx) => (
-                          <p key={idx} className="text-slate-700 text-xs">
-                            {it.name ?? it.product_id ?? "—"} <span className="text-slate-500">× {it.quantity ?? 1}</span>
+                          <p key={idx} className="text-white/60 text-xs">
+                            {it.name ?? it.product_id ?? "—"} <span className="text-white/30">× {it.quantity ?? 1}</span>
                           </p>
                         ))}
                       </div>
@@ -470,8 +470,8 @@ export default function AdminOrders() {
                 });
               })()}
             </div>
-            <div className="px-6 py-3 border-t border-slate-200 shrink-0">
-              <p className="text-slate-500 text-xs">
+            <div className="px-6 py-3 border-t border-white/[0.06] shrink-0">
+              <p className="text-white/30 text-xs">
                 סה&quot;כ {orders.filter((o) => o.customer_email === customerModal.email).length} הזמנות
               </p>
             </div>
@@ -481,34 +481,34 @@ export default function AdminOrders() {
 
       {emailModal && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => !sendingEmail && setEmailModal(null)}
         >
           <div
-            className="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden flex flex-col"
-            style={{ boxShadow: "0 12px 32px rgba(15,23,42,0.12)" }}
+            className="bg-navy-900 border border-white/[0.08] rounded-2xl w-full max-w-md overflow-hidden flex flex-col"
+            style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-5 border-b border-slate-200 flex items-start justify-between">
+            <div className="px-6 py-5 border-b border-white/[0.06] flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-teal-700" aria-hidden="true" />
+                <div className="w-11 h-11 rounded-xl bg-cyan/10 border border-cyan/20 flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-cyan" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">שליחת הודעה ללקוח</p>
-                  <p className="text-slate-600 text-xs mt-0.5">{emailModal.name} · {emailModal.email}</p>
+                  <p className="font-black text-white">שליחת הודעה ללקוח</p>
+                  <p className="text-white/40 text-xs mt-0.5">{emailModal.name} · {emailModal.email}</p>
                 </div>
               </div>
               <button
                 onClick={() => setEmailModal(null)}
                 aria-label="סגור"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all shrink-0"
               >
                 <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
             <div className="px-6 py-5 space-y-3">
-              <p className="text-slate-500 text-xs font-bold uppercase">תבניות מהירות</p>
+              <p className="text-white/30 text-xs font-bold uppercase">תבניות מהירות</p>
               <div className="flex flex-wrap gap-2">
                 {emailPresets.map((p) => (
                   <button
@@ -517,7 +517,7 @@ export default function AdminOrders() {
                     className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${
                       emailText === p.message
                         ? statusColors[p.status]
-                        : "bg-slate-50 border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300"
+                        : "bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20"
                     }`}
                   >
                     {p.label}
@@ -529,23 +529,23 @@ export default function AdminOrders() {
                 onChange={(e) => setEmailText(e.target.value)}
                 rows={5}
                 placeholder="כתוב כאן את ההודעה ללקוח..."
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder-slate-400 outline-none focus:border-teal-600 resize-none"
+                className="w-full bg-white/5 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 outline-none focus:border-cyan/40 resize-none"
               />
             </div>
-            <div className="px-6 py-4 border-t border-slate-200 flex justify-end gap-2">
+            <div className="px-6 py-4 border-t border-white/[0.06] flex justify-end gap-2">
               <button
                 onClick={() => setEmailModal(null)}
-                className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all"
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-white/50 hover:text-white transition-all"
               >
                 ביטול
               </button>
               <button
                 onClick={sendCustomerEmail}
                 disabled={sendingEmail || !emailText.trim()}
-                className="flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-semibold px-5 py-2 rounded-full text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black px-5 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {sendingEmail ? (
-                  <div className="w-4 h-4 border-2 border-slate-300 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                 ) : (
                   <Send className="w-4 h-4" aria-hidden="true" />
                 )}

@@ -132,62 +132,62 @@ export default function AdminProducts() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">מוצרים</h1>
-          <p className="text-slate-600 text-sm">{products.length} מוצרים</p>
+          <h1 className="text-2xl font-black text-white">מוצרים</h1>
+          <p className="text-white/40 text-sm">{products.length} מוצרים</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={downloadTemplate}
-            className="flex items-center gap-2 bg-white border border-slate-200 hover:border-teal-300 text-slate-700 hover:text-slate-900 font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
+            className="flex items-center gap-2 glass border border-white/[0.08] hover:border-cyan/30 text-white/70 hover:text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
             <Download className="w-4 h-4" /> טמפלט CSV
           </button>
           <button onClick={() => fileRef.current?.click()} disabled={importing}
-            className="flex items-center gap-2 bg-white border border-slate-200 border border-green-200 hover:border-green-400/60 text-green-800 font-bold px-4 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50">
+            className="flex items-center gap-2 glass border border-green-400/30 hover:border-green-400/60 text-green-400 font-bold px-4 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50">
             <Upload className="w-4 h-4" /> {importing ? "מייבא..." : "ייבא CSV/Excel"}
           </button>
           <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleImport} className="hidden" />
           <Link href="/admin/products/new"
-            className="flex items-center gap-2 bg-teal-700 text-white font-bold px-4 py-2.5 rounded-full text-sm hover:bg-teal-800 transition-colors">
+            className="flex items-center gap-2 bg-cyan text-navy-900 font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-cyan-600 transition-colors">
             <Plus className="w-4 h-4" /> מוצר חדש
           </Link>
         </div>
       </div>
 
       {/* Import info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-blue-800 text-xs">
+      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-3 text-blue-300 text-xs">
         💡 הורד את טמפלט ה-CSV, מלא את המוצרים ב-Excel, ואז ייבא חזרה. מוצרים קיימים יתעדכנו לפי ה-slug.
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+        <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="חפש מוצר..."
-          className="w-full bg-white border border-slate-200 rounded-xl pr-11 pl-4 py-3 text-slate-900 text-sm placeholder-slate-400" />
+          className="w-full bg-navy-800 border border-white/[0.08] rounded-xl pr-11 pl-4 py-3 text-white text-sm placeholder-white/25" />
       </div>
 
       {/* Table */}
       {loading ? (
         <div className="space-y-3">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-white animate-pulse" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-navy-800 animate-pulse" />)}
         </div>
       ) : (
-        <div className="admin-card overflow-hidden">
-          <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
+        <div className="glass border border-white/[0.07] rounded-2xl overflow-hidden">
+          <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-200">
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">מוצר</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider hidden md:table-cell">טעם</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">מחיר</th>
-                <th className="text-right px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider hidden md:table-cell">מלאי</th>
+              <tr className="border-b border-white/[0.06]">
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase tracking-wider">מוצר</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase tracking-wider hidden md:table-cell">טעם</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase tracking-wider">מחיר</th>
+                <th className="text-right px-5 py-3 text-xs font-bold text-white/40 uppercase tracking-wider hidden md:table-cell">מלאי</th>
                 <th className="px-5 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.04]">
               {filtered.map(p => (
-                <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-navy-700 overflow-hidden flex-shrink-0">
                         <ProductImage
                           key={p.images?.[0] ?? p.id}
                           src={p.images?.[0]}
@@ -197,21 +197,21 @@ export default function AdminProducts() {
                         />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm">{p.name}</p>
-                        <p className="text-slate-500 text-xs">{p.weight}</p>
+                        <p className="font-semibold text-white text-sm">{p.name}</p>
+                        <p className="text-white/30 text-xs">{p.weight}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
-                    <span className="text-slate-600 text-sm">{p.flavor ?? "—"}</span>
+                    <span className="text-white/50 text-sm">{p.flavor ?? "—"}</span>
                   </td>
                   <td className="px-5 py-4">
-                    <span className="font-bold text-slate-900">₪{p.price}</span>
-                    {p.compare_price && <span className="text-slate-500 text-xs line-through mr-1">₪{p.compare_price}</span>}
+                    <span className="font-bold text-white">₪{p.price}</span>
+                    {p.compare_price && <span className="text-white/30 text-xs line-through mr-1">₪{p.compare_price}</span>}
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${p.in_stock ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}>
+                      <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${p.in_stock ? "bg-green-500/15 text-green-400" : "bg-red-500/15 text-red-400"}`}>
                         {p.in_stock ? "במלאי" : "אזל"}
                       </span>
                       <input
@@ -226,7 +226,7 @@ export default function AdminProducts() {
                           await adminWrite("products", { op: "update", id: p.id, values: { stock_quantity: value } });
                           fetchProducts();
                         }}
-                        className="w-20 bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none"
+                        className="w-20 bg-navy-800 border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-white placeholder-white/25 focus:border-cyan/40 focus:outline-none"
                       />
                     </div>
                   </td>
@@ -234,15 +234,15 @@ export default function AdminProducts() {
                     <div className="flex items-center gap-2 justify-end">
                       <Link href={"/shop/" + encodeURIComponent(p.slug)} target="_blank" rel="noreferrer"
                         aria-label={`צפה באתר במוצר ${p.name}`} title="צפייה באתר"
-                        className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:border-teal-300 hover:text-teal-700 transition-all">
+                        className="w-8 h-8 rounded-lg glass flex items-center justify-center hover:border-cyan/30 hover:text-cyan transition-all">
                         <Eye className="w-3.5 h-3.5" />
                       </Link>
                       <Link href={"/admin/products/" + p.id}
-                        className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:border-teal-300 hover:text-teal-700 transition-all">
+                        className="w-8 h-8 rounded-lg glass flex items-center justify-center hover:border-cyan/30 hover:text-cyan transition-all">
                         <Edit className="w-3.5 h-3.5" />
                       </Link>
                       <button onClick={() => handleDelete(p.id, p.name)}
-                        className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:border-red-200 hover:text-red-700 transition-all">
+                        className="w-8 h-8 rounded-lg glass flex items-center justify-center hover:border-red-500/30 hover:text-red-400 transition-all">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -250,9 +250,9 @@ export default function AdminProducts() {
                 </tr>
               ))}
             </tbody>
-          </table></div>
+          </table>
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-slate-500">
+            <div className="text-center py-12 text-white/30">
               <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p>לא נמצאו מוצרים</p>
             </div>

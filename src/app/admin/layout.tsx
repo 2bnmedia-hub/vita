@@ -13,9 +13,9 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
     <AdminShell>
       {children}
       <Toaster position="bottom-center" toastOptions={{
-        style: { background: "#fff", color: "#0f172a", border: "1px solid #e2e8f0", fontFamily: "Heebo, sans-serif", direction: "rtl", fontSize: 15 },
-        success: { iconTheme: { primary: "#0f766e", secondary: "#fff" } },
-        error: { iconTheme: { primary: "#b91c1c", secondary: "#fff" } },
+        style: { background: "#0F2238", color: "#fff", border: "1px solid rgba(0,212,255,0.2)", fontFamily: "Heebo, sans-serif", direction: "rtl" },
+        success: { iconTheme: { primary: "#00D4FF", secondary: "#0B1929" } },
+        error: { iconTheme: { primary: "#ef4444", secondary: "#fff" } },
       }} />
     </AdminShell>
   );
