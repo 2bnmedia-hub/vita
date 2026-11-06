@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, ChevronRight, Star, Shield, Truck, RotateCcw, Percent } from "lucide-react";
+import { ShoppingCart, ChevronRight, Star, Shield, Truck, RotateCcw, Percent, Pill, Layers, Scale, type LucideIcon } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, calcDiscount } from "@/lib/utils";
 import type { Product } from "@/types";
@@ -166,9 +166,9 @@ export function ProductDetailClient({
 
             {/* Specs chips */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {product.weight && <Chip>{product.weight}</Chip>}
-              {product.servings && <Chip>{product.servings} מנות</Chip>}
-              {product.serving_size && <Chip>{product.serving_size} / מנה</Chip>}
+              {product.weight && <Chip icon={Pill} tone="cyan">{product.weight}</Chip>}
+              {product.servings && <Chip icon={Layers} tone="violet">{product.servings} מנות</Chip>}
+              {product.serving_size && <Chip icon={Scale} tone="amber">{product.serving_size} / מנה</Chip>}
               {!product.in_stock && (
                 <Chip className="border-red-500/30 text-red-400">אזל המלאי</Chip>
               )}
@@ -253,17 +253,28 @@ export function ProductDetailClient({
   );
 }
 
+const CHIP_TONES = {
+  cyan: "bg-cyan/10 border-cyan/30 text-cyan",
+  violet: "bg-violet-500/10 border-violet-400/30 text-violet-300",
+  amber: "bg-amber-500/10 border-amber-400/30 text-amber-300",
+} as const;
+
 function Chip({
   children,
   className = "",
+  icon: Icon,
+  tone,
 }: {
   children: React.ReactNode;
   className?: string;
+  icon?: LucideIcon;
+  tone?: keyof typeof CHIP_TONES;
 }) {
   return (
     <span
-      className={`px-3 py-1 rounded-lg bg-navy-700/60 border border-white/[0.08] text-white/50 text-xs font-medium ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold ${tone ? CHIP_TONES[tone] : "bg-navy-700/60 border-white/[0.08] text-white/50"} ${className}`}
     >
+      {Icon && <Icon className="w-3.5 h-3.5" aria-hidden="true" />}
       {children}
     </span>
   );
