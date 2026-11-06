@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, ChevronRight, Star, Shield, Truck, RotateCcw, Percent, Pill, Layers, Scale, type LucideIcon } from "lucide-react";
+import { ShoppingCart, ChevronRight, Star, Shield, Truck, RotateCcw, Percent, Pill, Layers, Scale, CircleCheck, type LucideIcon } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, calcDiscount } from "@/lib/utils";
 import type { Product } from "@/types";
@@ -153,19 +153,9 @@ export function ProductDetailClient({
               )}
             </div>
 
-            {/* Stock availability */}
-            {product.in_stock && (
-              <p className="inline-flex items-center gap-2 mb-4 px-3.5 py-1.5 rounded-xl bg-green-500/15 border border-green-500/40 text-green-400 text-sm font-bold">
-                <span className="relative flex w-2.5 h-2.5" aria-hidden="true">
-                  <span className="absolute inset-0 rounded-full bg-green-400 opacity-75 animate-ping motion-reduce:animate-none" />
-                  <span className="relative w-2.5 h-2.5 rounded-full bg-green-500" />
-                </span>
-                זמין במלאי
-              </p>
-            )}
-
             {/* Specs chips */}
             <div className="flex flex-wrap gap-2 mb-6">
+              {product.in_stock && <Chip icon={CircleCheck} tone="green">זמין במלאי</Chip>}
               {product.weight && <Chip icon={Pill} tone="cyan">{product.weight}</Chip>}
               {product.servings && <Chip icon={Layers} tone="violet">{product.servings} מנות</Chip>}
               {product.serving_size && <Chip icon={Scale} tone="amber">{product.serving_size} / מנה</Chip>}
@@ -257,6 +247,7 @@ const CHIP_TONES = {
   cyan: "bg-cyan/10 border-cyan/30 text-cyan",
   violet: "bg-violet-500/10 border-violet-400/30 text-violet-300",
   amber: "bg-amber-500/10 border-amber-400/30 text-amber-300",
+  green: "bg-green-500/10 border-green-400/30 text-green-400",
 } as const;
 
 function Chip({
