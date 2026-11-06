@@ -85,7 +85,7 @@ export function ProductDetailClient({
                 <ProductAutoBadges product={product} />
               </div>
               {product.badge && (
-                <div className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-xl bg-cyan text-navy-900 font-black text-sm shadow-cyan inline-flex items-center gap-1.5">
+                <div className={`absolute top-4 right-4 z-30 px-3 py-1.5 rounded-xl font-black text-sm inline-flex items-center gap-1.5 ${product.badge === "במבצע" ? "bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.45)]" : "bg-cyan text-navy-900 shadow-cyan"}`}>
                   {product.badge === "במבצע" && <Percent className="w-4 h-4" aria-hidden="true" />}{product.badge}
                 </div>
               )}
