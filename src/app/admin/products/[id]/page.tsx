@@ -4,9 +4,9 @@ import { supabase } from "@/lib/auth";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Loader2, Save, Upload, X } from "lucide-react";
+import { ArrowRight, Loader2, Save, Upload, X, PackageCheck, Star, Flame, Percent } from "lucide-react";
 import toast from "react-hot-toast";
-import { ProductAutoBadges } from "@/components/shop/ProductAutoBadges";
+import { ProductAutoBadges, TagChip, TAG_GRID } from "@/components/shop/ProductAutoBadges";
 import { BESTSELLER_BADGE } from "@/lib/utils";
 
 const empty = {
@@ -149,27 +149,18 @@ export default function AdminProductEdit() {
               </select>
             </div>
           </div>
-          <ProductAutoBadges product={form} admin onChangeTags={(tags) => set("tags", tags)} />
-          <div className="flex flex-wrap gap-6">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.in_stock} onChange={e => set("in_stock", e.target.checked)} className="w-4 h-4 accent-cyan" />
-              <span className="text-white/70 text-sm font-medium">במלאי</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.featured} onChange={e => set("featured", e.target.checked)} className="w-4 h-4 accent-cyan" />
-              <span className="text-white/70 text-sm font-medium">מוצר מומלץ</span>
-            </label>
-            {[BESTSELLER_BADGE, "במבצע"].map((badge) => (
-              <label key={badge} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.badge === badge}
-                  onChange={e => set("badge", e.target.checked ? badge : "")}
-                  className="w-4 h-4 accent-cyan"
-                />
-                <span className="text-white/70 text-sm font-medium">{badge}</span>
-              </label>
-            ))}
+          <div className="space-y-2">
+            <p className="text-white/60 text-sm font-semibold">מצב ותגית ראשית</p>
+            <div className={TAG_GRID}>
+              <TagChip label="במלאי" icon={PackageCheck} hex="#22C55E" checked={form.in_stock} onChange={v => set("in_stock", v)} />
+              <TagChip label="מוצר מומלץ" icon={Star} hex="#00D4FF" checked={form.featured} onChange={v => set("featured", v)} />
+              <TagChip label={BESTSELLER_BADGE} icon={Flame} hex="#A78BFA" checked={form.badge === BESTSELLER_BADGE} onChange={v => set("badge", v ? BESTSELLER_BADGE : "")} />
+              <TagChip label="במבצע" icon={Percent} hex="#EF4444" checked={form.badge === "במבצע"} onChange={v => set("badge", v ? "במבצע" : "")} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-white/60 text-sm font-semibold">תגיות על תמונת המוצר</p>
+            <ProductAutoBadges product={form} admin onChangeTags={(tags) => set("tags", tags)} />
           </div>
           <p className="text-white/40 text-xs">
             ניתן לבחור תגית אחת: הנמכר ביותר או במבצע. היא תוצג בכרטיס המוצר ובעמוד המוצר.
