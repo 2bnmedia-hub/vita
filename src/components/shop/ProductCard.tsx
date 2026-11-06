@@ -47,9 +47,6 @@ export function ProductCard({ product }: ProductCardProps) {
         {product.badge === "במבצע" && (
           <span className={`${TAG_BASE} ${SALE_TAG}`}>במבצע</span>
         )}
-        <div className="flex flex-row gap-1.5 empty:hidden">
-          <ProductAutoBadges product={product} />
-        </div>
         {product.badge && product.badge !== "במבצע" && (
           <span className={product.badge === BESTSELLER_BADGE ? `${TAG_BASE} ${BESTSELLER_TAG}` : "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan text-navy-900 text-xs font-black shadow-cyan-sm"}>
             {product.badge === BESTSELLER_BADGE && <Flame className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -81,6 +78,11 @@ export function ProductCard({ product }: ProductCardProps) {
               (e.target as HTMLImageElement).src = PLACEHOLDER;
             }}
           />
+
+          {/* New / limited-stock tags: bottom-right of the image */}
+          <div className="absolute bottom-3 right-3 z-30 flex flex-row gap-1.5 empty:hidden">
+            <ProductAutoBadges product={product} />
+          </div>
 
           {/* Scan line */}
           <div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
