@@ -155,8 +155,12 @@ export function ProductDetailClient({
             </div>
 
             {/* Specs chips */}
+            {product.in_stock && (
+              <div className="mb-3">
+                <Chip icon={CircleCheck} tone="green">זמין במלאי</Chip>
+              </div>
+            )}
             <div className="flex flex-wrap gap-2 mb-6">
-              {product.in_stock && <Chip icon={CircleCheck} tone="green">זמין במלאי</Chip>}
               {product.weight && <Chip icon={Pill} tone="cyan">{product.weight}</Chip>}
               {product.servings && <Chip icon={Layers} tone="violet">{product.servings} מנות</Chip>}
               {product.serving_size && <Chip icon={Scale} tone="amber">{product.serving_size} / מנה</Chip>}
