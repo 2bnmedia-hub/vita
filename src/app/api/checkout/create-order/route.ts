@@ -224,13 +224,19 @@ export async function POST(req: NextRequest) {
   const insertOrder = (row: Record<string, unknown>) =>
     supabase.from("orders").insert([row]).select().single();
   let { data: order, error: insertError } = await insertOrder(isCod ? { ...baseRow, payment_method: "cod" } : baseRow);
-  // ponytail: COD before supabase-cod-migration.sql is applied — the payment_method
-  // column is missing, so store the order without it (payment_status 'cod_pending'
-  // still marks it as COD) and skip the stock RPC. Remove once the migration runs.
+  // ponytail: COD before supabase-cod-migration.sql is applied. Prod lacks the
+  // payment_method column and its payment_status check rejects 'cod_pending', so
+  // store a plain 'pending' order flagged as COD in its notes (no Tranzila call
+  // ever touches it) and skip the stock RPC — stock is updated by hand meanwhile.
+  // Remove this block once the migration runs.
   let codLegacy = false;
-  if (isCod && insertError && /payment_method/.test(insertError.message ?? "")) {
+  if (isCod && insertError && (insertError.code === "PGRST204" || /payment_method/.test(insertError.message ?? ""))) {
     codLegacy = true;
-    ({ data: order, error: insertError } = await insertOrder(baseRow));
+    ({ data: order, error: insertError } = await insertOrder({
+      ...baseRow,
+      payment_status: "pending",
+      notes: `[תשלום לשליח]${notes ? " " + notes : ""}`,
+    }));
   }
 
   if (insertError || !order) {
